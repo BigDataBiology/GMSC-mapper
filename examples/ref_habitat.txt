@@ -1,0 +1,29 @@
+k141_52_1	human gut
+k141_16_1	human gut
+k141_36_1	human gut
+k141_91_1	soil
+k141_72_1	marine
+k141_11_1	lake associated
+k141_80_3	water associated
+k141_80_4	termite gut
+k141_15_1	isolate
+k141_58_1	river associated
+k141_84_1	marine,water associated
+k141_84_2	marine,wastewater,water associated
+k141_54_1	wastewater
+k141_74_2	human gut,isolate
+k141_74_3	soil
+k141_89_1	soil
+k141_49_1	soil
+k141_92_2	marine
+k141_92_3	marine
+k141_37_1	lake associated,water associated
+k141_61_4	marine,water associated
+k141_61_5	lake associated,river associated
+k141_33_1	plant associated
+k141_33_4	coral associated,marine
+k141_38_1	annelidae associated
+k141_31_1	built environment
+k141_87_1	chicken gut
+k141_87_4	anthropogenic
+k141_87_5	built environment,human skin
