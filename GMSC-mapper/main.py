@@ -18,7 +18,6 @@ def parse_args(args):
                         dest='genome_fasta',
                         default = None)
 
-    #how to process nucleotide sequences
     parser.add_argument('--nt-genes', '--nt_genes',
                         required=False,
                         help='Path to the input nucleotide sequence FASTA file.',
@@ -168,6 +167,13 @@ def predict_smorf(args):
     print('\nsmORF prediction has done.\n')
     return path.join(args.output,"predicted_smorf/macrel.out.smorfs.faa")
 
+def translate_gene(args,tmpdir):
+    print('Start gene translation...')
+    from translate import translate_gene
+    translated_file = translate_gene(args,tmpdir)
+    print('Gene translation has done.')
+    return translated_file
+
 def mapdb_diamond(args,queryfile):
     print('Start smORF mapping...')
 
@@ -313,7 +319,9 @@ def main(args=None):
                 queryfile = predict_smorf(args)
                 smorf_number = int(predicted_smorf_count(queryfile)/2)
                 summary.append(f'{str(smorf_number)} smORFs are predicted in total.')
-
+            if args.nt_input:
+                args.nt_input = uncompress(args.nt_input,tmpdir)
+                queryfile = translate_gene(args,tmpdir)  
             if args.aa_input:
                 args.aa_input = uncompress(args.aa_input,tmpdir)
                 queryfile = args.aa_input

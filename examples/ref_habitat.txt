@@ -27,3 +27,13 @@ k141_31_1	built environment
 k141_87_1	chicken gut
 k141_87_4	anthropogenic
 k141_87_5	built environment,human skin
+GMSC10.90AA.000_000_000_000	marine
+GMSC10.90AA.000_000_000_001	lake associated
+GMSC10.90AA.000_000_000_002	marine
+GMSC10.90AA.000_000_000_003	water associated
+GMSC10.90AA.000_000_000_004	termite gut
+GMSC10.90AA.000_000_000_005	termite gut
+GMSC10.90AA.000_000_000_006	marine
+GMSC10.90AA.000_000_000_007	marine
+GMSC10.90AA.000_000_000_008	marine
+GMSC10.90AA.000_000_000_009	marine,isolate
