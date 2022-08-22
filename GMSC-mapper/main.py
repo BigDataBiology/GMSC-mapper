@@ -69,6 +69,12 @@ def parse_args(args):
                         dest='evalue',
                         default=0.00001)
 
+    parser.add_argument('--outfmt', '--outfmt',
+                        required=False,
+                        help='Output format of alignment result.',
+                        dest='outfmt',
+                        default=None)   
+
     parser.add_argument('--habitat', '--habitat',
                         required=False,
                         help='Path to the habitat file',
@@ -94,7 +100,7 @@ def parse_args(args):
                         required=True,
                         help='Output directory (will be created if non-existent)',
                         dest='output',
-                        default = None)	
+                        default=None)	
 
     parser.add_argument('-t', '--threads',
                         required=False,
@@ -134,7 +140,14 @@ def validate_args(args):
 
     if args.quality is not None:
         expect_file(args.quality)
-
+ 
+def flatten(items, ignore_types=(str, bytes)):
+    from collections.abc import Iterable
+    for x in items:
+        if isinstance(x, Iterable) and not isinstance(x, ignore_types):
+            yield from flatten(x)
+        else:
+            yield x
 
 def uncompress(input,tmpdir):
     import bz2
@@ -188,7 +201,7 @@ def mapdb_diamond(args,queryfile):
 
     resultfile = path.join(args.output,"diamond.out.smorfs.tsv")
 
-    subprocess.check_call([
+    subprocess.check_call([x for x in flatten([
         'diamond','blastp',
         '-q',queryfile,
         '-d',args.database,
@@ -198,10 +211,8 @@ def mapdb_diamond(args,queryfile):
         '--id',str(args.identity*100),
         '--query-cover',str(args.coverage*100),
         '--subject-cover',str(args.coverage*100),
-        #'--outfmt','6 qseqid full_qseq qlen sseqid full_sseq slen pident length evalue qcovhsp scovhsp',can't work 
-        # Value 6 may be followed by a space-separated list of these keywords: how to accept this parameter from command
-        '--outfmt','6','qseqid','full_qseq','qlen','sseqid','full_sseq','slen','pident','length','evalue','qcovhsp','scovhsp',
-        '-p',str(args.threads)])  
+        '-p',str(args.threads),
+		'--outfmt',args.outfmt.split(',')])])  
 
     print('\nsmORF mapping has done.\n')
     return resultfile
@@ -235,7 +246,7 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
         args.database,
         resultdb,
         resultfile,
-        '--format-output',"query,qseq,qlen,target,tseq,tlen,fident,alnlen,evalue,qcov,tcov"])		
+		'--format-output',args.outfmt])		
 
     print('\nsmORF mapping has done.\n')
     return resultfile
@@ -308,11 +319,15 @@ def main(args=None):
             args.sensitivity = 'very-sensitive'
         if args.sensitivity == '7':
             args.sensitivity = 'ultra-sensitive'
+        if args.outfmt is None:
+           args.outfmt = '6,qseqid,full_qseq,qlen,sseqid,full_sseq,slen,pident,length,evalue,qcovhsp,scovhsp'
     if args.tool == 'mmseqs':
         if args.database is None:
             args.database = path.join(_ROOT, 'example/example_mmseqs_db')
         if args.sensitivity is None:
             args.sensitivity = 5.7
+        if args.outfmt is None:
+            args.outfmt = 'query,qseq,qlen,target,tseq,tlen,fident,alnlen,evalue,qcov,tcov'
 
     validate_args(args)
 
