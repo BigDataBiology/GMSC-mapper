@@ -5,7 +5,7 @@ def smorf_quality(args,resultfile):
     quality_file = path.join(args.output,"quality.out.smorfs.tsv")	
 
     result = pd.read_csv(resultfile, sep='\t',header=None)
-    result.columns = ['qseqid','full_qseq','qlen','sseqid','full_sseq','slen','pident','length','evalue','qcovhsp','scovhsp']
+    result = result.rename(columns={0:'qseqid',1:'sseqid'})
     ref_quality = pd.read_csv(args.quality, sep='\t',header=None)
     ref_quality.columns = ['sseqid']
     ref_quality['quality'] = 'high quality'

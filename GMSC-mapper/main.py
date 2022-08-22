@@ -320,15 +320,15 @@ def main(args=None):
         if args.sensitivity == '7':
             args.sensitivity = 'ultra-sensitive'
         if args.outfmt is None:
-           args.outfmt = '6,qseqid,full_qseq,qlen,sseqid,full_sseq,slen,pident,length,evalue,qcovhsp,scovhsp'
+           args.outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp'
     if args.tool == 'mmseqs':
         if args.database is None:
             args.database = path.join(_ROOT, 'example/example_mmseqs_db')
         if args.sensitivity is None:
             args.sensitivity = 5.7
         if args.outfmt is None:
-            args.outfmt = 'query,qseq,qlen,target,tseq,tlen,fident,alnlen,evalue,qcov,tcov'
-
+            args.outfmt = 'query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov'
+			
     validate_args(args)
 
     if not os.path.exists(args.output):

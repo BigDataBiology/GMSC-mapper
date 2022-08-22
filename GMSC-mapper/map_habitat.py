@@ -7,7 +7,7 @@ def smorf_habitat(args,resultfile):
     habitat_file = path.join(args.output,"habitat.out.smorfs.tsv")	
 
     result = pd.read_csv(resultfile, sep='\t',header=None)
-    result.columns = ['qseqid','full_qseq','qlen','sseqid','full_sseq','slen','pident','length','evalue','qcovhsp','scovhsp']
+    result = result.rename(columns={0:'qseqid',1:'sseqid'})
     ref_habitat = pd.read_csv(args.habitat, sep='\t',header=None)
     ref_habitat.columns = ['sseqid','habitat']
 
