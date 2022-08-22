@@ -12,13 +12,19 @@ Command line tool to query the Global Microbial smORFs Catalog (GMSC)
 python3 main.py -i example.fa -o output
 ```
 
-2. Input is protein sequences
+2. Input is amino acid sequences.
 
 ```bash
 python3 main.py --aa-genes example.faa -o output
 ```
 
-### GMSC database/habitat/taxonomy/quality file path can be assigned on your own
+3. Input is nucleotide gene sequences.
+
+```bash
+python3 main.py --nt-genes example.fna -o output
+```
+
+### GMSC database/habitat/taxonomy/quality file path can be assigned on your own after you download them.
 ```bash
 python3 main.py -i example.fa -o output --db exampledb.dmnd
 ```
@@ -56,6 +62,10 @@ The output folder will contain
 
 * `--aa-genes`: Path to the input amino acid sequence FASTA file (possibly .gz/.bz2/.xz compressed).
 
+* `--nt-genes`: Path to the input nucleotide gene sequence FASTA file (possibly .gz/.bz2/.xz compressed).
+
+* `--nofilter`: Use this if no need to filter <100aa input sequences.
+
 * `-o/--output`: Output directory (will be created if non-existent).
 
 * `--tool`: Sequence alignment tool(Diamond/MMseqs).
@@ -67,6 +77,14 @@ The output folder will contain
 * `--cov`: Minimum coverage to report an alignment(range 0.0-1.0).
 
 * `-e/--evalue`: Maximum e-value to report alignments(default=0.00001).
+
+* `--outfmt`: Output format of alignment result.
+
+(Diamond default is "6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp".
+
+MMseqs default is "query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov".
+
+The first two column in result format of Diamond/MMseqs must be "qseqid"/"query" and "sseqid"/"target".)
 
 * `--habitat`: Path to the habitat file.
 
@@ -81,5 +99,3 @@ The output folder will contain
 * `--noquality`: Use this if no need to annotate quality.
 
 * `-t/--threads`: Number of CPU threads(default=3).
-
-

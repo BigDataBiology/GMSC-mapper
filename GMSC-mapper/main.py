@@ -20,7 +20,7 @@ def parse_args(args):
 
     parser.add_argument('--nt-genes', '--nt_genes',
                         required=False,
-                        help='Path to the input nucleotide sequence FASTA file.',
+                        help='Path to the input nucleotide gene sequence FASTA file.',
                         dest='nt_input',
                         default=None)
 
@@ -30,7 +30,7 @@ def parse_args(args):
                         dest='aa_input',
                         default=None)
 
-    parser.add_argument('--nofilter','--nofilter',action='store_true', help='Use this if no need to filter input sequences')
+    parser.add_argument('--nofilter','--nofilter',action='store_true', help='Use this if no need to filter <100aa input sequences')
 
     parser.add_argument('--tool', '--tool',
                         required=False,
@@ -328,7 +328,7 @@ def main(args=None):
             args.sensitivity = 5.7
         if args.outfmt is None:
             args.outfmt = 'query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov'
-			
+
     validate_args(args)
 
     if not os.path.exists(args.output):
