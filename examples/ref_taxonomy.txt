@@ -27,3 +27,13 @@ k141_31_1	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Oscillospirales
 k141_87_1	d__Bacteria;p__Actinobacteriota;c__Thermoleophilia;o__Solirubrobacterales;f__Solirubrobacteraceae;g__Solirubrobacter
 k141_87_4	d__Bacteria;p__Actinobacteriota;c__Actinomycetia
 k141_87_5	
+GMSC10.90AA.000_000_000_000
+GMSC10.90AA.000_000_000_001
+GMSC10.90AA.000_000_000_002	d__Bacteria
+GMSC10.90AA.000_000_000_003           d__Bacteria;p__Firmicutes_A
+GMSC10.90AA.000_000_000_004
+GMSC10.90AA.000_000_000_005	d__Bacteria;p__Actinobacteriota;c__Actinomycetia;o__Actinomycetales;f__Microbacteriaceae;g__Microbacterium;s__Microbacterium sp003476465
+GMSC10.90AA.000_000_000_006	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Lachnospirales;f__Lachnospiraceae;g__Enterocloster;s__Enterocloster sp900551225
+GMSC10.90AA.000_000_000_007
+GMSC10.90AA.000_000_000_008	d__Bacteria
+GMSC10.90AA.000_000_000_009

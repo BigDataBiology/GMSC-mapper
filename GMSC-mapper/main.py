@@ -18,7 +18,6 @@ def parse_args(args):
                         dest='genome_fasta',
                         default = None)
 
-    #how to process nucleotide sequences
     parser.add_argument('--nt-genes', '--nt_genes',
                         required=False,
                         help='Path to the input nucleotide sequence FASTA file.',
@@ -30,6 +29,8 @@ def parse_args(args):
                         help='Path to the input amino acid sequence FASTA file.',
                         dest='aa_input',
                         default=None)
+
+    parser.add_argument('--nofilter','--nofilter',action='store_true', help='Use this if no need to filter input sequences')
 
     parser.add_argument('--tool', '--tool',
                         required=False,
@@ -167,6 +168,20 @@ def predict_smorf(args):
         '--keep-fasta-headers'])
     print('\nsmORF prediction has done.\n')
     return path.join(args.output,"predicted_smorf/macrel.out.smorfs.faa")
+
+def translate_gene(args,tmpdir):
+    from translate import translate_gene
+    print('Start gene translation...')
+    translated_file = translate_gene(args,tmpdir)
+    print('Gene translation has done.')
+    return translated_file
+
+def filter_length(queryfile,tmpdir,N):
+    print('Start length filter...')
+    from filter_length import filter_length
+    filtered_file = filter_length(queryfile,tmpdir,N)
+    print('Length filter has done.')
+    return filtered_file
 
 def mapdb_diamond(args,queryfile):
     print('Start smORF mapping...')
@@ -313,9 +328,15 @@ def main(args=None):
                 queryfile = predict_smorf(args)
                 smorf_number = int(predicted_smorf_count(queryfile)/2)
                 summary.append(f'{str(smorf_number)} smORFs are predicted in total.')
-
+            if args.nt_input:
+                args.nt_input = uncompress(args.nt_input,tmpdir)
+                if not args.nofilter:
+                    args.nt_input = filter_length(args.nt_input,tmpdir,303)
+                queryfile = translate_gene(args,tmpdir)  
             if args.aa_input:
                 args.aa_input = uncompress(args.aa_input,tmpdir)
+                if not args.nofilter:
+                    args.aa_input = filter_length(args.aa_input,tmpdir,100)
                 queryfile = args.aa_input
 
             if args.tool == 'diamond':
