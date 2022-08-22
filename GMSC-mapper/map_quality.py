@@ -17,7 +17,11 @@ def smorf_quality(args,resultfile):
 
     number_dict = dict(output['quality'].value_counts())
     number_dict_normalize = dict(output['quality'].value_counts(normalize=True))
-    number = number_dict['high quality']
-    percentage = number_dict_normalize['high quality']
+    if "high quality" in number_dict.keys():
+        number = number_dict['high quality']
+        percentage = number_dict_normalize['high quality']
+    else:
+        number = 0
+        percentage = 0
     output.to_csv(quality_file,sep='\t',index=False)
     return number,percentage
