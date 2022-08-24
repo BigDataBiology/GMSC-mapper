@@ -7,7 +7,7 @@ import pandas as pd
 import tempfile
 from atomicwrites import atomic_write
 
-_ROOT = path.abspath(path.dirname(__file__))
+_ROOT = path.abspath(path.join(os.getcwd(), ".."))
 
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -79,21 +79,21 @@ def parse_args(args):
                         required=False,
                         help='Path to the habitat file',
                         dest='habitat',
-                        default=path.join(_ROOT, 'example/ref_habitat.txt'))
+                        default=path.join(_ROOT, 'examples/ref_habitat.txt'))
     parser.add_argument('--nohabitat','--nohabitat',action='store_true', help='Use this if no need to annotate habitat')
 
     parser.add_argument('--taxonomy', '--taxonomy',
                         required=False,
                         help='Path to the taxonomy file',
                         dest='taxonomy',
-                        default=path.join(_ROOT, 'example/ref_taxonomy.txt'))
+                        default=path.join(_ROOT, 'examples/ref_taxonomy.txt'))
     parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
 
     parser.add_argument('--quality', '--quality',
                         required=False,
                         help='Path to the quality file',
                         dest='quality',
-                        default=path.join(_ROOT, 'example/ref_quality.txt'))
+                        default=path.join(_ROOT, 'examples/ref_quality.txt'))
     parser.add_argument('--noquality', '--noquality',action='store_true', help='Use this if no need to annotate quality')
 
     parser.add_argument('-o', '--output',
@@ -302,7 +302,7 @@ def main(args=None):
 
     if args.tool == 'diamond':
         if args.database is None:
-            args.database = path.join(_ROOT, 'example/example_diamond_db.dmnd')	
+            args.database = path.join(_ROOT, 'examples/example_diamond_db.dmnd')	
         if args.sensitivity is None:
             args.sensitivity = '--more-sensitive'
         if args.sensitivity == '1':
@@ -323,7 +323,7 @@ def main(args=None):
            args.outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp'
     if args.tool == 'mmseqs':
         if args.database is None:
-            args.database = path.join(_ROOT, 'example/example_mmseqs_db')
+            args.database = path.join(_ROOT, 'examples/example_mmseqs_db')
         if args.sensitivity is None:
             args.sensitivity = 5.7
         if args.outfmt is None:
