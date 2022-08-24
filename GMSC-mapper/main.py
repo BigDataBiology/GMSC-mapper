@@ -168,19 +168,15 @@ def uncompress(input,tmpdir):
     print('\nUncompression has done.\n')
     return input
 
-def predict_smorf(args):
+def predict(args):
+    from predict import predict_genes,filter_smorfs
     print('Start smORF prediction...')
-
-    outdir = path.join(args.output,"predicted_smorf")
-
-    subprocess.check_call([
-        'macrel','get-smorfs',
-        '--fasta',args.genome_fasta,
-        '--output',outdir,
-        '--cluster',
-        '--keep-fasta-headers'])
+    predicted_smorf = path.join(args.output,"predicted.smorf.faa")
+    filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
+    predict_genes(args.genome_fasta,predicted_smorf)
+    filter_smorfs(predicted_smorf, filtered_smorf)
     print('\nsmORF prediction has done.\n')
-    return path.join(args.output,"predicted_smorf/macrel.out.smorfs.faa")
+    return filtered_smorf
 
 def translate_gene(args,tmpdir):
     from translate import translate_gene
@@ -340,7 +336,7 @@ def main(args=None):
             summary.append(f'# Total number\n')
             if args.genome_fasta:
                 args.genome_fasta = uncompress(args.genome_fasta,tmpdir)
-                queryfile = predict_smorf(args)
+                queryfile = predict(args)
                 smorf_number = int(predicted_smorf_count(queryfile)/2)
                 summary.append(f'{str(smorf_number)} smORFs are predicted in total.')
             if args.nt_input:
