@@ -2,29 +2,28 @@ qseqid	habitat
 smORF_0	human gut
 smORF_1	human gut
 smORF_2	human gut
-smORF_3	soil
-smORF_4	marine
-smORF_5	lake associated
-smORF_6	water associated
-smORF_7	termite gut
-smORF_8	isolate
-smORF_9	river associated
-smORF_10	marine,water associated
-smORF_11	marine,wastewater,water associated
-smORF_12	wastewater
-smORF_13	human gut,isolate
-smORF_14	soil
+smORF_5	marine
+smORF_6	lake associated
+smORF_7	water associated
+smORF_8	termite gut
+smORF_9	isolate
+smORF_10	river associated
+smORF_11	marine,water associated
+smORF_12	marine,wastewater,water associated
+smORF_13	wastewater
+smORF_14	human gut,isolate
 smORF_15	soil
 smORF_16	soil
-smORF_17	marine
+smORF_17	soil
 smORF_18	marine
-smORF_19	lake associated,water associated
-smORF_20	marine,water associated
-smORF_21	lake associated,river associated
-smORF_22	plant associated
-smORF_23	coral associated,marine
-smORF_24	annelidae associated
-smORF_25	built environment
-smORF_26	chicken gut
-smORF_27	anthropogenic
-smORF_28	built environment,human skin
+smORF_19	marine
+smORF_20	lake associated,water associated
+smORF_21	marine,water associated
+smORF_22	lake associated,river associated
+smORF_24	plant associated
+smORF_25	coral associated,marine
+smORF_26	annelidae associated
+smORF_27	built environment
+smORF_28	chicken gut
+smORF_29	anthropogenic
+smORF_30	built environment,human skin
