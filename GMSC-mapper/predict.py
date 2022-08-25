@@ -58,11 +58,11 @@ def filter_smorfs(ifile, ofile):
     from utils import open_output  
     seen = set()
     with open_output(ofile, mode='wt') as output:
-        for h,seq in fasta_iter(ifile):
+        for h,seq in fasta_iter(ifile,full_header=True):
             if len(seq) > 100: 
                 continue
             if seq in seen: 
                 continue
-            h = 'smORF_{}'.format(len(seen))
+            h = f'smORF_{len(seen)} # {h}'
             seen.add(seq)
             output.write(">{}\n{}\n".format(h,seq))

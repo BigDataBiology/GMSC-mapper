@@ -168,10 +168,10 @@ def uncompress(input,tmpdir):
     print('\nUncompression has done.\n')
     return input
 
-def predict(args):
+def predict(args,tmpdir):
     from predict import predict_genes,filter_smorfs
     print('Start smORF prediction...')
-    predicted_smorf = path.join(args.output,"predicted.smorf.faa")
+    predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
     predict_genes(args.genome_fasta,predicted_smorf)
     filter_smorfs(predicted_smorf, filtered_smorf)
@@ -336,7 +336,7 @@ def main(args=None):
             summary.append(f'# Total number\n')
             if args.genome_fasta:
                 args.genome_fasta = uncompress(args.genome_fasta,tmpdir)
-                queryfile = predict(args)
+                queryfile = predict(args,tmpdir)
                 smorf_number = int(predicted_smorf_count(queryfile)/2)
                 summary.append(f'{str(smorf_number)} smORFs are predicted in total.')
             if args.nt_input:
