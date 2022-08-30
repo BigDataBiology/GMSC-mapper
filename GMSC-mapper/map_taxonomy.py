@@ -1,18 +1,39 @@
-# how to solve memory/time consuming
-# adapt to different format(.xz .gz)
 from os import path
 import pandas as pd
 
+#def smorf_taxonomy(args,resultfile,tmpdirname):
+#    taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv")	
+
+#    result = pd.read_csv(resultfile, sep='\t',header=None)
+#    result = result.rename(columns={0:'qseqid',1:'sseqid'})
+#    ref_taxonomy = pd.read_csv(args.taxonomy, sep='\t',header=None)
+#    ref_taxonomy.columns = ['sseqid','taxonomy']
+
+#    output = pd.merge(result,ref_taxonomy,how='left')[['qseqid', 'sseqid','taxonomy']]
+#    output.to_csv(taxonomy_file,sep='\t',index=False)
+#    return taxonomy_file
+
 def smorf_taxonomy(args,resultfile,tmpdirname):
+    import sqlite3
+    print('Start taxonomy mapping...')
     taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv")	
-
-    result = pd.read_csv(resultfile, sep='\t',header=None)
-    result = result.rename(columns={0:'qseqid',1:'sseqid'})
-    ref_taxonomy = pd.read_csv(args.taxonomy, sep='\t',header=None)
-    ref_taxonomy.columns = ['sseqid','taxonomy']
-
-    output = pd.merge(result,ref_taxonomy,how='left')[['qseqid', 'sseqid','taxonomy']]
-    output.to_csv(taxonomy_file,sep='\t',index=False)
+    conn = sqlite3.connect(args.taxonomy)
+    tax = sqlite3.connect(':memory:')
+    conn.backup(tax)
+    conn.close()
+    cursorObj = tax.cursor()
+    
+    with open(taxonomy_file,"wt") as out:
+        with open(resultfile,"rt") as f:
+            for line in f:
+                linelist = line.strip().split("\t")
+                sseqid = int(linelist[1].split('.')[2].replace("_",""))
+                sql = f'SELECT * FROM taxonomy WHERE smorf = "{sseqid}"'
+                cursorObj.execute(sql)
+                searched = cursorObj.fetchone()
+                out.write(f'{linelist[0]}\t{str(searched[0])}\t{searched[1]}\n')
+    tax.close()
+    print('Finish taxonomy mapping.')
     return taxonomy_file
 
 def add_taxa_to_sseqid(taxa,linelist,original_tax,sseqid):

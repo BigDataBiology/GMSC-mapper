@@ -1,39 +1,89 @@
-k141_52_1	human gut
-k141_16_1	human gut
-k141_36_1	human gut
-k141_91_1	soil
-k141_72_1	marine
-k141_11_1	lake associated
-k141_80_3	water associated
-k141_80_4	termite gut
-k141_15_1	isolate
-k141_58_1	river associated
-k141_84_1	marine,water associated
-k141_84_2	marine,wastewater,water associated
-k141_54_1	wastewater
-k141_74_2	human gut,isolate
-k141_74_3	soil
-k141_89_1	soil
-k141_49_1	soil
-k141_92_2	marine
-k141_92_3	marine
-k141_37_1	lake associated,water associated
-k141_61_4	marine,water associated
-k141_61_5	lake associated,river associated
-k141_33_1	plant associated
-k141_33_4	coral associated,marine
-k141_38_1	annelidae associated
-k141_31_1	built environment
-k141_87_1	chicken gut
-k141_87_4	anthropogenic
-k141_87_5	built environment,human skin
-GMSC10.90AA.000_000_000_000	marine
-GMSC10.90AA.000_000_000_001	lake associated
-GMSC10.90AA.000_000_000_002	marine
-GMSC10.90AA.000_000_000_003	water associated
-GMSC10.90AA.000_000_000_004	termite gut
-GMSC10.90AA.000_000_000_005	termite gut
-GMSC10.90AA.000_000_000_006	marine
-GMSC10.90AA.000_000_000_007	marine
-GMSC10.90AA.000_000_000_008	marine
-GMSC10.90AA.000_000_000_009	marine,isolate
+GMSC10.90AA.000_000_000_000	human gut
+GMSC10.90AA.000_000_000_001	soil
+GMSC10.90AA.000_000_000_002	human gut
+GMSC10.90AA.000_000_000_003	marine
+GMSC10.90AA.000_000_000_004	human gut
+GMSC10.90AA.000_000_000_005	lake associated
+GMSC10.90AA.000_000_000_006	human gut
+GMSC10.90AA.000_000_000_007	water associated
+GMSC10.90AA.000_000_000_008	human gut
+GMSC10.90AA.000_000_000_009	termite gut
+GMSC10.90AA.000_000_000_010	human gut
+GMSC10.90AA.000_000_000_011	isolate
+GMSC10.90AA.000_000_000_012	human gut
+GMSC10.90AA.000_000_000_013	river associated
+GMSC10.90AA.000_000_000_014	human gut
+GMSC10.90AA.000_000_000_015	marine,water associated
+GMSC10.90AA.000_000_000_016	human gut
+GMSC10.90AA.000_000_000_017	marine,wastewater,water associated
+GMSC10.90AA.000_000_000_018	human gut
+GMSC10.90AA.000_000_000_019	wastewater
+GMSC10.90AA.000_000_000_020	human gut
+GMSC10.90AA.000_000_000_021	human gut,isolate
+GMSC10.90AA.000_000_000_022	human gut
+GMSC10.90AA.000_000_000_023	soil
+GMSC10.90AA.000_000_000_024	human gut
+GMSC10.90AA.000_000_000_025	soil
+GMSC10.90AA.000_000_000_026	human gut
+GMSC10.90AA.000_000_000_027	soil
+GMSC10.90AA.000_000_000_028	human gut
+GMSC10.90AA.000_000_000_029	marine
+GMSC10.90AA.000_000_000_030	human gut
+GMSC10.90AA.000_000_000_031	marine
+GMSC10.90AA.000_000_000_032	human gut
+GMSC10.90AA.000_000_000_033	lake associated,water associated
+GMSC10.90AA.000_000_000_034	human gut
+GMSC10.90AA.000_000_000_035	marine,water associated
+GMSC10.90AA.000_000_000_036	human gut
+GMSC10.90AA.000_000_000_037	lake associated,river associated
+GMSC10.90AA.000_000_000_038	human gut
+GMSC10.90AA.000_000_000_039	plant associated
+GMSC10.90AA.000_000_000_040	human gut
+GMSC10.90AA.000_000_000_041	coral associated,marine
+GMSC10.90AA.000_000_000_042	human gut
+GMSC10.90AA.000_000_000_043	annelidae associated
+GMSC10.90AA.000_000_000_044	human gut
+GMSC10.90AA.000_000_000_045	built environment
+GMSC10.90AA.000_000_000_046	human gut
+GMSC10.90AA.000_000_000_047	chicken gut
+GMSC10.90AA.000_000_000_048	human gut
+GMSC10.90AA.000_000_000_049	anthropogenic
+GMSC10.90AA.000_000_000_050	human gut
+GMSC10.90AA.000_000_000_051	built environment,human skin
+GMSC10.90AA.000_000_000_052	human gut
+GMSC10.90AA.000_000_000_053	marine
+GMSC10.90AA.000_000_000_054	human gut
+GMSC10.90AA.000_000_000_055	lake associated
+GMSC10.90AA.000_000_000_056	human gut
+GMSC10.90AA.000_000_000_057	marine
+GMSC10.90AA.000_000_000_058	human gut
+GMSC10.90AA.000_000_000_059	water associated
+GMSC10.90AA.000_000_000_060	human gut
+GMSC10.90AA.000_000_000_061	termite gut
+GMSC10.90AA.000_000_000_062	human gut
+GMSC10.90AA.000_000_000_063	termite gut
+GMSC10.90AA.000_000_000_064	human gut
+GMSC10.90AA.000_000_000_065	marine
+GMSC10.90AA.000_000_000_066	human gut
+GMSC10.90AA.000_000_000_067	marine
+GMSC10.90AA.000_000_000_068	human gut
+GMSC10.90AA.000_000_000_069	marine
+GMSC10.90AA.000_000_000_070	human gut
+GMSC10.90AA.000_000_000_071	marine,isolate
+GMSC10.90AA.000_000_000_072	human gut
+GMSC10.90AA.000_000_000_073	built environment
+GMSC10.90AA.000_000_000_074	human gut
+GMSC10.90AA.000_000_000_075	air
+GMSC10.90AA.000_000_000_076	human gut
+GMSC10.90AA.000_000_000_077	human skin
+GMSC10.90AA.000_000_000_078	human gut
+GMSC10.90AA.000_000_000_079	lake associated
+GMSC10.90AA.000_000_000_080	human gut
+GMSC10.90AA.000_000_000_081	water associated
+GMSC10.90AA.000_000_000_082	human gut
+GMSC10.90AA.000_000_000_083	human gut
+GMSC10.90AA.000_000_000_084	human gut
+GMSC10.90AA.000_000_000_085	water associated
+GMSC10.90AA.000_000_000_086	human gut
+GMSC10.90AA.000_000_000_087	water associated
+GMSC10.90AA.000_000_000_088	human gut

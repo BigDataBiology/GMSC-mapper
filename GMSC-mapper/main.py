@@ -277,7 +277,7 @@ def taxonomy(args,resultfile,tmpdirname):
     print('Start taxonomy annotation...')
     deep_lca(args,resultfile,tmpdirname)
     annotated_number,rank_number,rank_percentage = taxa_summary(args)
-    print('\ntaxonomy annotation has done.\n')
+    print('taxonomy annotation has done.\n')
     return annotated_number,rank_number,rank_percentage
 
 def quality(args,resultfile):
