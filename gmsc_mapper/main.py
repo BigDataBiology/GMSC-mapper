@@ -288,7 +288,7 @@ def taxonomy(args,resultfile,tmpdirname):
 def quality(args,resultfile):
     from map_quality import smorf_quality
     print('Start quality annotation...')
-    number,percentage = smorf_quality(args,resultfile)
+    number,percentage = smorf_quality(args.output,args.quality,resultfile)
     print('\nquality annotation has done.\n')
     return number,percentage
 
