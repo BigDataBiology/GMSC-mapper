@@ -13,11 +13,11 @@ import pandas as pd
 #    output.to_csv(taxonomy_file,sep='\t',index=False)
 #    return taxonomy_file
 
-def smorf_taxonomy(args,resultfile,tmpdirname):
+def smorf_taxonomy(taxonomyfile,resultfile,tmpdirname):
     import sqlite3
     print('Start taxonomy mapping...')
     taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv")	
-    conn = sqlite3.connect(args.taxonomy)
+    conn = sqlite3.connect(taxonomyfile)
     tax = sqlite3.connect(':memory:')
     conn.backup(tax)
     conn.close()
@@ -79,9 +79,9 @@ def compare_cluster(cluster,taxa,change,lastrank,out):
         else: #for sequence which doesn't have taxonomy
             out.write(f'{q_seqid}\n')     
 
-def deep_lca(args,resultfile,tmpdirname):
-    taxonomy_file = smorf_taxonomy(args,resultfile,tmpdirname)
-    taxonomy_dlca_file = path.join(args.output,"taxonomy.out.smorfs.tsv")
+def deep_lca(taxonomyfile,outdir,resultfile,tmpdirname):
+    taxonomy_file = smorf_taxonomy(taxonomyfile,resultfile,tmpdirname)
+    taxonomy_dlca_file = path.join(outdir,"taxonomy.out.smorfs.tsv")
 	
     cluster = {}
     taxa = {}
@@ -89,6 +89,7 @@ def deep_lca(args,resultfile,tmpdirname):
     lastrank = ""
 
     with open(taxonomy_dlca_file, "wt") as out:
+        out.write(f'q_seqid\ttaxonomy\n')
         with open(taxonomy_file,"rt") as f:
             for line in f:
                 linelist = line.strip().split("\t")
@@ -112,8 +113,8 @@ def deep_lca(args,resultfile,tmpdirname):
                 taxa = add_taxa_to_sseqid(taxa,linelist,original_tax,sseqid)
             compare_cluster(cluster,taxa,change,lastrank,out)                                            
 
-def taxa_summary(args):
-    taxonomy_dlca_file = path.join(args.output,"taxonomy.out.smorfs.tsv")
+def taxa_summary(outdir):
+    taxonomy_dlca_file = path.join(outdir,"taxonomy.out.smorfs.tsv")
     output = pd.read_csv(taxonomy_dlca_file, sep='\t')
     rank = {1:'kingdom',2:'phylum',3:'class',4:'order',5:'family',6:'genus',7:'species',8:'no rank'}
     number_dict = dict(output['taxonomy'].fillna(';;;;;;;').apply(lambda x: len(x.split(';'))).value_counts())
@@ -128,33 +129,4 @@ def taxa_summary(args):
             rank_number[rank[i]] = 0
             rank_percentage[rank[i]] = 0
     annotated_number = output['taxonomy'].size - rank_number['no rank']
-    return annotated_number,rank_number,rank_percentage
-
-
-
-'''
-def store_taxonomy(args):
-    import lzma
-    taxonomy_dict = {}
-    with open(args.taxonomy,"rt") as f:
-        for line in f:
-            linelist = line.strip().split("\t")
-            if len(linelist) == 2:
-                taxonomy_dict[linelist[0]] = linelist[1]
-            else:
-                taxonomy_dict[linelist[0]] = ""
-    return taxonomy_dict
-
-def map_taxonomy(args):
-    taxonomy_dict = store_taxonomy(args)
-    result_file = path.join(args.output,"diamond.out.smorfs.tsv")
-    taxonomy_mapped_file = path.join(args.output,"taxonomy.out.smorfs.tsv")
-
-    with open(taxonomy_mapped_file,"wt") as out:
-        with open(result_file,"rt") as f:
-            for line in f:
-                line = line.strip()
-                linelist = line.split("\t")
-                taxa = taxonomy_dict[linelist[3]]
-                out.write(f'{line}\t{taxa}\n') 
-'''			
+    return annotated_number,rank_number,rank_percentage			

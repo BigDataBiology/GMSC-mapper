@@ -280,8 +280,8 @@ def habitat(args,resultfile):
 def taxonomy(args,resultfile,tmpdirname):
     from map_taxonomy import deep_lca,taxa_summary
     print('Start taxonomy annotation...')
-    deep_lca(args,resultfile,tmpdirname)
-    annotated_number,rank_number,rank_percentage = taxa_summary(args)
+    deep_lca(args.taxonomy,args.output,resultfile,tmpdirname)
+    annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
     print('taxonomy annotation has done.\n')
     return annotated_number,rank_number,rank_percentage
 

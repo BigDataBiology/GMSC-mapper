@@ -2,3 +2,4 @@ GMSC10.90AA.000_000_000_080	human gut
 GMSC10.90AA.000_000_000_081	marine,wastewater,water associated
 GMSC10.90AA.000_000_000_082	soil
 GMSC10.90AA.000_000_000_086	marine,water associated
+GMSC10.90AA.000_000_000_013           soil
