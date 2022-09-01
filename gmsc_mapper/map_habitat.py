@@ -1,14 +1,12 @@
-# how to solve memory/time consuming
-# adapt to different format(.xz .gz)
 import pandas as pd
 from os import path
 
-def smorf_habitat(args,resultfile):
-    habitat_file = path.join(args.output,"habitat.out.smorfs.tsv")	
+def smorf_habitat(outdir,habitatfile,resultfile):
+    habitat_file = path.join(outdir,"habitat.out.smorfs.tsv")	
 
     result = pd.read_csv(resultfile, sep='\t',header=None)
     result = result.rename(columns={0:'qseqid',1:'sseqid'})
-    ref_habitat = pd.read_csv(args.habitat, sep='\t',header=None)
+    ref_habitat = pd.read_csv(habitatfile, sep='\t',header=None)
     ref_habitat.columns = ['sseqid','habitat']
 
     output = pd.merge(result,ref_habitat,how='left')[['qseqid', 'habitat']]
@@ -24,38 +22,3 @@ def smorf_habitat(args,resultfile):
 
     output.to_csv(habitat_file,sep='\t',index=False)
     return single_number,single_percentage,multi_number,multi_percentage
-
-# the same function in another way
-'''
-def store_habitat(args):
-    #import lzma
-    #habitat_dict = {}
-    #with open(args.habitat,"rt") as f:
-    #    for line in f:
-    #        seq,env = line.strip().split("\t")
-    #        habitat_dict[seq] = env
-    #print(habitat_dict)
-
-    ref_habitat = pd.read_csv(args.habitat, sep='\t',header=None)
-    ref_habitat.columns = ['smorf','env']
-    habitat_dict = dict(zip(ref_habitat['smorf'],ref_habitat['env']))
-    return habitat_dict
-
-def map_env(args):
-    from os import path
-    
-    habitat_dict = store_habitat(args)
-    result_file = path.join(args.output,"diamond.out.smorfs.tsv")
-    habitat_mapped_file = path.join(args.output,"habitat.out.smorfs.tsv") 
-    smorf_habitat = {}
-    with open(habitat_mapped_file,"wt") as out:
-        with open(result_file,"rt") as f:
-            for line in f:
-                linelist = line.strip().split("\t")
-                if linelist[0] not in smorf_habitat.keys():
-                    smorf_habitat[linelist[0]] = []
-                smorf_habitat[linelist[0]].append(habitat_dict[linelist[3]])
-        for key,value in smorf_habitat.items():
-            value = ','.join(list(set(','.join(value).split(','))))
-            out.write(f'{key}\t{value}\n')
-'''

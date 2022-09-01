@@ -1,7 +1,6 @@
 import sys
 sys.path.append("..")
 from gmsc_mapper.filter_length import filter_length
-from gmsc_mapper.fasta import fasta_iter
 import pytest
 import os
 

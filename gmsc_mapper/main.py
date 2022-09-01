@@ -253,13 +253,12 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
     print('\nsmORF mapping has done.\n')
     return resultfile
 
-def generate_fasta(args,queryfile,resultfile):
-    print('Start smORF fasta file generating...')
-
+def generate_fasta(output,queryfile,resultfile):
     import pandas as pd
     from fasta import fasta_iter
 
-    fastafile = path.join(args.output,"mapped.smorfs.faa")
+    print('Start smORF fasta file generating...')
+    fastafile = path.join(output,"mapped.smorfs.faa")
 
     result = pd.read_csv(resultfile, sep='\t',header=None)
     smorf_id = set(result.iloc[:, 0].tolist())
@@ -274,7 +273,7 @@ def generate_fasta(args,queryfile,resultfile):
 def habitat(args,resultfile):
     from map_habitat import smorf_habitat
     print('Start habitat annotation...')
-    single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args,resultfile)
+    single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.output,args.habitat,resultfile)
     print('\nhabitat annotation has done.\n')
     return single_number,single_percentage,multi_number,multi_percentage 
 
@@ -361,7 +360,7 @@ def main(args=None):
             if args.tool == 'mmseqs':
                 resultfile = mapdb_mmseqs(args,queryfile,tmpdir)
 
-            fastafile = generate_fasta(args,queryfile,resultfile)
+            fastafile = generate_fasta(args.output,queryfile,resultfile)
             smorf_number = int(predicted_smorf_count(fastafile)/2)
             summary.append(f'{str(smorf_number)} smORFs are aligned against GMSC in total.\n')
 
