@@ -86,7 +86,7 @@ def parse_args(args):
                         required=False,
                         help='Path to the taxonomy file',
                         dest='taxonomy',
-                        default=path.join(_ROOT, 'examples/ref_taxonomy.txt'))
+                        default=path.join(_ROOT, 'examples/taxonomy.db'))
     parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
 
     parser.add_argument('--quality', '--quality',
@@ -150,10 +150,16 @@ def flatten(items, ignore_types=(str, bytes)):
             yield x
 
 def uncompress(input,tmpdir):
+    import gzip
     import bz2
     import lzma
 
     print('Start uncompression...')
+
+    if input.endswith('.gz'):
+        with gzip.GzipFile(input) as ifile:
+            open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
+        input = tmpdir + '/input.fasta'
 
     if input.endswith('.bz2'):
         with bz2.BZ2File(input) as ifile:
