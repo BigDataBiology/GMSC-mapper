@@ -187,7 +187,7 @@ def predict(args,tmpdir):
 def translate_gene(args,tmpdir):
     from translate import translate_gene
     print('Start gene translation...')
-    translated_file = translate_gene(args,tmpdir)
+    translated_file = translate_gene(args.nt_input,tmpdir)
     print('Gene translation has done.')
     return translated_file
 
