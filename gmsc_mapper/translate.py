@@ -9,14 +9,14 @@ def check_frame(seq):
         seq = f'ATG{seq[3:]}'
     return seq
 
-def translate_gene(args,tmpdirname):
-    from fasta import fasta_iter
+def translate_gene(nt_input,tmpdirname):
+    from .fasta import fasta_iter
     from Bio.Seq import Seq
     from os import path
 
     translated_file = path.join(tmpdirname,"translated.faa")
     with open(translated_file,'wt') as of:
-        for ID,seq in fasta_iter(args.nt_input):
+        for ID,seq in fasta_iter(nt_input):
             seq = check_frame(seq)
             translated_seq = Seq(seq).translate()
             of.write(f'>{ID}\n{translated_seq}\n')

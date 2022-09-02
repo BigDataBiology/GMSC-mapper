@@ -86,7 +86,7 @@ def parse_args(args):
                         required=False,
                         help='Path to the taxonomy file',
                         dest='taxonomy',
-                        default=path.join(_ROOT, 'examples/ref_taxonomy.txt'))
+                        default=path.join(_ROOT, 'examples/taxonomy.db'))
     parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
 
     parser.add_argument('--quality', '--quality',
@@ -150,10 +150,16 @@ def flatten(items, ignore_types=(str, bytes)):
             yield x
 
 def uncompress(input,tmpdir):
+    import gzip
     import bz2
     import lzma
 
     print('Start uncompression...')
+
+    if input.endswith('.gz'):
+        with gzip.GzipFile(input) as ifile:
+            open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
+        input = tmpdir + '/input.fasta'
 
     if input.endswith('.bz2'):
         with bz2.BZ2File(input) as ifile:
@@ -181,7 +187,7 @@ def predict(args,tmpdir):
 def translate_gene(args,tmpdir):
     from translate import translate_gene
     print('Start gene translation...')
-    translated_file = translate_gene(args,tmpdir)
+    translated_file = translate_gene(args.nt_input,tmpdir)
     print('Gene translation has done.')
     return translated_file
 
@@ -247,13 +253,12 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
     print('\nsmORF mapping has done.\n')
     return resultfile
 
-def generate_fasta(args,queryfile,resultfile):
-    print('Start smORF fasta file generating...')
-
+def generate_fasta(output,queryfile,resultfile):
     import pandas as pd
     from fasta import fasta_iter
 
-    fastafile = path.join(args.output,"mapped.smorfs.faa")
+    print('Start smORF fasta file generating...')
+    fastafile = path.join(output,"mapped.smorfs.faa")
 
     result = pd.read_csv(resultfile, sep='\t',header=None)
     smorf_id = set(result.iloc[:, 0].tolist())
@@ -268,22 +273,22 @@ def generate_fasta(args,queryfile,resultfile):
 def habitat(args,resultfile):
     from map_habitat import smorf_habitat
     print('Start habitat annotation...')
-    single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args,resultfile)
+    single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.output,args.habitat,resultfile)
     print('\nhabitat annotation has done.\n')
     return single_number,single_percentage,multi_number,multi_percentage 
 
 def taxonomy(args,resultfile,tmpdirname):
     from map_taxonomy import deep_lca,taxa_summary
     print('Start taxonomy annotation...')
-    deep_lca(args,resultfile,tmpdirname)
-    annotated_number,rank_number,rank_percentage = taxa_summary(args)
-    print('\ntaxonomy annotation has done.\n')
+    deep_lca(args.taxonomy,args.output,resultfile,tmpdirname)
+    annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
+    print('taxonomy annotation has done.\n')
     return annotated_number,rank_number,rank_percentage
 
 def quality(args,resultfile):
     from map_quality import smorf_quality
     print('Start quality annotation...')
-    number,percentage = smorf_quality(args,resultfile)
+    number,percentage = smorf_quality(args.output,args.quality,resultfile)
     print('\nquality annotation has done.\n')
     return number,percentage
 
@@ -355,7 +360,7 @@ def main(args=None):
             if args.tool == 'mmseqs':
                 resultfile = mapdb_mmseqs(args,queryfile,tmpdir)
 
-            fastafile = generate_fasta(args,queryfile,resultfile)
+            fastafile = generate_fasta(args.output,queryfile,resultfile)
             smorf_number = int(predicted_smorf_count(fastafile)/2)
             summary.append(f'{str(smorf_number)} smORFs are aligned against GMSC in total.\n')
 

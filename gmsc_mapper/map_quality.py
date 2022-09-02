@@ -1,12 +1,12 @@
 from os import path
 import pandas as pd
 
-def smorf_quality(args,resultfile):
-    quality_file = path.join(args.output,"quality.out.smorfs.tsv")	
+def smorf_quality(outdir,qualityfile,resultfile):
+    quality_file = path.join(outdir,"quality.out.smorfs.tsv")	
 
     result = pd.read_csv(resultfile, sep='\t',header=None)
     result = result.rename(columns={0:'qseqid',1:'sseqid'})
-    ref_quality = pd.read_csv(args.quality, sep='\t',header=None)
+    ref_quality = pd.read_csv(qualityfile, sep='\t',header=None)
     ref_quality.columns = ['sseqid']
     ref_quality['quality'] = 'high quality'
 

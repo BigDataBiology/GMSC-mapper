@@ -5,20 +5,20 @@
 
 # Quality
 
-6(21.43%) aligned smORFs are high quality.
+8(28.57%) aligned smORFs are high quality.
 
 # Habitat
 
-20(71.43%) aligned smORFs are single-habitat.
-8(28.57%) aligned smORFs are multi-habitat.
+25(89.29%) aligned smORFs are single-habitat.
+3(10.71%) aligned smORFs are multi-habitat.
 
 # Taxonomy
 
-22(78.57%) aligned smORFs have taxonomy annotation.
-5(17.86%) aligned smORFs are annotated on kingdom.
+8(28.57%) aligned smORFs have taxonomy annotation.
+3(10.71%) aligned smORFs are annotated on kingdom.
 0(0%) aligned smORFs are annotated on phylum.
-2(7.14%) aligned smORFs are annotated on class.
-2(7.14%) aligned smORFs are annotated on order.
-1(3.57%) aligned smORFs are annotated on family.
-2(7.14%) aligned smORFs are annotated on genus.
-10(35.71%) aligned smORFs are annotated on species.
+1(3.57%) aligned smORFs are annotated on class.
+1(3.57%) aligned smORFs are annotated on order.
+0(0%) aligned smORFs are annotated on family.
+0(0%) aligned smORFs are annotated on genus.
+3(10.71%) aligned smORFs are annotated on species.

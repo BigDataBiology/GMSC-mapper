@@ -1,7 +1,7 @@
 def filter_length(queryfile,tmpdirname,N):
     import sys
     from os import path
-    from fasta import fasta_iter
+    from .fasta import fasta_iter
     filtered_file = path.join(tmpdirname,"filtered.faa")
 
     with open(filtered_file,'wt') as of:

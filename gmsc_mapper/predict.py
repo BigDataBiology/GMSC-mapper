@@ -29,7 +29,7 @@ def ppyrodigal_out(contig, ind, idx, pred):
 def predict_genes(infile, ofile):
     import random
     import pandas as pd
-    from fasta import fasta_iter
+    from .fasta import fasta_iter
     from atomicwrites import atomic_write
 
     gorf, morf_finder = create_pyrodigal_orffinder()
@@ -54,8 +54,8 @@ def predict_genes(infile, ofile):
 
 def filter_smorfs(ifile, ofile):
     '''Remove larger ORFs, leaving only smORFs behind'''
-    from fasta import fasta_iter
-    from utils import open_output  
+    from .fasta import fasta_iter
+    from .utils import open_output  
     seen = set()
     with open_output(ofile, mode='wt') as output:
         for h,seq in fasta_iter(ifile,full_header=True):
