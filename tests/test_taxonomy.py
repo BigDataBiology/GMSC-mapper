@@ -4,8 +4,11 @@ from gmsc_mapper.map_taxonomy import smorf_taxonomy,deep_lca
 import pytest
 import os
 
-known_mapped_taxonomy = ["smORF_0\t80\td__Bacteria","smORF_1\t81\t","smORF_2\t82\td__Bacteria;p__Firmicutes_A","smORF_2\t86\t",
-                         "smORF_2\t13\td__Bacteria;p__Actinobacteriota;c__Actinomycetia;o__Actinomycetales;f__Microbacteriaceae;g__Microbacterium;s__Microbacterium sp003476465"]
+known_mapped_taxonomy = ["smORF_0\t257823465\td__Bacteria",
+                         "smORF_1\t279368202\t",
+                         "smORF_2\t276471764\td__Bacteria;p__Firmicutes_A",
+                         "smORF_2\t265853435\t",
+                         "smORF_2\t287349677\td__Bacteria;p__Actinobacteriota;c__Actinomycetia;o__Actinomycetales;f__Microbacteriaceae;g__Microbacterium;s__Microbacterium sp003476465"]
 mapped_taxonomy = []
 def test_smorf_taxonomy():
     taxonomy_file = smorf_taxonomy('test_taxonomy.db','alignment.tsv',os.path.dirname(os.path.realpath(__file__)))
