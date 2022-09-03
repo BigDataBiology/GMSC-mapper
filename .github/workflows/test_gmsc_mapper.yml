@@ -27,8 +27,8 @@ jobs:
         pip install pytest
         pip install atomicwrites
         pip install pyrodigal
+        pip install pandas
         conda install -c anaconda biopython
-        conda install -c anaconda pandas
     - name: Test with pytest
       run: |
         python -m pytest ./tests
