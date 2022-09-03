@@ -23,7 +23,6 @@ jobs:
         miniconda-version: "latest"
     - name: Install dependencies
       run: |
-        pip install numpy
         pip install .
         pip install pytest
         pip install atomicwrites
