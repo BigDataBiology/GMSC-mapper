@@ -24,7 +24,9 @@ jobs:
         auto-activate-base: false
     - name: Install dependencies
       run: |
-        source activate test
+        source activate
+        source deactivate
+        conda activate test
         pip install pytest
         pip install atomicwrites
         pip install pyrodigal
