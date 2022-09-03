@@ -22,7 +22,7 @@ def test_check_frame():
 
 translate_dict = {}
 def test_translate():
-    translated_file = translate_gene("test.fna",os.path.dirname(os.path.realpath(__file__)))
+    translated_file = translate_gene("./test.fna",os.path.dirname(os.path.realpath(__file__)))
     for h,seq in fasta_iter(translated_file,full_header=True):
         translate_dict[h] = seq
     assert translate_dict == known_translated

@@ -18,14 +18,14 @@ known_filtered = {"smORF_0 # k141_87_1 # 455 # 679 # -1 # ID=2_1;partial=00;star
 predict_dict = {}
 filter_dict = {}
 def test_predict_genes():
-    predict_genes("test_contig.fa","predicted.faa")
-    for h,seq in fasta_iter("predicted.faa",full_header=True):
+    predict_genes("./test_contig.fa","./predicted.faa")
+    for h,seq in fasta_iter("./predicted.faa",full_header=True):
         predict_dict[h] = seq
     assert predict_dict == known_predicted
 
 def test_filter():
-    filter_smorfs("predicted.faa", "filtered.faa")
-    for h,seq in fasta_iter("filtered.faa",full_header=True):
+    filter_smorfs("./predicted.faa", "./filtered.faa")
+    for h,seq in fasta_iter("./filtered.faa",full_header=True):
         filter_dict[h] = seq
     assert filter_dict == known_filtered
 
