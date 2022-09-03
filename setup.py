@@ -10,20 +10,20 @@ setup(
     url="https://github.com/BigDataBiology/GMSC-mapper",  
     author="Yiqian Duan",
     author_email="yqduan20@fudan.edu.cn",  
-    license="MIT"
+    license="MIT",
     classifiers=[  
         "Development Status :: 3 - Alpha",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.8",
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
-    package_dir={"GMSC-mapper": "GMSC-mapper"}, 
-    packages=['GMSC-mapper'],  
-    include_package_data=True,
-    python_requires='>=3.8',
+    packages=['gmsc_mapper'],  
     install_requires=open('./requirements.txt', 'r').read().splitlines(),
     zip_safe=False,
     entry_points={  
-        "console_scripts": ['GMSC-mapper=GMSC-mapper.main:main'],
+        "console_scripts": ['gmsc-mapper=gmsc_mapper.main:main'],
     }
 )
