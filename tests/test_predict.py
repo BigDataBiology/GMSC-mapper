@@ -19,7 +19,7 @@ predict_dict = {}
 filter_dict = {}
 def test_predict_genes():
     predict_genes("./tests/test_contig.fa","./tests/predicted.faa")
-    for h,seq in fasta_iter("./predicted.faa",full_header=True):
+    for h,seq in fasta_iter("./tests/predicted.faa",full_header=True):
         predict_dict[h] = seq
     assert predict_dict == known_predicted
 
