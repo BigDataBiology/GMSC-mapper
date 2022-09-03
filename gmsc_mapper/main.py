@@ -364,19 +364,19 @@ def main(args=None):
             smorf_number = int(predicted_smorf_count(fastafile)/2)
             summary.append(f'{str(smorf_number)} smORFs are aligned against GMSC in total.\n')
 
-            summary.append(f'# Quality\n')
             if not args.noquality:
+                summary.append(f'# Quality\n')
                 number,percentage = quality(args,resultfile)	
                 summary.append(f'{str(number)}({str(round(percentage*100,2))}%) aligned smORFs are high quality.\n')
 
-            summary.append(f'# Habitat\n')
             if not args.nohabitat:
+                summary.append(f'# Habitat\n')
                 single_number,single_percentage,multi_number,multi_percentage = habitat(args,resultfile)
                 summary.append(f'{str(single_number)}({str(round(single_percentage*100,2))}%) aligned smORFs are single-habitat.')
                 summary.append(f'{str(multi_number)}({str(round(multi_percentage*100,2))}%) aligned smORFs are multi-habitat.\n')
 
-            summary.append(f'# Taxonomy\n')
             if not args.notaxonomy:
+                summary.append(f'# Taxonomy\n')
                 annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)	
                 summary.append(str(annotated_number)+'('+str(round((1-rank_percentage['no rank'])*100,2))+'%) aligned smORFs have taxonomy annotation.')
                 summary.append(str(rank_number['kingdom'])+'('+str(round(rank_percentage['kingdom']*100,2))+'%) aligned smORFs are annotated on kingdom.')
