@@ -24,14 +24,11 @@ jobs:
         auto-activate-base: false
     - name: Install dependencies
       run: |
-        source activate
-        source deactivate
-        conda activate test
         pip install pytest
         pip install atomicwrites
         pip install pyrodigal
         pip install pandas
-        conda install -c anaconda biopython
+        pip install biopython
     - name: Test with pytest
       run: |
         python -m pytest ./tests
