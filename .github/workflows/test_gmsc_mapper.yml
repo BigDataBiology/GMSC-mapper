@@ -1,0 +1,34 @@
+name: gmsc_mapper_test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: test
+        python-version: ${{ matrix.python-version }}
+        auto-activate-base: false
+    - name: Install dependencies
+      run: |
+        pip install pytest
+        pip install atomicwrites
+        pip install pyrodigal
+        pip install pandas
+        pip install biopython
+    - name: Test with pytest
+      run: |
+        python -m pytest ./tests

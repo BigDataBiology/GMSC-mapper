@@ -10,8 +10,8 @@ known_quality = {"qseqid":"quality",
                  "smORF_2":"high quality"}
 quality_dict={}
 def test_smorf_quality():
-    smorf_quality(os.path.dirname(os.path.realpath(__file__)),'test_quality.txt','alignment.tsv')
-    with open('quality.out.smorfs.tsv',"rt") as f:
+    smorf_quality(os.path.dirname(os.path.realpath(__file__)),'./tests/test_quality.txt','./tests/alignment.tsv')
+    with open('./tests/quality.out.smorfs.tsv',"rt") as f:
         for line in f:
             qseqid,quality = line.strip().split("\t")
             quality_dict[qseqid] = quality

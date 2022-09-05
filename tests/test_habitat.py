@@ -10,8 +10,8 @@ known_habitat = {"qseqid":"habitat",
                  "smORF_2":"marine,soil,water associated"}
 habitat_dict = {}
 def test_habitat():
-    smorf_habitat(os.path.dirname(os.path.realpath(__file__)),'test_habitat.txt','alignment.tsv')
-    with open('habitat.out.smorfs.tsv',"rt") as f:
+    smorf_habitat(os.path.dirname(os.path.realpath(__file__)),'./tests/test_habitat.txt','./tests/alignment.tsv')
+    with open('./tests/habitat.out.smorfs.tsv',"rt") as f:
         for line in f:
             qseqid,habitat = line.strip().split("\t")
             habitat_dict[qseqid] = habitat

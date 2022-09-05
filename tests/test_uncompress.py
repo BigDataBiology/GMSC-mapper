@@ -7,11 +7,11 @@ import tempfile
 def test_gz():
     true_list = []
     gz_list = []
-    with open('test_contig.fa','rt') as true_file:
+    with open('./tests/test_contig.fa','rt') as true_file:
         for line in true_file:
             true_list.append(line)
     with tempfile.TemporaryDirectory() as tmpdir:
-        file = uncompress('test_contig.fa.gz',tmpdir)
+        file = uncompress('./tests/test_contig.fa.gz',tmpdir)
         with open(file,'rt') as gz_file:
             for line in gz_file:
                 gz_list.append(line)
@@ -20,11 +20,11 @@ def test_gz():
 def test_xz():
     true_list = []
     xz_list = []
-    with open('test_contig.fa','rt') as true_file:
+    with open('./tests/test_contig.fa','rt') as true_file:
         for line in true_file:
             true_list.append(line)
     with tempfile.TemporaryDirectory() as tmpdir:
-        file = uncompress('test_contig.fa.xz',tmpdir)
+        file = uncompress('./tests/test_contig.fa.xz',tmpdir)
         with open(file,'rt') as xz_file:
             for line in xz_file:
                 xz_list.append(line)
@@ -33,11 +33,11 @@ def test_xz():
 def test_bzip():
     true_list = []
     bzip_list = []
-    with open('test_contig.fa','rt') as true_file:
+    with open('./tests/test_contig.fa','rt') as true_file:
         for line in true_file:
             true_list.append(line)
     with tempfile.TemporaryDirectory() as tmpdir:
-        file = uncompress('test_contig.fa.bz2',tmpdir)
+        file = uncompress('./tests/test_contig.fa.bz2',tmpdir)
         with open(file,'rt') as bzip_file:
             for line in bzip_file:
                 bzip_list.append(line)

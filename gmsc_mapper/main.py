@@ -175,7 +175,7 @@ def uncompress(input,tmpdir):
     return input
 
 def predict(args,tmpdir):
-    from predict import predict_genes,filter_smorfs
+    from .predict import predict_genes,filter_smorfs
     print('Start smORF prediction...')
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
@@ -185,7 +185,7 @@ def predict(args,tmpdir):
     return filtered_smorf
 
 def translate_gene(args,tmpdir):
-    from translate import translate_gene
+    from .translate import translate_gene
     print('Start gene translation...')
     translated_file = translate_gene(args.nt_input,tmpdir)
     print('Gene translation has done.')
@@ -193,7 +193,7 @@ def translate_gene(args,tmpdir):
 
 def filter_length(queryfile,tmpdir,N):
     print('Start length filter...')
-    from filter_length import filter_length
+    from .filter_length import filter_length
     filtered_file = filter_length(queryfile,tmpdir,N)
     print('Length filter has done.')
     return filtered_file
@@ -255,7 +255,7 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
 
 def generate_fasta(output,queryfile,resultfile):
     import pandas as pd
-    from fasta import fasta_iter
+    from .fasta import fasta_iter
 
     print('Start smORF fasta file generating...')
     fastafile = path.join(output,"mapped.smorfs.faa")
@@ -271,14 +271,14 @@ def generate_fasta(output,queryfile,resultfile):
     return fastafile
 
 def habitat(args,resultfile):
-    from map_habitat import smorf_habitat
+    from .map_habitat import smorf_habitat
     print('Start habitat annotation...')
     single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.output,args.habitat,resultfile)
     print('\nhabitat annotation has done.\n')
     return single_number,single_percentage,multi_number,multi_percentage 
 
 def taxonomy(args,resultfile,tmpdirname):
-    from map_taxonomy import deep_lca,taxa_summary
+    from .map_taxonomy import deep_lca,taxa_summary
     print('Start taxonomy annotation...')
     deep_lca(args.taxonomy,args.output,resultfile,tmpdirname)
     annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
@@ -286,7 +286,7 @@ def taxonomy(args,resultfile,tmpdirname):
     return annotated_number,rank_number,rank_percentage
 
 def quality(args,resultfile):
-    from map_quality import smorf_quality
+    from .map_quality import smorf_quality
     print('Start quality annotation...')
     number,percentage = smorf_quality(args.output,args.quality,resultfile)
     print('\nquality annotation has done.\n')
@@ -364,19 +364,19 @@ def main(args=None):
             smorf_number = int(predicted_smorf_count(fastafile)/2)
             summary.append(f'{str(smorf_number)} smORFs are aligned against GMSC in total.\n')
 
-            summary.append(f'# Quality\n')
             if not args.noquality:
+                summary.append(f'# Quality\n')
                 number,percentage = quality(args,resultfile)	
                 summary.append(f'{str(number)}({str(round(percentage*100,2))}%) aligned smORFs are high quality.\n')
 
-            summary.append(f'# Habitat\n')
             if not args.nohabitat:
+                summary.append(f'# Habitat\n')
                 single_number,single_percentage,multi_number,multi_percentage = habitat(args,resultfile)
                 summary.append(f'{str(single_number)}({str(round(single_percentage*100,2))}%) aligned smORFs are single-habitat.')
                 summary.append(f'{str(multi_number)}({str(round(multi_percentage*100,2))}%) aligned smORFs are multi-habitat.\n')
 
-            summary.append(f'# Taxonomy\n')
             if not args.notaxonomy:
+                summary.append(f'# Taxonomy\n')
                 annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)	
                 summary.append(str(annotated_number)+'('+str(round((1-rank_percentage['no rank'])*100,2))+'%) aligned smORFs have taxonomy annotation.')
                 summary.append(str(rank_number['kingdom'])+'('+str(round(rank_percentage['kingdom']*100,2))+'%) aligned smORFs are annotated on kingdom.')
