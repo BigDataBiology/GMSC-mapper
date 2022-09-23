@@ -1,41 +1,22 @@
 from os import path
 import pandas as pd
 
-#def smorf_taxonomy(args,resultfile,tmpdirname):
-#    taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv")	
-
-#    result = pd.read_csv(resultfile, sep='\t',header=None)
-#    result = result.rename(columns={0:'qseqid',1:'sseqid'})
-#    ref_taxonomy = pd.read_csv(args.taxonomy, sep='\t',header=None)
-#    ref_taxonomy.columns = ['sseqid','taxonomy']
-
-#    output = pd.merge(result,ref_taxonomy,how='left')[['qseqid', 'sseqid','taxonomy']]
-#    output.to_csv(taxonomy_file,sep='\t',index=False)
-#    return taxonomy_file
-
-def smorf_taxonomy(taxonomyfile,resultfile,tmpdirname):
-    import sqlite3
+def smorf_taxonomy(taxfile,resultfile,tmpdirname):
     print('Start taxonomy mapping...')
-    taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv")	
-    conn = sqlite3.connect(taxonomyfile)
-    tax = sqlite3.connect(':memory:')
-    conn.backup(tax)
-    conn.close()
-    cursorObj = tax.cursor()
-    
-    with open(taxonomy_file,"wt") as out:
-        with open(resultfile,"rt") as f:
-            for line in f:
-                linelist = line.strip().split("\t")
-                sseqid = int(linelist[1].split('.')[2].replace("_",""))
-                sql = f'SELECT * FROM taxonomy WHERE smorf = "{sseqid}"'
-                cursorObj.execute(sql)
-                searched = cursorObj.fetchone()
-                out.write(f'{linelist[0]}\t{str(searched[0])}\t{searched[1]}\n')
-    tax.close()
+    taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv") 
+    result =  pd.read_csv(resultfile, sep="\t", header=None)
+    result = result.rename(columns={0:'qseqid',1:'sseqid'})
+    reader =  pd.read_csv(taxfile, sep="\t", chunksize=10000000,header=None)
+    output_list = []
+    for chunk in reader:
+        chunk.columns = ['sseqid','taxonomy']
+        output_chunk = pd.merge(result,chunk,how='inner')[['qseqid', 'sseqid','taxonomy']]
+        output_list.append(output_chunk)
+    output = pd.concat(output_list, axis=0).sort_values(by='qseqid')
+    output.to_csv(taxonomy_file,sep='\t',index=False)
     print('Finish taxonomy mapping.')
     return taxonomy_file
-
+    
 def add_taxa_to_sseqid(taxa,linelist,original_tax,sseqid):
     taxa[sseqid] = []
     if len(linelist) == 3:
@@ -130,3 +111,42 @@ def taxa_summary(outdir):
             rank_percentage[rank[i]] = 0
     annotated_number = output['taxonomy'].size - rank_number['no rank']
     return annotated_number,rank_number,rank_percentage			
+
+'''
+# pandas
+def smorf_taxonomy(args,resultfile,tmpdirname):
+    taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv")	
+
+    result = pd.read_csv(resultfile, sep='\t',header=None)
+    result = result.rename(columns={0:'qseqid',1:'sseqid'})
+    ref_taxonomy = pd.read_csv(args.taxonomy, sep='\t',header=None)
+    ref_taxonomy.columns = ['sseqid','taxonomy']
+
+    output = pd.merge(result,ref_taxonomy,how='left')[['qseqid', 'sseqid','taxonomy']]
+    output.to_csv(taxonomy_file,sep='\t',index=False)
+    return taxonomy_file
+    
+#sqlite3
+def smorf_taxonomy(taxonomyfile,resultfile,tmpdirname):
+    import sqlite3
+    print('Start taxonomy mapping...')
+    taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv")	
+    conn = sqlite3.connect(taxonomyfile)
+    tax = sqlite3.connect(':memory:')
+    conn.backup(tax)
+    conn.close()
+    cursorObj = tax.cursor()
+    
+    with open(taxonomy_file,"wt") as out:
+        with open(resultfile,"rt") as f:
+            for line in f:
+                linelist = line.strip().split("\t")
+                sseqid = int(linelist[1].split('.')[2].replace("_",""))
+                sql = f'SELECT * FROM taxonomy WHERE smorf = "{sseqid}"'
+                cursorObj.execute(sql)
+                searched = cursorObj.fetchone()
+                out.write(f'{linelist[0]}\t{str(searched[0])}\t{searched[1]}\n')
+    tax.close()
+    print('Finish taxonomy mapping.')
+    return taxonomy_file
+'''
