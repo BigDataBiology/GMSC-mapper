@@ -1,6 +1,7 @@
 import subprocess
 import argparse
 import sys
+sys.path.append("..")
 import os
 from os import path
 import pandas as pd
@@ -175,7 +176,7 @@ def uncompress(input,tmpdir):
     return input
 
 def predict(args,tmpdir):
-    from .predict import predict_genes,filter_smorfs
+    from gmsc_mapper.predict import predict_genes,filter_smorfs
     print('Start smORF prediction...')
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
@@ -185,7 +186,7 @@ def predict(args,tmpdir):
     return filtered_smorf
 
 def translate_gene(args,tmpdir):
-    from .translate import translate_gene
+    from gmsc_mapper.translate import translate_gene
     print('Start gene translation...')
     translated_file = translate_gene(args.nt_input,tmpdir)
     print('Gene translation has done.')
@@ -193,7 +194,7 @@ def translate_gene(args,tmpdir):
 
 def filter_length(queryfile,tmpdir,N):
     print('Start length filter...')
-    from .filter_length import filter_length
+    from gmsc_mapper.filter_length import filter_length
     filtered_file = filter_length(queryfile,tmpdir,N)
     print('Length filter has done.')
     return filtered_file
@@ -255,7 +256,7 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
 
 def generate_fasta(output,queryfile,resultfile):
     import pandas as pd
-    from .fasta import fasta_iter
+    from gmsc_mapper.fasta import fasta_iter
 
     print('Start smORF fasta file generating...')
     fastafile = path.join(output,"mapped.smorfs.faa")
@@ -271,14 +272,14 @@ def generate_fasta(output,queryfile,resultfile):
     return fastafile
 
 def habitat(args,resultfile):
-    from .map_habitat import smorf_habitat
+    from gmsc_mapper.map_habitat import smorf_habitat
     print('Start habitat annotation...')
     single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.output,args.habitat,resultfile)
     print('\nhabitat annotation has done.\n')
     return single_number,single_percentage,multi_number,multi_percentage 
 
 def taxonomy(args,resultfile,tmpdirname):
-    from .map_taxonomy import deep_lca,taxa_summary
+    from gmsc_mapper.map_taxonomy import deep_lca,taxa_summary
     print('Start taxonomy annotation...')
     deep_lca(args.taxonomy,args.output,resultfile,tmpdirname)
     annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
@@ -286,7 +287,7 @@ def taxonomy(args,resultfile,tmpdirname):
     return annotated_number,rank_number,rank_percentage
 
 def quality(args,resultfile):
-    from .map_quality import smorf_quality
+    from gmsc_mapper.map_quality import smorf_quality
     print('Start quality annotation...')
     number,percentage = smorf_quality(args.output,args.quality,resultfile)
     print('\nquality annotation has done.\n')
