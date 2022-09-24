@@ -1,0 +1,5 @@
+GMSC10.90AA.000_257_823_465	d__Bacteria
+GMSC10.90AA.000_279_368_202	
+GMSC10.90AA.000_276_471_764	d__Bacteria;p__Firmicutes_A
+GMSC10.90AA.000_265_853_435	
+GMSC10.90AA.000_287_349_677	d__Bacteria;p__Actinobacteriota;c__Actinomycetia;o__Actinomycetales;f__Microbacteriaceae;g__Microbacterium;s__Microbacterium sp003476465
