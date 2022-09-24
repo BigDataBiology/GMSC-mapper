@@ -13,7 +13,7 @@ def smorf_taxonomy(taxfile,resultfile,tmpdirname):
         output_chunk = pd.merge(result,chunk,how='inner')[['qseqid', 'sseqid','taxonomy']]
         output_list.append(output_chunk)
     output = pd.concat(output_list, axis=0).sort_values(by='qseqid')
-    output.to_csv(taxonomy_file,sep='\t',index=False)
+    output.to_csv(taxonomy_file,sep='\t',index=False,header=False)
     print('Finish taxonomy mapping.')
     return taxonomy_file
     

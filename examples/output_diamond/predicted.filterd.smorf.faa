@@ -1,22 +1,22 @@
->smORF_0 # k141_52_1 # 18 # 212 # -1 # ID=6_1;partial=00;start_type=ATG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.441
+>smORF_00 # k141_52_1 # 18 # 212 # -1 # ID=6_1;partial=00;start_type=ATG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.441
 MQEEMSALTQNHTWDLVPASPDMNLLGCKWVFRVKLNADGSLDKLKARLVAKGFLIPTRKKLVG*
->smORF_1 # k141_16_1 # 190 # 471 # -1 # ID=9_1;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.468
+>smORF_01 # k141_16_1 # 190 # 471 # -1 # ID=9_1;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.468
 MPALTEIFGDDSVLQFGGGTLGHPWGNAPGAVANRVALEACVQARNEGRDLAVEGNEIIREACKWSPELAAACEVWKEITFNFPTIDKLDGQE*
->smORF_2 # k141_36_1 # 75 # 326 # 1 # ID=14_1;partial=00;start_type=ATG;rbs_motif=GGA/GAG/AGG;rbs_spacer=5-10bp;gc_cont=0.468
+>smORF_02 # k141_36_1 # 75 # 326 # 1 # ID=14_1;partial=00;start_type=ATG;rbs_motif=GGA/GAG/AGG;rbs_spacer=5-10bp;gc_cont=0.468
 MGCCSTERRDAPDRWDPVPTKLIEGSANPTKLKKEWRTKENGRRSAVPKGCYSADRREVNSGIRMLRCQRSDGISSCQDRGMM*
->smORF_3 # k141_91_1 # 12 # 299 # 1 # ID=21_1;partial=00;start_type=TTG;rbs_motif=None;rbs_spacer=None;gc_cont=0.306
+>smORF_03 # k141_91_1 # 12 # 299 # 1 # ID=21_1;partial=00;start_type=TTG;rbs_motif=None;rbs_spacer=None;gc_cont=0.306
 MPVVDWKLETNIRKKRLLNYSIDFGICIFCGNCVEYCPTNCLSMTEEYEFSTYDRHELNYNQIALGRLPMSVIDDYTIRTIWNSPQTKNGVNPLI*
->smORF_4 # k141_68_1 # 787 # 966 # 1 # ID=27_1;partial=00;start_type=TTG;rbs_motif=GGA/GAG/AGG;rbs_spacer=11-12bp;gc_cont=0.217
+>smORF_04 # k141_68_1 # 787 # 966 # 1 # ID=27_1;partial=00;start_type=TTG;rbs_motif=GGA/GAG/AGG;rbs_spacer=11-12bp;gc_cont=0.217
 MATKKVLEKRVELKKIQIKLNILSITKIGVLVDNLILIEFLIYFLYKEKIKKDSLKRLC*
->smORF_5 # k141_72_1 # 260 # 490 # -1 # ID=33_1;partial=00;start_type=ATG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.333
+>smORF_05 # k141_72_1 # 260 # 490 # -1 # ID=33_1;partial=00;start_type=ATG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.333
 MVYILLLIAWRIKNMTIAFQLAVFALIITSSILLISVPVVFASPDGWSSNKNVVFSGTSLWIGLVFLVGILNSLIS*
->smORF_6 # k141_11_1 # 18 # 299 # -1 # ID=41_1;partial=00;start_type=ATG;rbs_motif=GGA/GAG/AGG;rbs_spacer=5-10bp;gc_cont=0.323
+>smORF_06 # k141_11_1 # 18 # 299 # -1 # ID=41_1;partial=00;start_type=ATG;rbs_motif=GGA/GAG/AGG;rbs_spacer=5-10bp;gc_cont=0.323
 MPRSRINGNFIDKTFTIVADILLRVIPTTSGEKEAFTYYRDGAIWLSLFFFLADFDWNRKKNEYWKKIYAFEGEVYNIKKTIPSVMYPRLMQP*
->smORF_7 # k141_80_3 # 2296 # 2496 # -1 # ID=43_3;partial=00;start_type=ATG;rbs_motif=AGGAG;rbs_spacer=5-10bp;gc_cont=0.368
+>smORF_07 # k141_80_3 # 2296 # 2496 # -1 # ID=43_3;partial=00;start_type=ATG;rbs_motif=AGGAG;rbs_spacer=5-10bp;gc_cont=0.368
 MAKGKDVRVTIILECTSCVRNDIKKEAAGISRYITQKNRHNTPSRLELRKFCPYCYKHTIHGEIKK*
->smORF_8 # k141_80_4 # 2918 # 3052 # -1 # ID=43_4;partial=00;start_type=ATG;rbs_motif=AGGAG;rbs_spacer=5-10bp;gc_cont=0.341
+>smORF_08 # k141_80_4 # 2918 # 3052 # -1 # ID=43_4;partial=00;start_type=ATG;rbs_motif=AGGAG;rbs_spacer=5-10bp;gc_cont=0.341
 MRDLKTYLSVAPVLSTLWFGSLAGLLIEINRLFPDALTFPFFSF*
->smORF_9 # k141_15_1 # 10 # 195 # 1 # ID=48_1;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.446
+>smORF_09 # k141_15_1 # 10 # 195 # 1 # ID=48_1;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.446
 MSSPEFARTIPVSPPMVNKKMNPTANNMGVLYCIEPPHMVAIQLKILIPVGTAMIMVAAVK*
 >smORF_10 # k141_58_1 # 32 # 190 # -1 # ID=52_1;partial=00;start_type=ATG;rbs_motif=TAAAAA;rbs_spacer=10bp;gc_cont=0.497
 MVFSRMFRMSRLLNSLTDWLLELTNGLPASLLFVLEPLLAMDLLWLTGPEMS*

@@ -1,12 +1,12 @@
 q_seqid	taxonomy
-smORF_0	d__Bacteria
-smORF_1
-smORF_2
-smORF_5
-smORF_6
-smORF_7
-smORF_8	d__Bacteria;p__Firmicutes_A;c__Clostridia_A;o__Christensenellales;f__UBA1242;g__UMGS687;s__UMGS687 sp900545735
-smORF_9
+smORF_00	d__Bacteria
+smORF_01
+smORF_02
+smORF_05
+smORF_06
+smORF_07
+smORF_08	d__Bacteria;p__Firmicutes_A;c__Clostridia_A;o__Christensenellales;f__UBA1242;g__UMGS687;s__UMGS687 sp900545735
+smORF_09
 smORF_10
 smORF_11
 smORF_12	d__Bacteria
