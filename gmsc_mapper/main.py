@@ -111,37 +111,72 @@ def parse_args(args):
 
     return parser.parse_args()
 
-def validate_args(args):
+def check_install():
+    from shutil import which
+    import sys
+    
+    has_mmseqs = False
+    has_diamond = False
+    dependencies = ['diamond', 'mmseqs']
+    print("Looking for dependencies...")
+
+    for dep in dependencies:
+        p = which(dep)
+        if p:
+            if dep == 'diamond':
+                has_diamond = True
+            if dep == 'mmseqs':
+                has_mmseqs = True
+    if not has_diamond and not has_mmseqs:
+        sys.stderr.write('GMSC-mapper Error: Neither diamond nor mmseqs appear to be available!\n'
+                        'At least one of them is necessary to run GMSC-mapper.\n')
+        sys.exit(1)
+    elif has_diamond and not has_mmseqs:
+        print('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
+    elif not has_diamond and has_mmseqs:
+        print('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
+    else:
+        print('Dependencies installation is OK')
+    return has_diamond,has_mmseqs
+
+def validate_args(args,has_diamond,has_mmseqs):
     def expect_file(f):
         if not os.path.exists(f):
             sys.stderr.write(f"GMSC-mapper Error: Expected file '{f}' does not exist\n")
             sys.exit(1)
     
-    if args.genome_fasta is None and args.aa_input is None and args.nt_input is None:
+    if not args.genome_fasta and not args.aa_input and not args.nt_input:
         sys.stderr.write("GMSC-mapper Error: At least one of --input or --aa-genes or --nt_genes is necessary\n")
-        sys.stderr.exit(1)
-    elif args.genome_fasta is not None and args.aa_input is None and args.nt_input is None:
+        sys.exit(1)
+    elif args.genome_fasta and not args.aa_input and not args.nt_input:
         expect_file(args.genome_fasta)
-    elif args.aa_input is not None and args.genome_fasta is None and args.nt_input is None:
+    elif args.aa_input and not args.genome_fasta and not args.nt_input:
         expect_file(args.aa_input)
-    elif args.nt_input is not None and args.genome_fasta is None and args.aa_input is None:
+    elif args.nt_input and not args.genome_fasta and not args.aa_input:
         expect_file(args.nt_input)
     else:
         sys.stderr.write("GMSC-mapper Error: --input or --aa-genes or --nt_genes shouldn't be assigned at the same time\n")
-        sys.stderr.exit(1)
+        sys.exit(1)
+    
+    if args.tool == "diamond" and not has_diamond:
+        sys.stderr.write("GMSC-mapper Error:diamond is not available.Please add diamond into your path or use the `--tool mmseqs` option.\n")
+        sys.exit(1)       
+    if args.tool == "mmseqs" and not has_mmseqs:
+        sys.stderr.write("GMSC-mapper Error:mmseqs is not available.Please add mmseqs into your path or use the `--tool diamond` option(default).\n")
+        sys.exit(1)
 
-    if args.database is not None:
+    if args.database:
         expect_file(args.database) 
     
-    if args.habitat is not None:
+    if args.habitat:
         expect_file(args.habitat)
 
-    if args.taxonomy is not None:
+    if args.taxonomy:
         expect_file(args.taxonomy)
 
-    if args.quality is not None:
+    if args.quality:
         expect_file(args.quality)
- 
+
 def flatten(items, ignore_types=(str, bytes)):
     from collections.abc import Iterable
     for x in items:
@@ -318,9 +353,9 @@ def main(args=None):
         if args.sensitivity == '5':
             args.sensitivity = '--more-sensitive'
         if args.sensitivity == '6':
-            args.sensitivity = 'very-sensitive'
+            args.sensitivity = '--very-sensitive'
         if args.sensitivity == '7':
-            args.sensitivity = 'ultra-sensitive'
+            args.sensitivity = '--ultra-sensitive'
         if args.outfmt is None:
            args.outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp'
     if args.tool == 'mmseqs':
@@ -331,7 +366,8 @@ def main(args=None):
         if args.outfmt is None:
             args.outfmt = 'query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov'
 
-    validate_args(args)
+    has_diamond,has_mmseqs = check_install()
+    validate_args(args,has_diamond,has_mmseqs)
 
     if not os.path.exists(args.output):
         os.makedirs(args.output)
