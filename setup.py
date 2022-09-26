@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="GMSC-mapper",  
-    version="0.0.1_alpha", 
+    version="0.0.1a0", 
     description="Command line tool to query the Global Microbial smORFs Catalog (GMSC)",  
     long_description=open("./README.md", "r").read(),  
     long_description_content_type="text/markdown",  
