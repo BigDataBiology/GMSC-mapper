@@ -9,7 +9,13 @@ def smorf_habitat(outdir,habitatfile,resultfile):
     ref_habitat = pd.read_csv(habitatfile, sep='\t',header=None)
     ref_habitat.columns = ['sseqid','habitat']
 
-    output = pd.merge(result,ref_habitat,how='left')[['qseqid', 'habitat']]
+    reader =  pd.read_csv(habitatfile, sep="\t", chunksize=10000000,header=None)
+    output_list = []
+    for chunk in reader:
+        chunk.columns = ['sseqid','habitat']
+        output_chunk = pd.merge(result,chunk,how='left')[['qseqid', 'habitat']]
+        output_list.append(output_chunk)
+    output = pd.concat(output_list, axis=0).sort_values(by='qseqid')
     output = output.groupby('qseqid',as_index=False,sort=False).agg({'habitat':lambda x : ','.join(x.dropna().drop_duplicates())})
     output['habitat'] = output['habitat'].apply(lambda x: ','.join(sorted(list(set(x.split(','))))))
 

@@ -1,29 +1,29 @@
 qseqid	habitat
-smORF_0	human gut
-smORF_1	water associated
-smORF_8	human gut
-smORF_9	human gut
-smORF_12	human gut
-smORF_15	lake associated,water associated
-smORF_18	annelidae associated
-smORF_19	human gut
-smORF_26	marine
-smORF_27	human gut
-smORF_30	lake associated
-smORF_5	human gut
-smORF_6	human gut
-smORF_7	river associated
-smORF_16	human gut
-smORF_2	human gut
+smORF_00	human gut
+smORF_01	water associated
+smORF_02	human gut
+smORF_05	human gut
+smORF_06	human gut
+smORF_07	river associated
+smORF_08	human gut
+smORF_09	human gut
 smORF_10	human gut,isolate
 smORF_11	soil
-smORF_14	human gut
+smORF_12	human gut
 smORF_13	human gut
+smORF_14	human gut
+smORF_15	lake associated,water associated
+smORF_16	human gut
+smORF_17	lake associated,river associated
+smORF_18	annelidae associated
+smORF_19	human gut
+smORF_20	chicken gut
+smORF_21	human gut
 smORF_22	lake associated
 smORF_24	water associated
 smORF_25	human gut
-smORF_17	lake associated,river associated
-smORF_20	chicken gut
-smORF_21	human gut
+smORF_26	marine
+smORF_27	human gut
 smORF_28	air
 smORF_29	human gut
+smORF_30	lake associated

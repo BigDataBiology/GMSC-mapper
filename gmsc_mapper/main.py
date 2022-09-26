@@ -1,6 +1,7 @@
 import subprocess
 import argparse
 import sys
+sys.path.append("..")
 import os
 from os import path
 import pandas as pd
@@ -110,37 +111,72 @@ def parse_args(args):
 
     return parser.parse_args()
 
-def validate_args(args):
+def check_install():
+    from shutil import which
+    import sys
+    
+    has_mmseqs = False
+    has_diamond = False
+    dependencies = ['diamond', 'mmseqs']
+    print("Looking for dependencies...")
+
+    for dep in dependencies:
+        p = which(dep)
+        if p:
+            if dep == 'diamond':
+                has_diamond = True
+            if dep == 'mmseqs':
+                has_mmseqs = True
+    if not has_diamond and not has_mmseqs:
+        sys.stderr.write('GMSC-mapper Error: Neither diamond nor mmseqs appear to be available!\n'
+                        'At least one of them is necessary to run GMSC-mapper.\n')
+        sys.exit(1)
+    elif has_diamond and not has_mmseqs:
+        print('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
+    elif not has_diamond and has_mmseqs:
+        print('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
+    else:
+        print('Dependencies installation is OK')
+    return has_diamond,has_mmseqs
+
+def validate_args(args,has_diamond,has_mmseqs):
     def expect_file(f):
         if not os.path.exists(f):
             sys.stderr.write(f"GMSC-mapper Error: Expected file '{f}' does not exist\n")
             sys.exit(1)
     
-    if args.genome_fasta is None and args.aa_input is None and args.nt_input is None:
+    if not args.genome_fasta and not args.aa_input and not args.nt_input:
         sys.stderr.write("GMSC-mapper Error: At least one of --input or --aa-genes or --nt_genes is necessary\n")
-        sys.stderr.exit(1)
-    elif args.genome_fasta is not None and args.aa_input is None and args.nt_input is None:
+        sys.exit(1)
+    elif args.genome_fasta and not args.aa_input and not args.nt_input:
         expect_file(args.genome_fasta)
-    elif args.aa_input is not None and args.genome_fasta is None and args.nt_input is None:
+    elif args.aa_input and not args.genome_fasta and not args.nt_input:
         expect_file(args.aa_input)
-    elif args.nt_input is not None and args.genome_fasta is None and args.aa_input is None:
+    elif args.nt_input and not args.genome_fasta and not args.aa_input:
         expect_file(args.nt_input)
     else:
         sys.stderr.write("GMSC-mapper Error: --input or --aa-genes or --nt_genes shouldn't be assigned at the same time\n")
-        sys.stderr.exit(1)
+        sys.exit(1)
+    
+    if args.tool == "diamond" and not has_diamond:
+        sys.stderr.write("GMSC-mapper Error:diamond is not available.Please add diamond into your path or use the `--tool mmseqs` option.\n")
+        sys.exit(1)       
+    if args.tool == "mmseqs" and not has_mmseqs:
+        sys.stderr.write("GMSC-mapper Error:mmseqs is not available.Please add mmseqs into your path or use the `--tool diamond` option(default).\n")
+        sys.exit(1)
 
-    if args.database is not None:
+    if args.database:
         expect_file(args.database) 
     
-    if args.habitat is not None:
+    if args.habitat:
         expect_file(args.habitat)
 
-    if args.taxonomy is not None:
+    if args.taxonomy:
         expect_file(args.taxonomy)
 
-    if args.quality is not None:
+    if args.quality:
         expect_file(args.quality)
- 
+
 def flatten(items, ignore_types=(str, bytes)):
     from collections.abc import Iterable
     for x in items:
@@ -175,7 +211,7 @@ def uncompress(input,tmpdir):
     return input
 
 def predict(args,tmpdir):
-    from .predict import predict_genes,filter_smorfs
+    from gmsc_mapper.predict import predict_genes,filter_smorfs
     print('Start smORF prediction...')
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
@@ -185,7 +221,7 @@ def predict(args,tmpdir):
     return filtered_smorf
 
 def translate_gene(args,tmpdir):
-    from .translate import translate_gene
+    from gmsc_mapper.translate import translate_gene
     print('Start gene translation...')
     translated_file = translate_gene(args.nt_input,tmpdir)
     print('Gene translation has done.')
@@ -193,7 +229,7 @@ def translate_gene(args,tmpdir):
 
 def filter_length(queryfile,tmpdir,N):
     print('Start length filter...')
-    from .filter_length import filter_length
+    from gmsc_mapper.filter_length import filter_length
     filtered_file = filter_length(queryfile,tmpdir,N)
     print('Length filter has done.')
     return filtered_file
@@ -255,7 +291,7 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
 
 def generate_fasta(output,queryfile,resultfile):
     import pandas as pd
-    from .fasta import fasta_iter
+    from gmsc_mapper.fasta import fasta_iter
 
     print('Start smORF fasta file generating...')
     fastafile = path.join(output,"mapped.smorfs.faa")
@@ -271,14 +307,14 @@ def generate_fasta(output,queryfile,resultfile):
     return fastafile
 
 def habitat(args,resultfile):
-    from .map_habitat import smorf_habitat
+    from gmsc_mapper.map_habitat import smorf_habitat
     print('Start habitat annotation...')
     single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.output,args.habitat,resultfile)
     print('\nhabitat annotation has done.\n')
     return single_number,single_percentage,multi_number,multi_percentage 
 
 def taxonomy(args,resultfile,tmpdirname):
-    from .map_taxonomy import deep_lca,taxa_summary
+    from gmsc_mapper.map_taxonomy import deep_lca,taxa_summary
     print('Start taxonomy annotation...')
     deep_lca(args.taxonomy,args.output,resultfile,tmpdirname)
     annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
@@ -286,7 +322,7 @@ def taxonomy(args,resultfile,tmpdirname):
     return annotated_number,rank_number,rank_percentage
 
 def quality(args,resultfile):
-    from .map_quality import smorf_quality
+    from gmsc_mapper.map_quality import smorf_quality
     print('Start quality annotation...')
     number,percentage = smorf_quality(args.output,args.quality,resultfile)
     print('\nquality annotation has done.\n')
@@ -317,9 +353,9 @@ def main(args=None):
         if args.sensitivity == '5':
             args.sensitivity = '--more-sensitive'
         if args.sensitivity == '6':
-            args.sensitivity = 'very-sensitive'
+            args.sensitivity = '--very-sensitive'
         if args.sensitivity == '7':
-            args.sensitivity = 'ultra-sensitive'
+            args.sensitivity = '--ultra-sensitive'
         if args.outfmt is None:
            args.outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp'
     if args.tool == 'mmseqs':
@@ -330,7 +366,8 @@ def main(args=None):
         if args.outfmt is None:
             args.outfmt = 'query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov'
 
-    validate_args(args)
+    has_diamond,has_mmseqs = check_install()
+    validate_args(args,has_diamond,has_mmseqs)
 
     if not os.path.exists(args.output):
         os.makedirs(args.output)

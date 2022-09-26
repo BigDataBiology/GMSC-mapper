@@ -56,13 +56,16 @@ def filter_smorfs(ifile, ofile):
     '''Remove larger ORFs, leaving only smORFs behind'''
     from .fasta import fasta_iter
     from .utils import open_output  
-    seen = set()
+    seen = {}
+    n = 0
     with open_output(ofile, mode='wt') as output:
         for h,seq in fasta_iter(ifile,full_header=True):
             if len(seq) > 100: 
                 continue
             if seq in seen: 
                 continue
-            h = f'smORF_{len(seen)} # {h}'
-            seen.add(seq)
+            seen[h] = seq       
+        for h,seq in seen.items():
+            h = f'smORF_{n:0{len(str(len(seen)))}} # {h}'
+            n += 1
             output.write(">{}\n{}\n".format(h,seq))

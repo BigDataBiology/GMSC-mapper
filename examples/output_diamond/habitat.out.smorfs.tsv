@@ -1,12 +1,12 @@
 qseqid	habitat
-smORF_0	human gut
-smORF_1	water associated
-smORF_2	human gut
-smORF_5	human gut
-smORF_6	human gut
-smORF_7	river associated
-smORF_8	human gut
-smORF_9	human gut
+smORF_00	human gut
+smORF_01	water associated
+smORF_02	human gut
+smORF_05	human gut
+smORF_06	human gut
+smORF_07	river associated
+smORF_08	human gut
+smORF_09	human gut
 smORF_10	human gut,isolate
 smORF_11	soil
 smORF_12	human gut

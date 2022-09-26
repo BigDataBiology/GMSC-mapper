@@ -3,6 +3,39 @@
 Command line tool to query the Global Microbial smORFs Catalog (GMSC)
 
 ## Installation
+### Source
+Clone GMSC-mapper repository
+
+```bash
+git clone https://github.com/BigDataBiology/GMSC-mapper.git
+```
+
+Create conda environment(only support python v3.8/v3.9)
+
+```bash
+conda create -n gmscmapper python=3.8
+or
+conda create -n gmscmapper python=3.9
+```
+
+You will need the following dependencies:
+
+- [MMseqs2](https://github.com/soedinglab/MMseqs2)
+- [Diamond](https://github.com/bbuchfink/diamond)
+
+The easiest way to install the dependencies is with [conda](https://conda.io):
+
+```bash
+conda install -c conda-forge -c bioconda mmseqs2
+conda install -c bioconda -c conda-forge diamond=2.0.13
+```
+
+Once the dependencies are installed, you can install GMSC-mapper by running:
+
+```bash
+cd GMSC-mapper
+python setup.py install
+```
 
 ## Example usage
 ### Default
