@@ -80,21 +80,21 @@ def parse_args(args):
                         required=False,
                         help='Path to the habitat file',
                         dest='habitat',
-                        default=path.join(_ROOT, 'examples/ref_habitat.txt'))
+                        default=None)
     parser.add_argument('--nohabitat','--nohabitat',action='store_true', help='Use this if no need to annotate habitat')
 
     parser.add_argument('--taxonomy', '--taxonomy',
                         required=False,
                         help='Path to the taxonomy file',
                         dest='taxonomy',
-                        default=path.join(_ROOT, 'examples/taxonomy.db'))
+                        default=None)
     parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
 
     parser.add_argument('--quality', '--quality',
                         required=False,
                         help='Path to the quality file',
                         dest='quality',
-                        default=path.join(_ROOT, 'examples/ref_quality.txt'))
+                        default=None)
     parser.add_argument('--noquality', '--noquality',action='store_true', help='Use this if no need to annotate quality')
 
     parser.add_argument('-o', '--output',

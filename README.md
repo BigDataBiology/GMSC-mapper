@@ -39,53 +39,47 @@ python setup.py install
 
 ## Example usage
 ### Default
+
+GMSC database/habitat/taxonomy/quality file path can be assigned on your own after you download them.
+
 1. Input is genome contig sequences.
 
 ```bash
-python3 main.py -i example.fa -o output
+gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt
 ```
 
 2. Input is amino acid sequences.
 
 ```bash
-python3 main.py --aa-genes example.faa -o output
+gmsc-mapper --aa-genes ./examples/example.faa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt
 ```
 
 3. Input is nucleotide gene sequences.
 
 ```bash
-python3 main.py --nt-genes example.fna -o output
+gmsc-mapper --nt-genes ./examples/example.fna -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt
 ```
-
-### GMSC database/habitat/taxonomy/quality file path can be assigned on your own after you download them.
+### Alignment tool: Diamond/MMseqs2 is optional
+If you want to change alignment tool(Diamond/MMseqs2), you can use `--tool`.
 ```bash
-python3 main.py -i example.fa -o output --db exampledb.dmnd
-```
-```bash
-python3 main.py -i example.fa -o output --habitat ref_habitat.txt 
-```
-```bash
-python3 main.py -i example.fa -o output --taxonomy ref_taxonomy.txt 
-```
-```bash
-python3 main.py -i example.fa -o output --quality ref_quality.txt
+gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_mmseqs_db --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt --tool mmseqs
 ```
 
 ### Habitat/taxonomy/quality annotation is optional
 If you don't want to annotate habitat/taxonomy/quality you can use `--nohabitat`/`--notaxonomy`/`--noquality`.
 ```bash
-python3 main.py -i example.fa -o output --nohabitat
+gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt --nohabitat
 ```
 ```bash
-python3 main.py -i example.fa -o output --notaxonomy
+gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --notaxonomy
 ```
 ```bash
-python3 main.py -i example.fa -o output --noquality
+gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --taxonomy ./examples/ref_taxonomy.txt --noquality
 ```
 ## Example Output
 The output folder will contain
-- Outputs of smORF prediction (Macrel).
-- Complete mapping result table, listing all the hits in GMSC, per smORF (Default:Diamond/MMseqs).
+- Outputs of smORF prediction.
+- Complete mapping result table, listing all the hits in GMSC, per smORF.
 - Habitat annotation of smORFs.(optional)
 - Taxonomy annotation of smORFs.(optional)
 - Quality annotation of smORFs.(optional)
