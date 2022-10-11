@@ -4,9 +4,11 @@ import pandas as pd
 def smorf_taxonomy(taxfile,resultfile,tmpdirname):
     print('Start taxonomy mapping...')
     taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv") 
+    
     result =  pd.read_csv(resultfile, sep="\t", header=None)
     result = result.rename(columns={0:'qseqid',1:'sseqid'})
-    reader =  pd.read_csv(taxfile, sep="\t", chunksize=10000000,header=None)
+
+    reader =  pd.read_csv(taxfile, sep="\t", chunksize=5000000,header=None)
     output_list = []
     for chunk in reader:
         chunk.columns = ['sseqid','taxonomy']

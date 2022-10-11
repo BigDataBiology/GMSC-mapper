@@ -6,10 +6,8 @@ def smorf_habitat(outdir,habitatfile,resultfile):
 
     result = pd.read_csv(resultfile, sep='\t',header=None)
     result = result.rename(columns={0:'qseqid',1:'sseqid'})
-    ref_habitat = pd.read_csv(habitatfile, sep='\t',header=None)
-    ref_habitat.columns = ['sseqid','habitat']
 
-    reader =  pd.read_csv(habitatfile, sep="\t", chunksize=10000000,header=None)
+    reader =  pd.read_csv(habitatfile, sep="\t", chunksize=5000000,header=None)
     output_list = []
     for chunk in reader:
         chunk.columns = ['sseqid','habitat']
