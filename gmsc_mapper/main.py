@@ -168,6 +168,17 @@ def validate_args(args,has_diamond,has_mmseqs):
     if args.database:
         expect_file(args.database) 
     
+    if args.outfmt:
+        keywords = args.outfmt.split(",")
+        if args.tool == "diamond":
+            if  keywords[0] != "6" or keywords[1] != "qseqid" or keywords[2] != "sseqid":
+                sys.stderr.write("GMSC-mapper Error:Outfmt value should be 6 (BLAST tabular format).And the first two columns of output should be `qseqid` and `sseqid`.\n")
+                sys.exit(1)                
+        if args.tool == "mmseqs":
+            if  keywords[0] != "query" or keywords[1] != "target":
+                sys.stderr.write("GMSC-mapper Error:The first two columns of output should be `query` and `target`.\n")
+                sys.exit(1)             
+
     if args.habitat:
         expect_file(args.habitat)
 
