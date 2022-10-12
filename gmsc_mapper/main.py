@@ -72,7 +72,7 @@ def parse_args(args):
 
     parser.add_argument('--outfmt', '--outfmt',
                         required=False,
-                        help='Output format of alignment result.',
+                        help='Output format of alignment result.\nDiamond default is `6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp`.\nMMseqs default is `query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov`.\nThe first two column in result format of Diamond/MMseqs must be `qseqid`/`query` and `sseqid`/`target`.',
                         dest='outfmt',
                         default=None)   
 
@@ -136,7 +136,7 @@ def check_install():
     elif not has_diamond and has_mmseqs:
         print('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
     else:
-        print('Dependencies installation is OK')
+        print('Dependencies installation is OK\n')
     return has_diamond,has_mmseqs
 
 def validate_args(args,has_diamond,has_mmseqs):
@@ -168,6 +168,17 @@ def validate_args(args,has_diamond,has_mmseqs):
     if args.database:
         expect_file(args.database) 
     
+    if args.outfmt:
+        keywords = args.outfmt.split(",")
+        if args.tool == "diamond":
+            if  keywords[0] != "6" or keywords[1] != "qseqid" or keywords[2] != "sseqid":
+                sys.stderr.write("GMSC-mapper Error:Outfmt value should be 6 (BLAST tabular format).And the first two columns of output should be `qseqid` and `sseqid`.\n")
+                sys.exit(1)                
+        if args.tool == "mmseqs":
+            if  keywords[0] != "query" or keywords[1] != "target":
+                sys.stderr.write("GMSC-mapper Error:The first two columns of output should be `query` and `target`.\n")
+                sys.exit(1)             
+
     if args.habitat:
         expect_file(args.habitat)
 
@@ -190,24 +201,27 @@ def uncompress(input,tmpdir):
     import bz2
     import lzma
 
-    print('Start uncompression...')
-
     if input.endswith('.gz'):
+        print('Start uncompression...')
         with gzip.GzipFile(input) as ifile:
             open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
         input = tmpdir + '/input.fasta'
+        print('Uncompression has done.\n')
 
     if input.endswith('.bz2'):
+        print('Start uncompression...')
         with bz2.BZ2File(input) as ifile:
             open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
         input = tmpdir + '/input.fasta'
+        print('Uncompression has done.\n')
 
     if input.endswith('.xz'):
+        print('Start uncompression...')
         with lzma.open(input, 'rb') as ifile:
             open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
         input = tmpdir + '/input.fasta'	
-
-    print('\nUncompression has done.\n')
+        print('Uncompression has done.\n')
+ 
     return input
 
 def predict(args,tmpdir):
@@ -224,14 +238,14 @@ def translate_gene(args,tmpdir):
     from gmsc_mapper.translate import translate_gene
     print('Start gene translation...')
     translated_file = translate_gene(args.nt_input,tmpdir)
-    print('Gene translation has done.')
+    print('Gene translation has done.\n')
     return translated_file
 
 def filter_length(queryfile,tmpdir,N):
-    print('Start length filter...')
     from gmsc_mapper.filter_length import filter_length
+    print('Start length filter...')
     filtered_file = filter_length(queryfile,tmpdir,N)
-    print('Length filter has done.')
+    print('Length filter has done.\n')
     return filtered_file
 
 def mapdb_diamond(args,queryfile):
@@ -246,9 +260,9 @@ def mapdb_diamond(args,queryfile):
         '-o',resultfile,
         args.sensitivity,
         '-e',str(args.evalue),
-        '--id',str(args.identity*100),
-        '--query-cover',str(args.coverage*100),
-        '--subject-cover',str(args.coverage*100),
+        '--id',str(float(args.identity)*100),
+        '--query-cover',str(float(args.coverage)*100),
+        '--subject-cover',str(float(args.coverage)*100),
         '-p',str(args.threads),
 		'--outfmt',args.outfmt.split(',')])])  
 
@@ -303,14 +317,14 @@ def generate_fasta(output,queryfile,resultfile):
         for ID,seq in fasta_iter(queryfile):
             if ID in smorf_id:
                 f.write(f'>{ID}\n{seq}\n')
-    print('\nsmORF fasta file generating has done.\n')
+    print('smORF fasta file generating has done.\n')
     return fastafile
 
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
     print('Start habitat annotation...')
     single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.output,args.habitat,resultfile)
-    print('\nhabitat annotation has done.\n')
+    print('habitat annotation has done.\n')
     return single_number,single_percentage,multi_number,multi_percentage 
 
 def taxonomy(args,resultfile,tmpdirname):
@@ -325,7 +339,7 @@ def quality(args,resultfile):
     from gmsc_mapper.map_quality import smorf_quality
     print('Start quality annotation...')
     number,percentage = smorf_quality(args.output,args.quality,resultfile)
-    print('\nquality annotation has done.\n')
+    print('quality annotation has done.\n')
     return number,percentage
 
 def predicted_smorf_count(file_name):
@@ -375,7 +389,7 @@ def main(args=None):
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
             summary = []
-            summary.append(f'# Total number\n')
+            summary.append(f'# Total number')
             if args.genome_fasta:
                 args.genome_fasta = uncompress(args.genome_fasta,tmpdir)
                 queryfile = predict(args,tmpdir)
@@ -402,18 +416,18 @@ def main(args=None):
             summary.append(f'{str(smorf_number)} smORFs are aligned against GMSC in total.\n')
 
             if not args.noquality:
-                summary.append(f'# Quality\n')
+                summary.append(f'# Quality')
                 number,percentage = quality(args,resultfile)	
                 summary.append(f'{str(number)}({str(round(percentage*100,2))}%) aligned smORFs are high quality.\n')
 
             if not args.nohabitat:
-                summary.append(f'# Habitat\n')
+                summary.append(f'# Habitat')
                 single_number,single_percentage,multi_number,multi_percentage = habitat(args,resultfile)
                 summary.append(f'{str(single_number)}({str(round(single_percentage*100,2))}%) aligned smORFs are single-habitat.')
                 summary.append(f'{str(multi_number)}({str(round(multi_percentage*100,2))}%) aligned smORFs are multi-habitat.\n')
 
             if not args.notaxonomy:
-                summary.append(f'# Taxonomy\n')
+                summary.append(f'# Taxonomy')
                 annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)	
                 summary.append(str(annotated_number)+'('+str(round((1-rank_percentage['no rank'])*100,2))+'%) aligned smORFs have taxonomy annotation.')
                 summary.append(str(rank_number['kingdom'])+'('+str(round(rank_percentage['kingdom']*100,2))+'%) aligned smORFs are annotated on kingdom.')

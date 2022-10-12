@@ -14,9 +14,9 @@ def filter_length(queryfile,tmpdirname,N):
             else:
                 longer_exist_flag = 1
         if all_longer_flag:
-            sys.stderr.write("Input sequences are all more than 300nt or 100aa,which will be filtered. 1.If you don't want to filter,please use --nofilter flag. 2.Please check if your input is contigs,which should use -i not --nt-genes or --aa-genes as input.\n")
+            sys.stderr.write("Input sequences are all more than 300nt or 100aa,which will be filtered. 1.If you don't want to filter,please use --nofilter flag. 2.Please check if your input is contigs,which should use -i not --nt-genes or --aa-genes as input.")
             sys.exit(1)
         else:
             if longer_exist_flag:
-                print("Warning:Input has seqences more than 300nt or 100aa,which will be filtered.If you don't want to filter,please use --nofilter flag.\n")
+                print("Warning:Input has seqences more than 300nt or 100aa,which will be filtered.If you don't want to filter,please use --nofilter flag.")
     return filtered_file
