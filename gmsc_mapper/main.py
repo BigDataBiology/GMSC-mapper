@@ -260,9 +260,9 @@ def mapdb_diamond(args,queryfile):
         '-o',resultfile,
         args.sensitivity,
         '-e',str(args.evalue),
-        '--id',str(args.identity*100),
-        '--query-cover',str(args.coverage*100),
-        '--subject-cover',str(args.coverage*100),
+        '--id',str(float(args.identity)*100),
+        '--query-cover',str(float(args.coverage)*100),
+        '--subject-cover',str(float(args.coverage)*100),
         '-p',str(args.threads),
 		'--outfmt',args.outfmt.split(',')])])  
 
