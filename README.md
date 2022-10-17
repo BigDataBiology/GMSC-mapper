@@ -44,6 +44,7 @@ The GMSC database is large,and taks some time to process all the things. If you 
 
 #### Create GMSC database index
 `-o`: Path to database output directory.(default: `GMSC-mapper/examples`)
+
 `-m`: Alignment tool(Diamond/MMseqs2).
 ```
 cd gmsc_mapper
@@ -93,6 +94,7 @@ gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb.dmnd --habitat .
 ### Real data Usage
 #### Create GMSC database index
 `-o`: Path to database output directory.(default: `GMSC-mapper/db`)
+
 `-m`: Alignment tool(Diamond/MMseqs2).
 ```
 cd gmsc_mapper
@@ -190,3 +192,12 @@ The first two column in result format of Diamond/MMseqs must be "qseqid"/"query"
 * `--noquality`: Use this if no need to annotate quality.
 
 * `-t/--threads`: Number of CPU threads(default=3).
+
+### Subcommands and Parameters 
+Subcommands: `gmsc-mapper createdb`
+
+* `-i`: Path to the GMSC 90AA FASTA file.
+
+* `-o/--output`: Path to database output directory.
+
+* `-m/--mode`: Alignment tool(Diamond/MMseqs2)
