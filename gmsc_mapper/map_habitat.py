@@ -4,10 +4,17 @@ from os import path
 def smorf_habitat(outdir,habitatfile,resultfile):
     habitat_file = path.join(outdir,"habitat.out.smorfs.tsv")	
 
-    result = pd.read_csv(resultfile, sep='\t',header=None)
+    result = pd.read_csv(resultfile,sep='\t',header=None)
     result = result.rename(columns={0:'qseqid',1:'sseqid'})
+    if habitatfile.endswith('.gz'):
+        reader =  pd.read_csv(habitatfile,compression="gzip",sep="\t",chunksize=5000000,header=None)
+    if habitatfile.endswith('.xz'):
+        reader =  pd.read_csv(habitatfile,compression="xz",sep="\t",chunksize=5000000,header=None)
+    if habitatfile.endswith('.bz2'):
+        reader =  pd.read_csv(habitatfile,compression="bz2",sep="\t",chunksize=5000000,header=None)
+    else:
+        reader =  pd.read_csv(habitatfile,sep="\t",chunksize=5000000,header=None)
 
-    reader =  pd.read_csv(habitatfile, sep="\t", chunksize=5000000,header=None)
     output_list = []
     for chunk in reader:
         chunk.columns = ['sseqid','habitat']
