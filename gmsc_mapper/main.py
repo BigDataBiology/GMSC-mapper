@@ -270,8 +270,16 @@ def predict(args,tmpdir):
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
     predict_genes(args.genome_fasta,predicted_smorf)
-    filter_smorfs(predicted_smorf, filtered_smorf)
-    print('\nsmORF prediction has done.\n')
+    if not path.getsize(predicted_smorf):
+        sys.stderr.write("GMSC-mapper Error:No smORFs have been predicted.Please check your input file.\n")
+        sys.exit(1)          
+    else:
+        filter_smorfs(predicted_smorf, filtered_smorf)
+    if not path.getsize(filtered_smorf):
+        sys.stderr.write("GMSC-mapper Error:No smORFs remained after filtering by length(<100aa).\n")
+        sys.exit(1)  
+    else:
+        print('\nsmORF prediction has done.\n')
     return filtered_smorf
 
 def translate_gene(args,tmpdir):
@@ -350,7 +358,7 @@ def generate_fasta(output,queryfile,resultfile):
     try:
         result = pd.read_csv(resultfile, sep='\t',header=None)
     except:
-        print('GMSC-mapper Warning: There is no alignment resuls between your input sequences and GMSC.\n')
+        print('GMSC-mapper Warning: There is no alignment results between your input sequences and GMSC.\n')
         sys.exit(1)
 
     print('Start smORF fasta file generating...')
