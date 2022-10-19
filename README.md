@@ -14,8 +14,10 @@ Create conda environment(only support python v3.8/v3.9)
 
 ```bash
 conda create -n gmscmapper python=3.8
+conda activate gmscmapper
 or
 conda create -n gmscmapper python=3.9
+conda activate gmscmapper
 ```
 
 You will need the following dependencies:

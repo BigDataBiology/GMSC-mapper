@@ -199,13 +199,13 @@ def validate_args(args,has_diamond,has_mmseqs):
                 sys.stderr.write("GMSC-mapper Error:The first two columns of output should be `query` and `target`.\n")
                 sys.exit(1)             
 
-    if args.habitat:
+    if not args.nohabitat and args.habitat:
         expect_file(args.habitat)
 
-    if args.taxonomy:
+    if not args.notaxonomy and args.taxonomy:
         expect_file(args.taxonomy)
 
-    if args.quality:
+    if not args.noquality and args.quality:
         expect_file(args.quality)
 
 def create_db(arguments):
