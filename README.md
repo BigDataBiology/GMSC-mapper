@@ -37,45 +37,111 @@ cd GMSC-mapper
 python setup.py install
 ```
 
-## Example usage
-### Default
+## Usage
 
-GMSC database/habitat/taxonomy/quality file path can be assigned on your own after you download them.
+### Example Usage
+The GMSC database is large,and taks some time to process all the things. If you want to know if GMSC-Mapper has been installed successfully and work well, please try the example usage with example target database as below.
+
+#### Create GMSC database index
+`-o`: Path to database output directory.(default: `GMSC-mapper/examples`)
+
+`-m`: Alignment tool(Diamond/MMseqs2).
+```
+cd gmsc_mapper
+gmsc-mapper createdb -i ../examples/target.faa -o ../examples -m diamond
+```
+or
+```
+cd gmsc_mapper
+gmsc-mapper createdb -i ../examples/target.faa -o ../examples -m mmseqs
+```
+
+#### Default
+
+Please make `GMSC-mapper/gmsc_mapper` as your work directory.
+
+GMSC database/habitat/taxonomy/quality file path and output directory path can be assigned on your own.Default is `GMSC-mapper/db` and `GMSC-mapper/output`.
 
 1. Input is genome contig sequences.
 
 ```bash
-gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt
+gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
 ```
 
 2. Input is amino acid sequences.
 
 ```bash
-gmsc-mapper --aa-genes ./examples/example.faa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt
+gmsc-mapper --aa-genes ../examples/example.faa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
 ```
 
 3. Input is nucleotide gene sequences.
 
 ```bash
-gmsc-mapper --nt-genes ./examples/example.fna -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt
-```
-### Alignment tool: Diamond/MMseqs2 is optional
-If you want to change alignment tool(Diamond/MMseqs2), you can use `--tool`.
-```bash
-gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_mmseqs_db --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt --tool mmseqs
+gmsc-mapper --nt-genes ../examples/example.fna --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
 ```
 
-### Habitat/taxonomy/quality annotation is optional
+#### Alignment tool: Diamond/MMseqs2 is optional
+If you want to change alignment tool(Diamond/MMseqs2), you can use `--tool`.
+```bash
+gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --tool mmseqs
+```
+
+#### Habitat/taxonomy/quality annotation is optional
 If you don't want to annotate habitat/taxonomy/quality you can use `--nohabitat`/`--notaxonomy`/`--noquality`.
 ```bash
-gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.txt --nohabitat
+gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --nohabitat --notaxonomy --noquality
 ```
+### Real data Usage
+#### Create GMSC database index
+`-o`: Path to database output directory.(default: `GMSC-mapper/db`)
+
+`-m`: Alignment tool(Diamond/MMseqs2).
+```
+cd gmsc_mapper
+gmsc-mapper createdb -i ../db/90AA_GMSC.faa.gz -m diamond
+```
+or
+```
+cd gmsc_mapper
+gmsc-mapper createdb -i ../db/90AA_GMSC.faa.gz -m mmseqs
+```
+
+#### Default
+
+Please make `GMSC-mapper/gmsc_mapper` as your work directory.
+
+GMSC database/habitat/taxonomy/quality file path and output directory path can be assigned on your own.Default is `GMSC-mapper/db` and `GMSC-mapper/output`.
+
+1. Input is genome contig sequences.
+
 ```bash
-gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --quality ./examples/ref_quality.txt --notaxonomy
+gmsc-mapper -i ../examples/example.fa
 ```
+
+2. Input is amino acid sequences.
+
 ```bash
-gmsc-mapper -i ./examples/example.fa -o ./output --db ./examples/example_diamond_db.dmnd --habitat ./examples/ref_habitat.txt --taxonomy ./examples/ref_taxonomy.txt --noquality
+gmsc-mapper --aa-genes ../examples/example.faa 
 ```
+
+3. Input is nucleotide gene sequences.
+
+```bash
+gmsc-mapper --nt-genes ../examples/example.fna
+```
+
+#### Alignment tool: Diamond/MMseqs2 is optional
+If you want to change alignment tool(Diamond/MMseqs2), you can use `--tool`.
+```bash
+gmsc-mapper -i ../examples/example.fa --tool mmseqs
+```
+
+#### Habitat/taxonomy/quality annotation is optional
+If you don't want to annotate habitat/taxonomy/quality you can use `--nohabitat`/`--notaxonomy`/`--noquality`.
+```bash
+gmsc-mapper -i ../examples/example.fa --nohabitat --notaxonomy --noquality
+```
+
 ## Example Output
 The output folder will contain
 - Outputs of smORF prediction.
@@ -126,3 +192,12 @@ The first two column in result format of Diamond/MMseqs must be "qseqid"/"query"
 * `--noquality`: Use this if no need to annotate quality.
 
 * `-t/--threads`: Number of CPU threads(default=3).
+
+### Subcommands and Parameters 
+Subcommands: `gmsc-mapper createdb`
+
+* `-i`: Path to the GMSC 90AA FASTA file.
+
+* `-o/--output`: Path to database output directory.
+
+* `-m/--mode`: Alignment tool(Diamond/MMseqs2)

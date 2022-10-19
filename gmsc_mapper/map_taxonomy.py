@@ -5,10 +5,18 @@ def smorf_taxonomy(taxfile,resultfile,tmpdirname):
     print('Start taxonomy mapping...')
     taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv") 
     
-    result =  pd.read_csv(resultfile, sep="\t", header=None)
+    result =  pd.read_csv(resultfile,sep="\t",header=None)
     result = result.rename(columns={0:'qseqid',1:'sseqid'})
 
-    reader =  pd.read_csv(taxfile, sep="\t", chunksize=5000000,header=None)
+    if taxfile.endswith('.gz'):
+        reader =  pd.read_csv(taxfile,compression="gzip",sep="\t",chunksize=5000000,header=None)
+    if taxfile.endswith('.xz'):
+        reader =  pd.read_csv(taxfile,compression="xz",sep="\t",chunksize=5000000,header=None)
+    if taxfile.endswith('.bz2'):
+        reader =  pd.read_csv(taxfile,compression="bz2",sep="\t",chunksize=5000000,header=None)
+    else:
+        reader =  pd.read_csv(taxfile,sep="\t",chunksize=5000000,header=None)
+
     output_list = []
     for chunk in reader:
         chunk.columns = ['sseqid','taxonomy']
