@@ -21,8 +21,11 @@ def smorf_habitat(outdir, habitatfile, resultfile):
 
     result = pd.read_csv(resultfile,
                          sep='\t',
-                         header=None,
-                         names=['qseqid', 'sseqid'])
+                         header=None)
+                         
+    result.rename({0: 'qseqid', 1: 'sseqid'},
+                  axis=1,
+                  inplace=True)
                          
     reader =  pd.read_table(habitatfile,
                             sep="\t",
@@ -34,10 +37,13 @@ def smorf_habitat(outdir, habitatfile, resultfile):
     for chunk in reader:
         output_chunk = result.merge(on='sseqid',
                                     right=chunk,
-                                    how='left')[['qseqid', 'habitat']]
+                                    how='left')
+        output = output[['qseqid', 'habitat']]
         output_list.append(output_chunk)
         
-    output = pd.concat(output_list, axis=0)
+    output = pd.concat(output_list,
+                       axis=0)
+    
     output = output.sort_values(by='qseqid')
     
     output = output.groupby('qseqid',
@@ -46,6 +52,7 @@ def smorf_habitat(outdir, habitatfile, resultfile):
     
     output = output.agg({'habitat':lambda x : fixdf(x)})
     output['habitat'] = output['habitat'].apply(lambda x: formatlabel(x))
+    
     output.to_csv(habitat_file,
                   sep='\t',
                   index=False)
