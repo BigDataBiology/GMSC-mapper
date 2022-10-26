@@ -16,7 +16,7 @@ def formatlabel(x):
     return ','.join(x)
     
         
-def smorf_habitat(outdir,habitatfile,resultfile):
+def smorf_habitat(outdir, habitatfile, resultfile):
     habitat_file = path.join(outdir, "habitat.out.smorfs.tsv")	
 
     result = pd.read_csv(resultfile,
@@ -32,15 +32,18 @@ def smorf_habitat(outdir,habitatfile,resultfile):
 
     output_list = []
     for chunk in reader:
-        output_chunk = pd.merge(result,
-                                chunk,
-                                how='left')[['qseqid', 'habitat']]
+        output_chunk = result.merge(on='sseqid',
+                                    right=chunk,
+                                    how='left')[['qseqid', 'habitat']]
         output_list.append(output_chunk)
         
-    output = pd.concat(output_list, axis=0).sort_values(by='qseqid')
+    output = pd.concat(output_list, axis=0)
+    output = output.sort_values(by='qseqid')
+    
     output = output.groupby('qseqid',
                             as_index=False,
                             sort=False)
+    
     output = output.agg({'habitat':lambda x : fixdf(x)})
     output['habitat'] = output['habitat'].apply(lambda x: formatlabel(x))
     output.to_csv(habitat_file,
