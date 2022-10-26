@@ -38,7 +38,7 @@ def smorf_habitat(outdir, habitatfile, resultfile):
         output_chunk = result.merge(on='sseqid',
                                     right=chunk,
                                     how='left')
-        output = output[['qseqid', 'habitat']]
+        output_chunk = output_chunk[['qseqid', 'habitat']]
         output_list.append(output_chunk)
         
     output = pd.concat(output_list,
