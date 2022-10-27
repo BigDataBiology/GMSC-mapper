@@ -17,10 +17,13 @@ def test_smorf_taxonomy():
             mapped_taxonomy.append(line.replace("\n",""))
     assert mapped_taxonomy == known_mapped_taxonomy
 
-known_taxonomy = ["q_seqid\ttaxonomy","smORF_0\td__Bacteria","smORF_1","smORF_2\td__Bacteria"]
+known_taxonomy = ["q_seqid\ttaxonomy","smORF_0\td__Bacteria","smORF_1\t","smORF_2\td__Bacteria"]
 deep_lca_taxonomy = []
 def test_deep_lca():
-    deep_lca('./tests/test_taxonomy.txt',os.path.dirname(os.path.realpath(__file__)),'./tests/alignment.tsv',os.path.dirname(os.path.realpath(__file__)))
+    deep_lca('./tests/test_taxonomy.txt',
+             os.path.dirname(os.path.realpath(__file__)),
+             './tests/alignment.tsv',
+             os.path.dirname(os.path.realpath(__file__)))
     with open('./tests/taxonomy.out.smorfs.tsv',"rt") as f:
         for line in f:
             deep_lca_taxonomy.append(line.replace("\n",""))

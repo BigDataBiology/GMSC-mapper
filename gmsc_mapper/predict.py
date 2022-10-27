@@ -1,9 +1,11 @@
 def create_pyrodigal_orffinder():
-    # generating orf_finder
     import pyrodigal
+    
+    # generating orf_finder
     gorf = pyrodigal.OrfFinder(closed=True,
                                min_gene=33,
                                max_overlap=0)       
+    
     morf_finder = pyrodigal.OrfFinder(meta=True,
                                       closed=True,
                                       min_gene=33,
@@ -31,9 +33,9 @@ def predict_genes(infile, ofile):
     import pandas as pd
     from .fasta import fasta_iter
     from atomicwrites import atomic_write
-
+    
     gorf, morf_finder = create_pyrodigal_orffinder()
-
+    
     # predict genes
     with atomic_write(ofile, overwrite=True) as odb:
         for idx, (h, s) in enumerate(fasta_iter(infile)):
@@ -52,6 +54,7 @@ def predict_genes(infile, ofile):
                     t = ppyrodigal_out(h, i+1, idx+1, pred)
                     odb.write(t)
 
+                    
 def filter_smorfs(ifile, ofile):
     '''Remove larger ORFs, leaving only smORFs behind'''
     from .fasta import fasta_iter
@@ -60,12 +63,11 @@ def filter_smorfs(ifile, ofile):
     n = 0
     with open_output(ofile, mode='wt') as output:
         for h,seq in fasta_iter(ifile,full_header=True):
-            if len(seq) > 100: 
-                continue
-            if seq in seen: 
-                continue
-            seen[h] = seq       
+            if len(seq) > 100: continue
+            elif seq in seen: continue
+            else: seen[h] = seq       
         for h,seq in seen.items():
             h = f'smORF_{n:0{len(str(len(seen)))}} # {h}'
             n += 1
             output.write(">{}\n{}\n".format(h,seq))
+            
