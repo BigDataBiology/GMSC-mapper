@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from os import path
@@ -47,33 +48,34 @@ def smorf_taxonomy(taxfile:str, resultfile:str ,tmpdirname: str) -> str:
 
 def fixformat(x):
     x = x.split(';')
-    if len(x) < 7:
-        n = 7-len(x)
-        for _ in range(n): x.append('')
+    while len(x) < 7:
+        x.append('')
     return ';'.join(x)
 
 
 def reducetab(df):
     df = df.drop_duplicates()
-    cols = list(df.columns)[::-1]
-    tax = dict()
+    cols = list(df.columns)
+    tax, keepflag = [dict(), 0]
     for i in cols:
-        w = df[i].dropna()
-        w = w.drop_duplicates()
-        if len(w) != 1:
+        if keepflag:
             tax[i] = ''
         else:
-            w = w.tolist()[0]
-            tax[i] = w  
-    taxonomy_flag = ''
-    for t in 'dpcofgs':
-        t = tax.get(t, '')
-        taxonomy_flag += f"{t};"
-    while ';;' in taxonomy_flag:
-         taxonomy_flag = taxonomy_flag.replace(';;', ';')     
-    if taxonomy_flag.endswith(';'):
-        taxonomy_flag = taxonomy_flag[:-1]
-    return taxonomy_flag
+            w = df.loc[df[i] != '', i]
+            w = w.value_counts()
+            if len(w) != 1:
+                tax[i] = ''
+                keepflag = 1
+            else:
+                w = w.index[0]
+                tax[i] = w
+    tax_flag = [tax.get(t, '') for t in 'dpcofgs']
+    tax_flag = ';'.join(tax_flag)
+    while ';;' in tax_flag:
+         tax_flag = tax_flag.replace(';;', ';')     
+    if tax_flag.endswith(';'):
+        tax_flag = tax_flag[:-1]
+    return tax_flag
 
 
 def deep_lca(taxfile, outdirname, resultfile, tmpdirname):
@@ -88,7 +90,7 @@ def deep_lca(taxfile, outdirname, resultfile, tmpdirname):
                          header=None,
                          names=['smorf', 'gmsc', 'taxonomy'])
 
-    data = data.fillna(';;;;;;')
+    data = data.fillna('')
     data.taxonomy = data.taxonomy.apply(lambda x: fixformat(x))
     data = data.groupby('smorf').apply(lambda x: x.taxonomy.tolist())
     data = data.reset_index()
@@ -98,9 +100,7 @@ def deep_lca(taxfile, outdirname, resultfile, tmpdirname):
     for _, smorf, tax in data.itertuples():
         tax = [x.split(';') for x in tax]
         tax = pd.DataFrame(tax,
-                           columns=['d', 'p', 'c',
-                                    'o', 'f', 'g',
-                                    's'])
+                           columns=list('dpcofgs'))
         tax = reducetab(tax)
         lca_list.append((smorf, tax))                                    
     
