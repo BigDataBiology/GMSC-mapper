@@ -64,8 +64,10 @@ def reducetab(df):
             tax[i] = ''
         else:
             w = w.tolist()[0]
-            tax[i] = w   
-    taxonomy_flag = f'{tax['d']};{tax['p']};{tax['c']};{tax['o']};{tax['f']};{tax['g']};{tax['s']}'
+            tax[i] = w  
+    taxonomy_flag = ''
+    for t in 'dpcofgs':
+        taxonomy_flag += f'{tax.get(t, '')};'
     while ';;' in taxonomy_flag:
          taxonomy_flag = taxonomy_flag.replace(';;', ';')     
     if taxonomy_flag.endswith(';'):
