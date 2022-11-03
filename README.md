@@ -165,15 +165,15 @@ The output folder will contain
 
   `length`: Alignment length
 
-  `(qstart)`: Start of alignment in query
+  `qstart`: Start of alignment in query
 
-  `(qend)`: End of alignment in query
+  `qend`: End of alignment in query
 
-  `(sstart)`: Start of alignment in target
+  `sstart`: Start of alignment in target
 
-  `(send)`: End of alignment in target
+  `send`: End of alignment in target
 
-  `(bitscore)`: Bit score
+  `bitscore`: Bit score
 
   `pident`: Percentage of identical matches
 
@@ -240,7 +240,7 @@ The output folder will contain
 
 * `-t/--threads`: Number of CPU threads. (default: 1)
 
-* `--filter`: Use this to filter < 100 aa / < 303 nt input sequences. (default: False)
+* `--filter`: Use this to filter <100 aa or <303 nt input sequences. (default: False)
 
 * `--nohabitat`: Use this if no need to annotate habitat. (default: False)
 

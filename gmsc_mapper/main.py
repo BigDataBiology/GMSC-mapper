@@ -95,7 +95,7 @@ def parse_args(args):
                         dest='threads',
                         default=1)
 
-    parser.add_argument('--filter','--filter',action='store_true', help='Use this to filter < 100 aa or < 303 nt input sequences.')
+    parser.add_argument('--filter','--filter',action='store_true', help='Use this to filter <100 aa or <303 nt input sequences.')
 
     parser.add_argument('--nohabitat','--nohabitat',action='store_true', help='Use this if no need to annotate habitat')
 
