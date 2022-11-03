@@ -53,8 +53,8 @@ def parse_args(args):
                         dest='aa_input',
                         default=None)
 
-    parser.add_argument('--nofilter','--nofilter',action='store_true', help='Use this if no need to filter <100aa input sequences')
-
+    parser.add_argument('--filter','--filter',action='store_true', help='Use this to filter < 100 aa or < 303 nt input sequences.')
+ 
     parser.add_argument('--tool', '--tool',
                         required=False,
                         choices=['diamond', 'mmseqs'],
@@ -236,39 +236,14 @@ def flatten(items, ignore_types=(str, bytes)):
         else:
             yield x
 
-def uncompress(input,tmpdir):
-    import gzip
-    import bz2
-    import lzma
-
-    if input.endswith('.gz'):
-        print('Start uncompression...')
-        with gzip.GzipFile(input) as ifile:
-            open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
-        input = tmpdir + '/input.fasta'
-        print('Uncompression has done.\n')
-
-    if input.endswith('.bz2'):
-        print('Start uncompression...')
-        with bz2.BZ2File(input) as ifile:
-            open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
-        input = tmpdir + '/input.fasta'
-        print('Uncompression has done.\n')
-
-    if input.endswith('.xz'):
-        print('Start uncompression...')
-        with lzma.open(input, 'rb') as ifile:
-            open(tmpdir + '/input.fasta', "wb+").write(ifile.read())
-        input = tmpdir + '/input.fasta'	
-        print('Uncompression has done.\n')
- 
-    return input
-
 def predict(args,tmpdir):
     from gmsc_mapper.predict import predict_genes,filter_smorfs
+
     print('Start smORF prediction...')
+
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
+
     predict_genes(args.genome_fasta,predicted_smorf)
     if not path.getsize(predicted_smorf):
         sys.stderr.write("GMSC-mapper Error:No smORFs have been predicted.Please check your input file.\n")
@@ -288,6 +263,22 @@ def translate_gene(args,tmpdir):
     translated_file = translate_gene(args.nt_input,tmpdir)
     print('Gene translation has done.\n')
     return translated_file
+
+def check_length(queryfile):
+    from gmsc_mapper.fasta import fasta_iter
+    print('Start length checking...')
+    message_warning = '''GMSC-mapper Warning: Input sequences are all more than 303nt.
+                        Please check if your input consists of contigs, which should use -i not --nt-genes or --aa-genes as input.
+                        However, we will regard your input sequences as nucleotide genes and continue to process.\n'''
+    all_longer_flag = 1
+
+    for ID, seq in fasta_iter(queryfile):
+        if len(seq) < 303:
+            all_longer_flag = 0   
+            break
+    if all_longer_flag:
+        print(message_warning)
+    print('Length checking has done.\n')
 
 def filter_length(queryfile,tmpdir,N):
     from gmsc_mapper.filter_length import filter_length
@@ -451,18 +442,17 @@ def main(args=None):
                 summary = []
                 summary.append(f'# Total number')
                 if args.genome_fasta:
-                    args.genome_fasta = uncompress(args.genome_fasta,tmpdir)
                     queryfile = predict(args,tmpdir)
                     smorf_number = int(predicted_smorf_count(queryfile)/2)
                     summary.append(f'{str(smorf_number)} smORFs are predicted in total.')
                 if args.nt_input:
-                    args.nt_input = uncompress(args.nt_input,tmpdir)
-                    if not args.nofilter:
+                    if args.filter:
                         args.nt_input = filter_length(args.nt_input,tmpdir,303)
+                    else:
+                        check_length(args.nt_input)
                     queryfile = translate_gene(args,tmpdir)  
                 if args.aa_input:
-                    args.aa_input = uncompress(args.aa_input,tmpdir)
-                    if not args.nofilter:
+                    if args.filter:
                         args.aa_input = filter_length(args.aa_input,tmpdir,100)
                     queryfile = args.aa_input
 

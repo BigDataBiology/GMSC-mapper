@@ -149,7 +149,7 @@ The output folder will contain
 
   A file listing all the query hits of GMSC, from Diamond or MMseqs2.
 
-  The default format is followed by a space-separated list of these keywords:
+  The file format is followed by a space-separated list of these keywords:
 
   `qseqid`: Query seq id
 
@@ -220,13 +220,13 @@ The output folder will contain
   A file providing a human-readable summary of the results.
 
 ## Parameters
-* `-i/--input`: Path to the input genome contig sequence FASTA file (possibly .gz / .bz2 compressed).
+* `-i/--input`: Path to the input genome contig sequence FASTA file (possibly .gz compressed).
 
-* `--aa-genes`: Path to the input amino acid sequence FASTA file (possibly .gz / .bz2 compressed).
+* `--aa-genes`: Path to the input amino acid sequence FASTA file (possibly .gz compressed).
 
-* `--nt-genes`: Path to the input nucleotide gene sequence FASTA file (possibly .gz / .bz2 compressed).
+* `--nt-genes`: Path to the input nucleotide gene sequence FASTA file (possibly .gz compressed).
 
-* `--nofilter`: Use this if no need to filter <100aa input sequences. (default: False)
+* `--filter`: Use this to filter < 100 aa / <303nt input sequences. (default: False)
 
 * `-o/--output`: Output directory (will be created if non-existent). (default: ../output)
 

@@ -13,9 +13,10 @@ def translate_gene(nt_input,tmpdirname):
     from .fasta import fasta_iter
     from Bio.Seq import Seq
     from os import path
+    import gzip
 
-    translated_file = path.join(tmpdirname,"translated.faa")
-    with open(translated_file,'wt') as of:
+    translated_file = path.join(tmpdirname,"translated.faa.gz")
+    with gzip.open(translated_file,'wt',compresslevel=1) as of:
         for ID,seq in fasta_iter(nt_input):
             seq = check_frame(seq)
             translated_seq = Seq(seq).translate()
