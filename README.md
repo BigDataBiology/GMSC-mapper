@@ -226,40 +226,40 @@ The output folder will contain
 
 * `--nt-genes`: Path to the input nucleotide gene sequence FASTA file (possibly .gz compressed).
 
-* `--filter`: Use this to filter < 100 aa / <303nt input sequences. (default: False)
-
 * `-o/--output`: Output directory (will be created if non-existent). (default: ../output)
 
 * `--tool`: Sequence alignment tool (Diamond / MMseqs). (default: diamond)
 
-* `--db`: Path to the GMSC database file. (default: ../db/targetdb.dmnd)
+*  `-s/--sensitivity`: Sensitivity. (default: --more-sensitive (Diamond) 5.7 (mmseqs))
 
-*  `-s/--sensitivity`: Sensitivity. (default: --more-sensitive(Diamond) 5.7(mmseqs))
+* `--id`: Minimum identity to report an alignment (range 0.0-1.0). (default: 0.0)
 
-* `--id`: Minimum identity to report an alignment(range 0.0-1.0). (default: 0.0)
+* `--cov`: Minimum coverage to report an alignment (range 0.0-1.0). (default: 0.9)
 
-* `--cov`: Minimum coverage to report an alignment(range 0.0-1.0). (default: 0.9)
+* `-e/--evalue`: Maximum e-value to report alignments. (default: 1e-05)
 
-* `-e/--evalue`: Maximum e-value to report alignments(default=0.00001). (default: 1e-05)
+* `-t/--threads`: Number of CPU threads. (default: 1)
 
-* `--habitat`: Path to the habitat file. (default: ../db/ref_habitat.tsv.xz)
+* `--filter`: Use this to filter < 100 aa / < 303 nt input sequences. (default: False)
 
 * `--nohabitat`: Use this if no need to annotate habitat. (default: False)
 
-* `--taxonomy`: Path to the taxonomy file. (default: ../db/ref_taxonomy.tsv.xz)
-
 * `--notaxonomy`: Use this if no need to annotate taxonomy. (default: False)
-
-* `--quality`: Path to the quality file. (default: ../db/ref_quality.tsv.xz)
 
 * `--noquality`: Use this if no need to annotate quality. (default: False)
 
-* `-t/--threads`: Number of CPU threads. (default: 1)
+* `--db`: Path to the GMSC database file. (default: ../db/targetdb.dmnd)
+
+* `--habitat`: Path to the habitat file. (default: ../db/ref_habitat.tsv.xz)
+
+* `--taxonomy`: Path to the taxonomy file. (default: ../db/ref_taxonomy.tsv.xz)
+
+* `--quality`: Path to the quality file. (default: ../db/ref_quality.tsv.xz)
 
 ### Subcommands and Parameters 
 Subcommands: `gmsc-mapper createdb`
 
-* `-i`: Path to the GMSC 90AA FASTA file.
+* `-i`: Path to the GMSC FASTA file.
 
 * `-o/--output`: Path to database output directory. (default: ../db)
 

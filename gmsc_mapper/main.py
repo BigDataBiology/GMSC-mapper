@@ -21,7 +21,7 @@ def parse_args(args):
                                           help='Create target database')
     cmd_create_db.add_argument('-i',
                                required=True,
-                               help='Path to the GMSC 90AA FASTA file.',
+                               help='Path to the GMSC FASTA file.',
                                dest='target_faa',
                                default = None)
     cmd_create_db.add_argument('-o', '--output',
@@ -31,7 +31,7 @@ def parse_args(args):
                                default = path.join(_ROOT, 'db'))
     cmd_create_db.add_argument('-m', '--mode',
                                required=True,
-                               help='Alignment tool(Diamond/MMseqs2)',
+                               help='Alignment tool (Diamond / MMseqs2)',
                                dest='mode',
                                default = None)
 
@@ -53,83 +53,79 @@ def parse_args(args):
                         dest='aa_input',
                         default=None)
 
-    parser.add_argument('--filter','--filter',action='store_true', help='Use this to filter < 100 aa or < 303 nt input sequences.')
+    parser.add_argument('-o', '--output',
+                        required=False,
+                        help='Output directory (will be created if non-existent)',
+                        dest='output',
+                        default=path.join(_ROOT, 'output'))	
  
     parser.add_argument('--tool', '--tool',
                         required=False,
                         choices=['diamond', 'mmseqs'],
-                        help='Sequence alignment tool(Diamond/MMseqs).',
+                        help='Sequence alignment tool (Diamond / MMseqs).',
                         dest='tool',
                         default='diamond')
-
-    parser.add_argument('--db', '--db',
-                        required=False,
-                        help='Path to the GMSC database file.',
-                        dest='database',
-                        default=None)
 
     parser.add_argument('-s', '--sensitivity',
                         required=False,
                         help='Sensitivity.',
-                        dest='sensitivity',
-                        default=None)
+                        dest='sensitivity')
 
     parser.add_argument('--id', '--id',
                         required=False,
-                        help='Minimum identity to report an alignment(range 0.0-1.0).',
+                        help='Minimum identity to report an alignment (range 0.0-1.0).',
                         dest='identity',
                         default=0.0)
 
     parser.add_argument('--cov', '--cov',
                         required=False,
-                        help='Minimum coverage to report an alignment(range 0.0-1.0).',
+                        help='Minimum coverage to report an alignment (range 0.0-1.0).',
                         dest='coverage',
                         default=0.9)
 
     parser.add_argument('-e', '--evalue',
                         required=False,
-                        help='Maximum e-value to report alignments(default=0.00001).',
+                        help='Maximum e-value to report alignments.',
                         dest='evalue',
                         default=0.00001)
 
-    parser.add_argument('--outfmt', '--outfmt',
+    parser.add_argument('-t', '--threads',
                         required=False,
-                        help='Output format of alignment result.\nDiamond default is `6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp`.\nMMseqs default is `query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov`.\nThe first two column in result format of Diamond/MMseqs must be `qseqid`/`query` and `sseqid`/`target`.',
-                        dest='outfmt',
-                        default=None)   
+                        help='Number of CPU threads.',
+                        dest='threads',
+                        default=1)
+
+    parser.add_argument('--filter','--filter',action='store_true', help='Use this to filter < 100 aa or < 303 nt input sequences.')
+
+    parser.add_argument('--nohabitat','--nohabitat',action='store_true', help='Use this if no need to annotate habitat')
+
+    parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
+
+    parser.add_argument('--noquality', '--noquality',action='store_true', help='Use this if no need to annotate quality')
+
+    parser.add_argument('--db', '--db',
+                        required=False,
+                        help='Path to the GMSC database file.',
+                        dest='database')
 
     parser.add_argument('--habitat', '--habitat',
                         required=False,
                         help='Path to the habitat file',
                         dest='habitat',
                         default=path.join(_ROOT, 'db/ref_habitat.tsv.xz'))
-    parser.add_argument('--nohabitat','--nohabitat',action='store_true', help='Use this if no need to annotate habitat')
 
     parser.add_argument('--taxonomy', '--taxonomy',
                         required=False,
                         help='Path to the taxonomy file',
                         dest='taxonomy',
                         default=path.join(_ROOT, 'db/ref_taxonomy.tsv.xz'))
-    parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
 
     parser.add_argument('--quality', '--quality',
                         required=False,
                         help='Path to the quality file',
                         dest='quality',
                         default=path.join(_ROOT, 'db/ref_quality.tsv.xz'))
-    parser.add_argument('--noquality', '--noquality',action='store_true', help='Use this if no need to annotate quality')
 
-    parser.add_argument('-o', '--output',
-                        required=False,
-                        help='Output directory (will be created if non-existent)',
-                        dest='output',
-                        default=path.join(_ROOT, 'output'))	
-
-    parser.add_argument('-t', '--threads',
-                        required=False,
-                        help='Number of CPU threads(default=3).',
-                        dest='threads',
-                        default=3)		
     return parser.parse_args()
 
 def check_install():
@@ -186,18 +182,7 @@ def validate_args(args,has_diamond,has_mmseqs):
         sys.exit(1)
 
     if args.database:
-        expect_file(args.database) 
-    
-    if args.outfmt:
-        keywords = args.outfmt.split(",")
-        if args.tool == "diamond":
-            if  keywords[0] != "6" or keywords[1] != "qseqid" or keywords[2] != "sseqid":
-                sys.stderr.write("GMSC-mapper Error:Outfmt value should be 6 (BLAST tabular format).And the first two columns of output should be `qseqid` and `sseqid`.\n")
-                sys.exit(1)                
-        if args.tool == "mmseqs":
-            if  keywords[0] != "query" or keywords[1] != "target":
-                sys.stderr.write("GMSC-mapper Error:The first two columns of output should be `query` and `target`.\n")
-                sys.exit(1)             
+        expect_file(args.database)      
 
     if not args.nohabitat and args.habitat:
         expect_file(args.habitat)
@@ -290,8 +275,9 @@ def filter_length(queryfile,tmpdir,N):
 def mapdb_diamond(args,queryfile):
     print('Start smORF mapping...')
  
-    resultfile = path.join(args.output,"diamond.out.smorfs.tsv")
-
+    resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
+    outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,length,qstart,qend,sstart,send,bitscore,pident,evalue,qcovhsp,scovhsp'
+    
     subprocess.check_call([x for x in flatten([
         'diamond','blastp',
         '-q',queryfile,
@@ -303,7 +289,7 @@ def mapdb_diamond(args,queryfile):
         '--query-cover',str(float(args.coverage)*100),
         '--subject-cover',str(float(args.coverage)*100),
         '-p',str(args.threads),
-        '--outfmt',args.outfmt.split(',')])])  
+        '--outfmt',outfmt.split(',')])])  
 
     print('\nsmORF mapping has done.\n')
     return resultfile
@@ -314,7 +300,8 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
     querydb = path.join(tmpdir,"query.db")
     resultdb = path.join(tmpdir,"result.db")
     tmp = path.join(tmpdir,"tmp","")
-    resultfile = path.join(args.output,"mmseqs.out.smorfs.tsv")
+    resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
+    outfmt = 'query,target,qseq,tseq,qlen,tlen,alnlen,qstart,qend,tstart,tend,bits,pident,evalue,qcov,tcov'
 
     subprocess.check_call([
         'mmseqs','createdb',queryfile,querydb]) 
@@ -337,7 +324,7 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
         args.database,
         resultdb,
         resultfile,
-        '--format-output',args.outfmt])		
+        '--format-output',outfmt])		
 
     print('\nsmORF mapping has done.\n')
     return resultfile
@@ -424,15 +411,11 @@ def main(args=None):
                 args.sensitivity = '--very-sensitive'
             if args.sensitivity == '7':
                 args.sensitivity = '--ultra-sensitive'
-            if args.outfmt is None:
-                args.outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp'
         if args.tool == 'mmseqs':
             if args.database is None:
                 args.database = path.join(_ROOT, 'db/targetdb')
             if args.sensitivity is None:
                 args.sensitivity = 5.7
-            if args.outfmt is None:
-                args.outfmt = 'query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov'
 
         if not os.path.exists(args.output):
             os.makedirs(args.output)
