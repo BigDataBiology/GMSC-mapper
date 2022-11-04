@@ -35,54 +35,47 @@ During the process, we install also the following dependencies:
 - [MMseqs2](https://github.com/soedinglab/MMseqs2)
 - [Diamond](https://github.com/bbuchfink/diamond)
 
-Because the whole GMSC database is large, and takes some time to process all the things. We perform a series of tests using mock datasets to check if the installation works well:
+### Example test
+Because the whole GMSC database is large, and takes some minutes to process. 
 
-- test.sh
+If you want to check if the installation works well, you can test with mock datasets easily and fast.
 
-0. Create GMSC database index
-`-o`: Path to database output directory.(default: `GMSC-mapper/examples`)
+- Create GMSC database index
 
-`-m`: Alignment tool (Diamond / MMseqs2).
-```
-cd gmsc_mapper
-gmsc-mapper createdb -i ../examples/target.faa -o ../examples -m diamond
-```
-or
-```
-cd gmsc_mapper
-gmsc-mapper createdb -i ../examples/target.faa -o ../examples -m mmseqs
-```
-
-1. Input is genome contig sequences.
+Default alignment tool is Diamond.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
+gmsc-mapper createdb -i examples/target.faa -o examples/ -m diamond
 ```
 
-2. Input is amino acid sequences.
+If you want to use MMseqs2 as your alignment tool, you need to create GMSC database index in MMseqs2 format.
 
 ```bash
-gmsc-mapper --aa-genes ../examples/example.faa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
+gmsc-mapper createdb -i examples/target.faa -o examples/ -m mmseqs
 ```
 
-3. Input is nucleotide gene sequences.
+- Input is genome contig sequences.
 
 ```bash
-gmsc-mapper --nt-genes ../examples/example.fna --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
+gmsc-mapper -i examples/example.fa -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
 ```
 
-4. Check the Alignment tool: Diamond / MMseqs2 is optional
+- Input is amino acid sequences.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --tool mmseqs
-
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --tool diamond
+gmsc-mapper --aa-genes examples/example.faa -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
 ```
 
-5. Flags to disable results from Habitat / taxonomy / quality annotation
+- Input is nucleotide gene sequences.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --nohabitat --notaxonomy --noquality
+gmsc-mapper --nt-genes examples/example.fna -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
+```
+
+- Check another alignment tool: MMseqs2
+
+```bash
+gmsc-mapper -i examples/example.fa -o examples_output/ --db examples/targetdb --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt --tool mmseqs
 ```
 
 ## Usage

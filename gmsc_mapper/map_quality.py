@@ -42,6 +42,7 @@ def smorf_quality(outdir:str, qualityfile:str, resultfile:str) -> tuple:
     
     output = output.agg({'quality': lambda x: ','.join(x.drop_duplicates())})  
     output['quality'] = output['quality'].apply(lambda x: judgefunc(x))
+    output = output.sort_values(by='qseqid')
     
     number_dict = dict(output['quality'].value_counts())
     number_dict_normalize = dict(output['quality'].value_counts(normalize=True))
