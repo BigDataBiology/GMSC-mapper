@@ -34,6 +34,7 @@ def parse_args(args):
                                help='Alignment tool (Diamond / MMseqs2)',
                                dest='mode',
                                default = None)
+    cmd_create_db.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
 
     parser.add_argument('-i', '--input',
                         required=False,
@@ -102,6 +103,8 @@ def parse_args(args):
     parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
 
     parser.add_argument('--noquality', '--noquality',action='store_true', help='Use this if no need to annotate quality')
+    
+    parser.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
 
     parser.add_argument('--db', '--db',
                         required=False,
@@ -193,24 +196,36 @@ def validate_args(args,has_diamond,has_mmseqs):
     if not args.noquality and args.quality:
         expect_file(args.quality)
 
-def create_db(arguments):
-    if not os.path.exists(arguments.output):
-        os.makedirs(arguments.output)
-    out_db = path.join(arguments.output,"targetdb")
+def create_db(args):
+    if not os.path.exists(args.output):
+        os.makedirs(args.output)
+    out_db = path.join(args.output,"targetdb")
 
-    if arguments.mode == "diamond":
+    if args.quiet:
+        diamond_cmd = ['diamond','makedb',
+                        '--in',args.target_faa,
+                        '-d',out_db,
+                        '--quiet']
+        mmseqs_cmd = ['mmseqs','createdb',
+                        args.target_faa,
+                        out_db,
+                        '-v','0']    
+    else:                    
+        diamond_cmd = ['diamond','makedb',
+                    '--in',args.target_faa,
+                    '-d',out_db]
+        mmseqs_cmd = ['mmseqs','createdb',
+                    args.target_faa,
+                    out_db]
+    
+    if args.mode == "diamond":
         print('Start creating Diamond database...')
-        subprocess.check_call([
-            'diamond','makedb',
-            '--in',arguments.target_faa,
-            '-d',out_db]) 
+        subprocess.check_call(diamond_cmd) 
         print('\nDiamond database has been created successfully.\n')
-    if arguments.mode == "mmseqs":
+
+    if args.mode == "mmseqs":
         print('Start creating MMseqs database...')
-        subprocess.check_call([
-            'mmseqs','createdb',
-            arguments.target_faa,
-            out_db]) 
+        subprocess.check_call(mmseqs_cmd) 
         print('\nMMseqs database has been created successfully.\n')
 
 def flatten(items, ignore_types=(str, bytes)):
@@ -278,18 +293,33 @@ def mapdb_diamond(args,queryfile):
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,length,qstart,qend,sstart,send,bitscore,pident,evalue,qcovhsp,scovhsp'
     
-    subprocess.check_call([x for x in flatten([
-        'diamond','blastp',
-        '-q',queryfile,
-        '-d',args.database,
-        '-o',resultfile,
-        args.sensitivity,
-        '-e',str(args.evalue),
-        '--id',str(float(args.identity)*100),
-        '--query-cover',str(float(args.coverage)*100),
-        '--subject-cover',str(float(args.coverage)*100),
-        '-p',str(args.threads),
-        '--outfmt',outfmt.split(',')])])  
+    if args.quiet:
+        diamond_cmd = ['diamond','blastp',
+                        '-q',queryfile,
+                        '-d',args.database,
+                        '-o',resultfile,
+                        args.sensitivity,
+                        '-e',str(args.evalue),
+                        '--id',str(float(args.identity)*100),
+                        '--query-cover',str(float(args.coverage)*100),
+                        '--subject-cover',str(float(args.coverage)*100),
+                        '-p',str(args.threads),
+                        '--outfmt',outfmt.split(','),
+                        '--quiet']
+    else:
+        diamond_cmd = ['diamond','blastp',
+                        '-q',queryfile,
+                        '-d',args.database,
+                        '-o',resultfile,
+                        args.sensitivity,
+                        '-e',str(args.evalue),
+                        '--id',str(float(args.identity)*100),
+                        '--query-cover',str(float(args.coverage)*100),
+                        '--subject-cover',str(float(args.coverage)*100),
+                        '-p',str(args.threads),
+                        '--outfmt',outfmt.split(',')]
+
+    subprocess.check_call([x for x in flatten(diamond_cmd)])  
 
     print('\nsmORF mapping has done.\n')
     return resultfile
@@ -302,29 +332,51 @@ def mapdb_mmseqs(args,queryfile,tmpdir):
     tmp = path.join(tmpdir,"tmp","")
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = 'query,target,qseq,tseq,qlen,tlen,alnlen,qstart,qend,tstart,tend,bits,pident,evalue,qcov,tcov'
+    
+    if args.quiet:
+        mmseqs_cmd_db = ['mmseqs','createdb',queryfile,querydb,'-v','0']
+        mmseqs_cmd_search = ['mmseqs','search',
+                            querydb,
+                            args.database,
+                            resultdb,
+                            tmp,
+                            '-s',str(args.sensitivity),
+                            '-e',str(args.evalue),
+                            '--min-seq-id',str(args.identity),
+                            '-c',str(args.coverage),
+                            '--threads',str(args.threads),
+                            '-v','0']
+        mmseqs_cmd_out = ['mmseqs','convertalis',
+                        querydb,
+                        args.database,
+                        resultdb,
+                        resultfile,
+                        '--format-output',outfmt,
+                        '-v','0']
+    else:
+        mmseqs_cmd_db = ['mmseqs','createdb',queryfile,querydb]
+        mmseqs_cmd_search = ['mmseqs','search',
+                            querydb,
+                            args.database,
+                            resultdb,
+                            tmp,
+                            '-s',str(args.sensitivity),
+                            '-e',str(args.evalue),
+                            '--min-seq-id',str(args.identity),
+                            '-c',str(args.coverage),
+                            '--threads',str(args.threads)]
+        mmseqs_cmd_out = ['mmseqs','convertalis',
+                        querydb,
+                        args.database,
+                        resultdb,
+                        resultfile,
+                        '--format-output',outfmt]
 
-    subprocess.check_call([
-        'mmseqs','createdb',queryfile,querydb]) 
+    subprocess.check_call(mmseqs_cmd_db) 
 
-    subprocess.check_call([
-        'mmseqs','search',
-        querydb,
-        args.database,
-        resultdb,
-        tmp,
-        '-s',str(args.sensitivity),
-        '-e',str(args.evalue),
-        '--min-seq-id',str(args.identity),
-        '-c',str(args.coverage),
-        '--threads',str(args.threads)])  
+    subprocess.check_call(mmseqs_cmd_search)  
 
-    subprocess.check_call([
-        'mmseqs','convertalis',
-        querydb,
-        args.database,
-        resultdb,
-        resultfile,
-        '--format-output',outfmt])		
+    subprocess.check_call(mmseqs_cmd_out)		
 
     print('\nsmORF mapping has done.\n')
     return resultfile
