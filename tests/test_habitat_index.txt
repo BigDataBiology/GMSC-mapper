@@ -1,0 +1,4 @@
+0	human gut
+1	marine,wastewater,water associated
+2	marine,water associated
+3	soil

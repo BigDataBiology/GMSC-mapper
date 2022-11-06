@@ -115,7 +115,13 @@ def parse_args(args):
                         required=False,
                         help='Path to the habitat file',
                         dest='habitat',
-                        default=path.join(_ROOT, 'db/ref_habitat.tsv.xz'))
+                        default=path.join(_ROOT, 'db/ref_habitat.npy'))
+
+    parser.add_argument('--habitat-index', '--habitat-index',
+                        required=False,
+                        help='Path to the habitat index file',
+                        dest='habitatindex',
+                        default=path.join(_ROOT, 'db/ref_habitat_index.tsv'))
 
     parser.add_argument('--taxonomy', '--taxonomy',
                         required=False,
@@ -406,7 +412,7 @@ def generate_fasta(output,queryfile,resultfile):
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
     print('Start habitat annotation...')
-    single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.output,args.habitat,resultfile)
+    single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.habitatindex,args.output,args.habitat,resultfile)
     print('habitat annotation has done.\n')
     return single_number,single_percentage,multi_number,multi_percentage 
 

@@ -241,6 +241,8 @@ The output folder will contain
 
 * `--noquality`: Use this if no need to annotate quality. (default: False)
 
+* `--quiet`: Disable alignment console output. (default:False)
+
 * `--db`: Path to the GMSC database file. (default: ../db/targetdb.dmnd)
 
 * `--habitat`: Path to the habitat file. (default: ../db/ref_habitat.tsv.xz)
@@ -257,6 +259,8 @@ Subcommands: `gmsc-mapper createdb`
 * `-o/--output`: Path to database output directory. (default: ../db)
 
 * `-m/--mode`: Alignment tool (Diamond / MMseqs2).
+
+* `--quiet`: Disable alignment console output. (default:False)
 
 ## Sensitivity choices considering time and memory usage
 To be done
