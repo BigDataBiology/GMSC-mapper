@@ -127,7 +127,13 @@ def parse_args(args):
                         required=False,
                         help='Path to the taxonomy file',
                         dest='taxonomy',
-                        default=path.join(_ROOT, 'db/ref_taxonomy.tsv.xz'))
+                        default=path.join(_ROOT, 'db/ref_taxonomy.npy'))
+
+    parser.add_argument('--taxonomy-index', '--taxonomy-index',
+                        required=False,
+                        help='Path to the taxonomy index file',
+                        dest='taxonomyindex',
+                        default=path.join(_ROOT, 'db/ref_taxonomy_index.tsv'))
 
     parser.add_argument('--quality', '--quality',
                         required=False,
@@ -419,7 +425,7 @@ def habitat(args,resultfile):
 def taxonomy(args,resultfile,tmpdirname):
     from gmsc_mapper.map_taxonomy import deep_lca,taxa_summary
     print('Start taxonomy annotation...')
-    deep_lca(args.taxonomy,args.output,resultfile,tmpdirname)
+    deep_lca(args.taxonomyindex,args.taxonomy,args.output,resultfile,tmpdirname)
     annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
     print('taxonomy annotation has done.\n')
     return annotated_number,rank_number,rank_percentage
