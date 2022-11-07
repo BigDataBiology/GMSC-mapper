@@ -1,19 +1,15 @@
 # Total number
-
 31 smORFs are predicted in total.
 28 smORFs are aligned against GMSC in total.
 
 # Quality
-
 8(28.57%) aligned smORFs are high quality.
 
 # Habitat
-
 25(89.29%) aligned smORFs are single-habitat.
 3(10.71%) aligned smORFs are multi-habitat.
 
 # Taxonomy
-
 8(28.57%) aligned smORFs have taxonomy annotation.
 3(10.71%) aligned smORFs are annotated on kingdom.
 0(0%) aligned smORFs are annotated on phylum.

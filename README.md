@@ -1,6 +1,14 @@
 # GMSC-mapper
 
-Command line tool to query the Global Microbial smORFs Catalog (GMSC)
+GMSC-mapper is a command line tool to query the Global Microbial smORFs Catalog (GMSC).
+
+GMSC-mapper can be used to 
+- Find query smORFs (< 100aa) homologous to Global Microbial smORFs Catalog (GMSC) by alignment.
+  - Support 3 types of input:
+    - contigs (GMSC-mapper will predict smORFs from contigs first)
+    - amino acid sequences
+    - nucleotide gene sequences
+- Annotate query/predicted smORFs with quality, habitat and taxonomy information constructed manually in detail.
 
 ## Installation
 
@@ -27,64 +35,57 @@ During the process, we install also the following dependencies:
 - [MMseqs2](https://github.com/soedinglab/MMseqs2)
 - [Diamond](https://github.com/bbuchfink/diamond)
 
-And perform a series of tests using mock datasets to check if the installation works well:
+### Example test
+Because the whole GMSC database is large, and takes some minutes to process. 
 
-1. Input is genome contig sequences.
+If you want to check if the installation works well, you can test with mock datasets easily and fast.
+
+- Create GMSC database index
+
+Default alignment tool is Diamond.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
+gmsc-mapper createdb -i examples/target.faa -o examples/ -m diamond
 ```
 
-2. Input is amino acid sequences.
+If you want to use MMseqs2 as your alignment tool, you need to create GMSC database index in MMseqs2 format.
 
 ```bash
-gmsc-mapper --aa-genes ../examples/example.faa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
+gmsc-mapper createdb -i examples/target.faa -o examples/ -m mmseqs
 ```
 
-3. Input is nucleotide gene sequences.
+- Input is genome contig sequences.
 
 ```bash
-gmsc-mapper --nt-genes ../examples/example.fna --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt
+gmsc-mapper -i examples/example.fa -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
 ```
 
-4. Check the Alignment tool: Diamond/MMseqs2 is optional
+- Input is amino acid sequences.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --tool mmseqs
-
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --tool diamond
+gmsc-mapper --aa-genes examples/example.faa -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
 ```
 
-5. Flags to disable results from Habitat/taxonomy/quality annotation
+- Input is nucleotide gene sequences.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --db ../examples/targetdb.dmnd --habitat ../examples/ref_habitat.txt --quality ../examples/ref_quality.txt --taxonomy ../examples/ref_taxonomy.txt --nohabitat --notaxonomy --noquality
+gmsc-mapper --nt-genes examples/example.fna -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
+```
+
+- Check another alignment tool: MMseqs2
+
+```bash
+gmsc-mapper -i examples/example.fa -o examples_output/ --db examples/targetdb --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt --tool mmseqs
 ```
 
 ## Usage
+Please make `GMSC-mapper/gmsc_mapper` as your work directory.
 
-### Example Usage
-The GMSC database is large,and taks some time to process all the things. If you want to know if GMSC-Mapper has been installed successfully and work well, please try the example usage with example target database as below.
-
-#### Create GMSC database index
-`-o`: Path to database output directory.(default: `GMSC-mapper/examples`)
-
-`-m`: Alignment tool(Diamond/MMseqs2).
-```
-cd gmsc_mapper
-gmsc-mapper createdb -i ../examples/target.faa -o ../examples -m diamond
-```
-or
-```
-cd gmsc_mapper
-gmsc-mapper createdb -i ../examples/target.faa -o ../examples -m mmseqs
-```
-
-### Real data Usage
-#### Create GMSC database index
+### Create GMSC database index
 `-o`: Path to database output directory.(default: `GMSC-mapper/db`)
 
-`-m`: Alignment tool(Diamond/MMseqs2).
+`-m`: Alignment tool (Diamond / MMseqs2).
+
 ```
 cd gmsc_mapper
 gmsc-mapper createdb -i ../db/90AA_GMSC.faa.gz -m diamond
@@ -95,11 +96,8 @@ cd gmsc_mapper
 gmsc-mapper createdb -i ../db/90AA_GMSC.faa.gz -m mmseqs
 ```
 
-#### Default
-
-Please make `GMSC-mapper/gmsc_mapper` as your work directory.
-
-GMSC database/habitat/taxonomy/quality file path and output directory path can be assigned on your own.Default is `GMSC-mapper/db` and `GMSC-mapper/output`.
+### Default
+GMSC database / habitat / taxonomy / quality file path and output directory path can be assigned on your own.Default is `GMSC-mapper/db` and `GMSC-mapper/output`.
 
 1. Input is genome contig sequences.
 
@@ -119,74 +117,150 @@ gmsc-mapper --aa-genes ../examples/example.faa
 gmsc-mapper --nt-genes ../examples/example.fna
 ```
 
-#### Alignment tool: Diamond/MMseqs2 is optional
-If you want to change alignment tool(Diamond/MMseqs2), you can use `--tool`.
+### Alignment tool: Diamond / MMseqs2 is optional
+If you want to change alignment tool (Diamond / MMseqs2), you can use `--tool`.
+
 ```bash
 gmsc-mapper -i ../examples/example.fa --tool mmseqs
 ```
 
-#### Habitat/taxonomy/quality annotation is optional
-If you don't want to annotate habitat/taxonomy/quality you can use `--nohabitat`/`--notaxonomy`/`--noquality`.
+### Habitat / taxonomy / quality annotation is optional
+If you don't want to annotate habitat / taxonomy / quality you can use `--nohabitat`/`--notaxonomy`/`--noquality`.
+
 ```bash
 gmsc-mapper -i ../examples/example.fa --nohabitat --notaxonomy --noquality
 ```
 
-## Example Output
+## Output files
 The output folder will contain
-- Outputs of smORF prediction.
-- Complete mapping result table, listing all the hits in GMSC, per smORF.
-- Habitat annotation of smORFs.(optional)
-- Taxonomy annotation of smORFs.(optional)
-- Quality annotation of smORFs.(optional)
+
+- Outputs of smORFs prediction (predicted.filterd.smorf.faa)
+
+  A FASTA file with the sequences of the predicted smORFs. It is generated when the input file is contigs.
+
+- Complete alignment result table (diamond.out.smorfs.tsv / mmseqs.out.smorfs.tsv)
+
+  A file listing all the query hits of GMSC, from Diamond or MMseqs2.
+
+  The file format is followed by a space-separated list of these keywords:
+
+  `qseqid`: Query seq id
+
+  `sseqid`: Target seq id (in GMSC)
+
+  `full_qseq`: Query sequences
+
+  `full_sseq`: Target sequences (in GMSC)
+
+  `qlen`: Query sequences length
+
+  `slen`: Target sequences length
+
+  `length`: Alignment length
+
+  `qstart`: Start of alignment in query
+
+  `qend`: End of alignment in query
+
+  `sstart`: Start of alignment in target
+
+  `send`: End of alignment in target
+
+  `bitscore`: Bit score
+
+  `pident`: Percentage of identical matches
+
+  `evalue`: Expect value
+
+  `qcovhsp`: Query Coverage
+
+  `scovhsp`: Target Coverage
+
+- Total smORFs homologous to GMSC (mapped.smorfs.faa)
+
+  A FASTA file with the sequences of query/predicted smORFs homologous to GMSC.
+
+- Habitat annotation of smORFs (optional) (habitat.out.smorfs.tsv) 
+
+  A file listing the habitat annotation for each smORF homologous to GMSC.
+
+  There are two columns in the file:
+
+  `qseqid`: Query seq id
+
+  `habitat`: Habitat, ',' separated if the sequences is from multiple habitats
+
+- Taxonomy annotation of smORFs (optional) (taxonomy.out.smorfs.tsv)
+
+  A file listing the taxonomy annotation for each smORF homologous to GMSC.
+
+  There are two columns in the file:
+
+  `qseqid`: Query seq id
+
+  `taxonomy`: Taxonomy, ';' separated between each taxonomy rank
+
+- Quality annotation of smORFs (optional) (quality.out.smorfs.tsv)
+
+  A file listing the quality annotation for each smORF homologous to GMSC.
+
+  `qseqid`: Query seq id
+
+  `quality`: Quality label
+
+- Summry (summary.txt)
+
+  A file providing a human-readable summary of the results.
 
 ## Parameters
-* `-i/--input`: Path to the input genome contig sequence FASTA file (possibly .gz/.bz2/.xz compressed).
+* `-i/--input`: Path to the input genome contig sequence FASTA file (possibly .gz compressed).
 
-* `--aa-genes`: Path to the input amino acid sequence FASTA file (possibly .gz/.bz2/.xz compressed).
+* `--aa-genes`: Path to the input amino acid sequence FASTA file (possibly .gz compressed).
 
-* `--nt-genes`: Path to the input nucleotide gene sequence FASTA file (possibly .gz/.bz2/.xz compressed).
+* `--nt-genes`: Path to the input nucleotide gene sequence FASTA file (possibly .gz compressed).
 
-* `--nofilter`: Use this if no need to filter <100aa input sequences.
+* `-o/--output`: Output directory (will be created if non-existent). (default: ../output)
 
-* `-o/--output`: Output directory (will be created if non-existent).
+* `--tool`: Sequence alignment tool (Diamond / MMseqs). (default: diamond)
 
-* `--tool`: Sequence alignment tool(Diamond/MMseqs).
+*  `-s/--sensitivity`: Sensitivity. (default: --more-sensitive (Diamond) 5.7 (mmseqs))
 
-* `--db`: Path to the GMSC database file.
+* `--id`: Minimum identity to report an alignment (range 0.0-1.0). (default: 0.0)
 
-* `--id`: Minimum identity to report an alignment(range 0.0-1.0).
+* `--cov`: Minimum coverage to report an alignment (range 0.0-1.0). (default: 0.9)
 
-* `--cov`: Minimum coverage to report an alignment(range 0.0-1.0).
+* `-e/--evalue`: Maximum e-value to report alignments. (default: 1e-05)
 
-* `-e/--evalue`: Maximum e-value to report alignments(default=0.00001).
+* `-t/--threads`: Number of CPU threads. (default: 1)
 
-* `--outfmt`: Output format of alignment result.
+* `--filter`: Use this to filter <100 aa or <303 nt input sequences. (default: False)
 
-(Diamond default is "6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,pident,length,evalue,qcovhsp,scovhsp".
+* `--nohabitat`: Use this if no need to annotate habitat. (default: False)
 
-MMseqs default is "query,target,qseq,tseq,qlen,tlen,fident,alnlen,evalue,qcov,tcov".
+* `--notaxonomy`: Use this if no need to annotate taxonomy. (default: False)
 
-The first two column in result format of Diamond/MMseqs must be "qseqid"/"query" and "sseqid"/"target".)
+* `--noquality`: Use this if no need to annotate quality. (default: False)
 
-* `--habitat`: Path to the habitat file.
+* `--quiet`: Disable alignment console output. (default:False)
 
-* `--nohabitat`: Use this if no need to annotate habitat.
+* `--db`: Path to the GMSC database file. (default: ../db/targetdb.dmnd)
 
-* `--taxonomy`: Path to the taxonomy file.
+* `--habitat`: Path to the habitat file. (default: ../db/ref_habitat.tsv.xz)
 
-* `--notaxonomy`: Use this if no need to annotate taxonomy.
+* `--taxonomy`: Path to the taxonomy file. (default: ../db/ref_taxonomy.tsv.xz)
 
-* `--quality`: Path to the quality file.
-
-* `--noquality`: Use this if no need to annotate quality.
-
-* `-t/--threads`: Number of CPU threads(default=3).
+* `--quality`: Path to the quality file. (default: ../db/ref_quality.tsv.xz)
 
 ### Subcommands and Parameters 
 Subcommands: `gmsc-mapper createdb`
 
-* `-i`: Path to the GMSC 90AA FASTA file.
+* `-i`: Path to the GMSC FASTA file.
 
-* `-o/--output`: Path to database output directory.
+* `-o/--output`: Path to database output directory. (default: ../db)
 
-* `-m/--mode`: Alignment tool(Diamond/MMseqs2)
+* `-m/--mode`: Alignment tool (Diamond / MMseqs2).
+
+* `--quiet`: Disable alignment console output. (default:False)
+
+## Sensitivity choices considering time and memory usage
+To be done

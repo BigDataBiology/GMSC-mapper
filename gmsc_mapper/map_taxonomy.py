@@ -1,43 +1,39 @@
 import numpy as np
 import pandas as pd
-
 from os import path
 
-def smorf_taxonomy(taxfile:str, resultfile:str ,tmpdirname: str) -> str:
-    print('Start taxonomy mapping...')       
+def store_index(indexfile):
+    index_tax = pd.read_csv(indexfile,
+                            sep='\t',
+                            header=None,
+                            names=['index','taxonomy'])
+    index_tax_dict = index_tax['taxonomy'].to_dict()
+    return index_tax_dict
+
+def smorf_taxonomy(index_tax_dict,taxfile,resultfile,tmpdirname):
+    print('Start taxonomy mapping...') 
+    tax = np.load(taxfile,mmap_mode='r')
+    taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv") 
+
     result =  pd.read_csv(resultfile,
                           sep="\t",
                           header=None)
-    
-    result = result.rename({0:'qseqid',
-                            1:'sseqid'},
-                           axis=1)
+    result.rename({0: 'qseqid', 1: 'sseqid'},
+                  axis=1,
+                  inplace=True)
+    result['sseqid'] = result['sseqid'].apply(lambda x: int(x.split('.')[2].replace('_','')))
+    mapped_sseqid = result['sseqid'].to_list()
 
-    taxonomy_file = path.join(tmpdirname,
-                              "taxonomy.out.smorfs.tmp.tsv") 
-    
-    reader =  pd.read_table(taxfile,
-                            sep="\t",
-                            chunksize=5_000_000,
-                            header=None,
-                            names=['sseqid', 'taxonomy'])
+    mapped_sseqid_tax = {}
+    for item in mapped_sseqid:
+        mapped_sseqid_tax[item] = index_tax_dict[tax[item]]
 
-    output_list = []
-    for chunk in reader:
-        output_chunk = result.merge(on='sseqid',
-                                    right=chunk,
-                                    how='inner')
-        output_chunk = output_chunk[['qseqid',
-                                     'sseqid',
-                                     'taxonomy']]
-        output_list.append(output_chunk)
+    result['taxonomy'] = result['sseqid'].map(lambda g: mapped_sseqid_tax.get(g))
+    result = result[['qseqid', 'sseqid', 'taxonomy']]
+
+    result = result.sort_values(by='qseqid')
     
-    output = pd.concat(output_list,
-                       axis=0)
-    
-    output = output.sort_values(by='qseqid')
-    
-    output.to_csv(taxonomy_file,
+    result.to_csv(taxonomy_file,
                   sep='\t',
                   index=False,
                   header=False)
@@ -45,13 +41,11 @@ def smorf_taxonomy(taxfile:str, resultfile:str ,tmpdirname: str) -> str:
     print('Finish taxonomy mapping.')
     return taxonomy_file
     
-
 def fixformat(x):
     x = x.split(';')
     while len(x) < 7:
         x.append('')
     return ';'.join(x)
-
 
 def reducetab(df):
     df = df.drop_duplicates()
@@ -77,9 +71,11 @@ def reducetab(df):
         tax_flag = tax_flag[:-1]
     return tax_flag
 
+def deep_lca(indexfile,taxfile, outdirname, resultfile, tmpdirname):
+    index_tax_dict = store_index(indexfile)
 
-def deep_lca(taxfile, outdirname, resultfile, tmpdirname):
-    taxonomy_file = smorf_taxonomy(taxfile,
+    taxonomy_file = smorf_taxonomy(index_tax_dict,
+                                   taxfile,
                                    resultfile,
                                    tmpdirname)
     
@@ -89,8 +85,8 @@ def deep_lca(taxfile, outdirname, resultfile, tmpdirname):
     data = pd.read_table(taxonomy_file,
                          header=None,
                          names=['smorf', 'gmsc', 'taxonomy'])
-
-    data = data.fillna('')
+    
+    data['taxonomy'].replace('Unknown','',inplace=True)
     data.taxonomy = data.taxonomy.apply(lambda x: fixformat(x))
     data = data.groupby('smorf').apply(lambda x: x.taxonomy.tolist())
     data = data.reset_index()
@@ -112,7 +108,6 @@ def deep_lca(taxfile, outdirname, resultfile, tmpdirname):
                     sep='\t', 
                     header=True, 
                     index=None)
-   
    
 def taxa_summary(outdir):
     taxonomy_dlca_file = path.join(outdir,"taxonomy.out.smorfs.tsv")
