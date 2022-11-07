@@ -13,7 +13,44 @@ GMSC-mapper can be used to
 ## Installation
 
 ### Source
+#### Installation path 1
 
+Clone GMSC-mapper repository
+
+```bash
+git clone https://github.com/BigDataBiology/GMSC-mapper.git
+```
+
+Create conda environment(only support python v3.8/v3.9)
+
+```bash
+conda create -n gmscmapper python=3.8
+conda activate gmscmapper
+or
+conda create -n gmscmapper python=3.9
+conda activate gmscmapper
+```
+
+You will need the following dependencies:
+
+- [MMseqs2](https://github.com/soedinglab/MMseqs2)
+- [Diamond](https://github.com/bbuchfink/diamond)
+
+The easiest way to install the dependencies is with [conda](https://conda.io):
+
+```bash
+conda install -c conda-forge -c bioconda mmseqs2
+conda install -c bioconda -c conda-forge diamond
+```
+
+Once the dependencies are installed, you can install GMSC-mapper by running:
+
+```bash
+cd GMSC-mapper
+python setup.py install
+```
+
+#### Installation path 2
 Clone GMSC-mapper repository and execute our installation script.
 
 ```bash
@@ -22,7 +59,7 @@ cd GMSC-mapper
 ./install.sh
 ```
 
-It should create a conda environment (python vv3.9) called **gmscmapper**
+It should create a conda environment (python v3.9) called **gmscmapper**
 inserted in the folder `envs/` located in the GMSC-mapper main location.
 To call this environment:
 
