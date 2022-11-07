@@ -94,25 +94,25 @@ gmsc-mapper createdb -i examples/target.faa -o examples/ -m mmseqs
 - Input is genome contig sequences.
 
 ```bash
-gmsc-mapper -i examples/example.fa -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
+gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv
 ```
 
 - Input is amino acid sequences.
 
 ```bash
-gmsc-mapper --aa-genes examples/example.faa -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
+gmsc-mapper --aa-genes ./examples/example.faa -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv
 ```
 
 - Input is nucleotide gene sequences.
 
 ```bash
-gmsc-mapper --nt-genes examples/example.fna -o examples_output/ --db examples/targetdb.dmnd --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt
+gmsc-mapper --nt-genes ./examples/example.fna -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv
 ```
 
 - Check another alignment tool: MMseqs2
 
 ```bash
-gmsc-mapper -i examples/example.fa -o examples_output/ --db examples/targetdb --habitat examples/ref_habitat.txt --quality examples/ref_quality.txt --taxonomy examples/ref_taxonomy.txt --tool mmseqs
+gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --db ./examples/targetdb --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv --tool mmseqs
 ```
 
 ## Usage
@@ -280,14 +280,6 @@ The output folder will contain
 
 * `--quiet`: Disable alignment console output. (default:False)
 
-* `--db`: Path to the GMSC database file. (default: ../db/targetdb.dmnd)
-
-* `--habitat`: Path to the habitat file. (default: ../db/ref_habitat.tsv.xz)
-
-* `--taxonomy`: Path to the taxonomy file. (default: ../db/ref_taxonomy.tsv.xz)
-
-* `--quality`: Path to the quality file. (default: ../db/ref_quality.tsv.xz)
-
 ### Subcommands and Parameters 
 Subcommands: `gmsc-mapper createdb`
 
@@ -298,6 +290,3 @@ Subcommands: `gmsc-mapper createdb`
 * `-m/--mode`: Alignment tool (Diamond / MMseqs2).
 
 * `--quiet`: Disable alignment console output. (default:False)
-
-## Sensitivity choices considering time and memory usage
-To be done
