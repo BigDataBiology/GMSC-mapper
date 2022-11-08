@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from gmsc_mapper.map_quality import smorf_quality
 import pytest
 import os

@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from gmsc_mapper.main import generate_fasta
 from gmsc_mapper.fasta import fasta_iter
 import pytest

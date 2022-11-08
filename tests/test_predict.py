@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from gmsc_mapper.predict import predict_genes,filter_smorfs
 from gmsc_mapper.fasta import fasta_iter
 import pytest

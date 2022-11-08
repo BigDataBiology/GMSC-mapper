@@ -1,7 +1,6 @@
 import subprocess
 import argparse
 import sys
-sys.path.append("..")
 import os
 from os import path
 import pandas as pd

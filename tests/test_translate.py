@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from gmsc_mapper.translate import translate_gene,check_frame
 from gmsc_mapper.fasta import fasta_iter
 import pytest
