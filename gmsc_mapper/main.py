@@ -242,14 +242,6 @@ def create_db(args):
         subprocess.check_call(mmseqs_cmd) 
         print('\nMMseqs database has been created successfully.\n')
 
-def flatten(items, ignore_types=(str, bytes)):
-    from collections.abc import Iterable
-    for x in items:
-        if isinstance(x, Iterable) and not isinstance(x, ignore_types):
-            yield from flatten(x)
-        else:
-            yield x
-
 def predict(args,tmpdir):
     from gmsc_mapper.predict import predict_genes,filter_smorfs
 
@@ -301,34 +293,22 @@ def mapdb_diamond(args,queryfile):
 
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,length,qstart,qend,sstart,send,bitscore,pident,evalue,qcovhsp,scovhsp'
-    
-    if args.quiet:
-        diamond_cmd = ['diamond','blastp',
-                        '-q',queryfile,
-                        '-d',args.database,
-                        '-o',resultfile,
-                        args.sensitivity,
-                        '-e',str(args.evalue),
-                        '--id',str(float(args.identity)*100),
-                        '--query-cover',str(float(args.coverage)*100),
-                        '--subject-cover',str(float(args.coverage)*100),
-                        '-p',str(args.threads),
-                        '--outfmt',outfmt.split(','),
-                        '--quiet']
-    else:
-        diamond_cmd = ['diamond','blastp',
-                        '-q',queryfile,
-                        '-d',args.database,
-                        '-o',resultfile,
-                        args.sensitivity,
-                        '-e',str(args.evalue),
-                        '--id',str(float(args.identity)*100),
-                        '--query-cover',str(float(args.coverage)*100),
-                        '--subject-cover',str(float(args.coverage)*100),
-                        '-p',str(args.threads),
-                        '--outfmt',outfmt.split(',')]
 
-    subprocess.check_call([x for x in flatten(diamond_cmd)])  
+    diamond_cmd = ['diamond','blastp',
+                    '-q',queryfile,
+                    '-d',args.database,
+                    '-o',resultfile,
+                    args.sensitivity,
+                    '-e',str(args.evalue),
+                    '--id',str(float(args.identity)*100),
+                    '--query-cover',str(float(args.coverage)*100),
+                    '--subject-cover',str(float(args.coverage)*100),
+                    '-p',str(args.threads),
+                    '--outfmt'] + outfmt.split(',')
+    if args.quiet:
+        diamond_cmd.append('--quiet')
+
+    subprocess.check_call(diamond_cmd)
 
     logger.info('smORF mapping complete')
     return resultfile
@@ -341,53 +321,30 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
     tmp = path.join(tmpdir,"tmp","")
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = 'query,target,qseq,tseq,qlen,tlen,alnlen,qstart,qend,tstart,tend,bits,pident,evalue,qcov,tcov'
-    
-    if args.quiet:
-        mmseqs_cmd_db = ['mmseqs','createdb',queryfile,querydb,'-v','0']
-        mmseqs_cmd_search = ['mmseqs','search',
-                            querydb,
-                            args.database,
-                            resultdb,
-                            tmp,
-                            '-s',str(args.sensitivity),
-                            '-e',str(args.evalue),
-                            '--min-seq-id',str(args.identity),
-                            '-c',str(args.coverage),
-                            '--threads',str(args.threads),
-                            '-v','0']
-        mmseqs_cmd_out = ['mmseqs','convertalis',
+
+    mmseqs_cmd_db = ['mmseqs', 'createdb', queryfile, querydb]
+    mmseqs_cmd_search = ['mmseqs','search',
                         querydb,
                         args.database,
                         resultdb,
-                        resultfile,
-                        '--format-output',outfmt,
-                        '-v','0']
-    else:
-        mmseqs_cmd_db = ['mmseqs','createdb',queryfile,querydb]
-        mmseqs_cmd_search = ['mmseqs','search',
-                            querydb,
-                            args.database,
-                            resultdb,
-                            tmp,
-                            '-s',str(args.sensitivity),
-                            '-e',str(args.evalue),
-                            '--min-seq-id',str(args.identity),
-                            '-c',str(args.coverage),
-                            '--threads',str(args.threads)]
-        mmseqs_cmd_out = ['mmseqs','convertalis',
-                        querydb,
-                        args.database,
-                        resultdb,
-                        resultfile,
-                        '--format-output',outfmt]
+                        tmp,
+                        '-s',str(args.sensitivity),
+                        '-e',str(args.evalue),
+                        '--min-seq-id',str(args.identity),
+                        '-c',str(args.coverage),
+                        '--threads',str(args.threads)]
+    mmseqs_cmd_out = ['mmseqs','convertalis',
+                    querydb,
+                    args.database,
+                    resultdb,
+                    resultfile,
+                    '--format-output', outfmt]
+    for mmseqs_cmd in [mmseqs_cmd_db,mmseqs_cmd_search,mmseqs_cmd_out]:
+        if args.quiet:
+            mmseqs_cmd.extend(['-v', '0'])
+        subprocess.check_call(mmseqs_cmd)
 
-    subprocess.check_call(mmseqs_cmd_db) 
-
-    subprocess.check_call(mmseqs_cmd_search)  
-
-    subprocess.check_call(mmseqs_cmd_out)		
-
-    print('\nsmORF mapping has done.\n')
+    logger.info('smORF mapping complete')
     return resultfile
 
 def generate_fasta(output,queryfile,resultfile):
@@ -456,30 +413,24 @@ def main(args=None):
         if args.tool == 'diamond':
             if args.database is None:
                 args.database = path.join(_ROOT, 'db/targetdb.dmnd')
-            if args.sensitivity is None:
-                args.sensitivity = '--more-sensitive'
-            if args.sensitivity == '1':
-                args.sensitivity = '--fast'
-            if args.sensitivity == '2':
-                args.sensitivity = '--mid-sensitive'
-            if args.sensitivity == '3':
-                args.sensitivity = '--default'
-            if args.sensitivity == '4':
-                args.sensitivity = '--sensitive'
-            if args.sensitivity == '5':
-                args.sensitivity = '--more-sensitive'
-            if args.sensitivity == '6':
-                args.sensitivity = '--very-sensitive'
-            if args.sensitivity == '7':
-                args.sensitivity = '--ultra-sensitive'
+            args.sensitivity = {
+                None: '--more-sensitive',
+                '1': '--fast',
+                '2': '--mid-sensitive',
+                '3': '--default',
+                '4': '--sensitive',
+                '5': '--more-sensitive',
+                '6': '--very-sensitive',
+                '7': '--ultra-sensitive',
+            }.get(args.sensitivity, args.sensitivity)
+
         if args.tool == 'mmseqs':
             if args.database is None:
                 args.database = path.join(_ROOT, 'db/targetdb')
             if args.sensitivity is None:
                 args.sensitivity = 5.7
 
-        if not os.path.exists(args.output):
-            os.makedirs(args.output)
+        os.makedirs(args.output, exist_ok=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             try:
