@@ -36,7 +36,10 @@ def parse_args(args):
                                help='Alignment tool (Diamond / MMseqs2)',
                                dest='mode',
                                default = None)
-    cmd_create_db.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
+    cmd_create_db.add_argument('--quiet',
+                                action='store_true',
+                                dest='quiet',
+                                help='Disable alignment console output')
 
     parser.add_argument('-i', '--input',
                         required=False,
@@ -60,7 +63,7 @@ def parse_args(args):
                         required=False,
                         help='Output directory (will be created if non-existent)',
                         dest='output',
-                        default=path.join(_ROOT, 'output'))	
+                        default=path.join(_ROOT, 'output'))
  
     parser.add_argument('--tool', '--tool',
                         required=False,
@@ -152,7 +155,7 @@ def check_install():
     has_mmseqs = False
     has_diamond = False
     dependencies = ['diamond', 'mmseqs']
-    print("Looking for dependencies...")
+    logger.debug("Looking for dependencies...")
 
     for dep in dependencies:
         p = which(dep)
@@ -166,11 +169,11 @@ def check_install():
                         'At least one of them is necessary to run GMSC-mapper.\n')
         sys.exit(1)
     elif has_diamond and not has_mmseqs:
-        print('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
+        logger.warning('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
     elif not has_diamond and has_mmseqs:
-        print('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
+        logger.warning('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
     else:
-        print('Dependencies installation is OK\n')
+        logger.info('Dependencies installation is OK\n')
     return has_diamond,has_mmseqs
 
 def validate_args(args,has_diamond,has_mmseqs):
@@ -231,16 +234,16 @@ def create_db(args):
         mmseqs_cmd = ['mmseqs','createdb',
                     args.target_faa,
                     out_db]
-    
+
     if args.mode == "diamond":
-        print('Start creating Diamond database...')
-        subprocess.check_call(diamond_cmd) 
-        print('\nDiamond database has been created successfully.\n')
+        logger.info('Start creating Diamond database...')
+        subprocess.check_call(diamond_cmd)
+        logger.info('Diamond database has been created successfully.')
 
     if args.mode == "mmseqs":
-        print('Start creating MMseqs database...')
-        subprocess.check_call(mmseqs_cmd) 
-        print('\nMMseqs database has been created successfully.\n')
+        logger.debug('Start creating MMseqs database...')
+        subprocess.check_call(mmseqs_cmd)
+        logger.info('MMseqs database has been created successfully.')
 
 def predict(args,tmpdir):
     from gmsc_mapper.predict import predict_genes,filter_smorfs
@@ -253,21 +256,21 @@ def predict(args,tmpdir):
     predict_genes(args.genome_fasta,predicted_smorf)
     if not path.getsize(predicted_smorf):
         sys.stderr.write("GMSC-mapper Error:No smORFs have been predicted.Please check your input file.\n")
-        sys.exit(1)          
+        sys.exit(1)
     else:
         filter_smorfs(predicted_smorf, filtered_smorf)
     if not path.getsize(filtered_smorf):
         sys.stderr.write("GMSC-mapper Error:No smORFs remained after filtering by length(<100aa).\n")
-        sys.exit(1)  
+        sys.exit(1)
     else:
-        print('\nsmORF prediction has done.\n')
+        logger.info('smORF prediction complete')
     return filtered_smorf
 
 def translate_gene(args,tmpdir):
     from gmsc_mapper.translate import translate_gene
-    print('Start gene translation...')
+    logger.debug('Starting gene translation...')
     translated_file = translate_gene(args.nt_input,tmpdir)
-    print('Gene translation has done.\n')
+    logger.info('Gene translation complete')
     return translated_file
 
 def check_length(queryfile):
@@ -366,34 +369,33 @@ def generate_fasta(output,queryfile,resultfile):
         for ID,seq in fasta_iter(queryfile):
             if ID in smorf_id:
                 f.write(f'>{ID}\n{seq}\n')
-    print('smORF fasta file generating has done.\n')
+    logger.debug('smORF fasta file generation complete')
     return fastafile
 
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
-    print('Start habitat annotation...')
+    logger.debug('Starting habitat annotation...')
     single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.habitatindex,args.output,args.habitat,resultfile)
-    print('habitat annotation has done.\n')
+    logger.info('habitat annotation has done.')
     return single_number,single_percentage,multi_number,multi_percentage 
 
 def taxonomy(args,resultfile,tmpdirname):
     from gmsc_mapper.map_taxonomy import deep_lca,taxa_summary
-    print('Start taxonomy annotation...')
+    logger.debug('Start taxonomy annotation...')
     deep_lca(args.taxonomyindex,args.taxonomy,args.output,resultfile,tmpdirname)
     annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
-    print('taxonomy annotation has done.\n')
+    logger.info('Taxonomy annotation complete.')
     return annotated_number,rank_number,rank_percentage
 
 def quality(args,resultfile):
     from gmsc_mapper.map_quality import smorf_quality
-    print('Start quality annotation...')
+    logger.debug('Start quality annotation...')
     number,percentage = smorf_quality(args.output,args.quality,resultfile)
-    print('quality annotation has done.\n')
+    logger.info('Quality annotation completed.')
     return number,percentage
 
 def predicted_smorf_count(file_name):
-    out = subprocess.getoutput("wc -l %s" % file_name)
-    return int(out.split()[0])
+    return sum(1 for _ in open(file_name, 'rt'))
 
 def main(args=None):
     if args is None:
@@ -439,7 +441,7 @@ def main(args=None):
                 if args.genome_fasta:
                     queryfile = predict(args,tmpdir)
                     smorf_number = int(predicted_smorf_count(queryfile)/2)
-                    summary.append(f'{str(smorf_number)} smORFs are predicted in total.')
+                    summary.append(f'{smorf_number} smORFs are predicted in total.')
                 if args.nt_input:
                     if args.filter:
                         args.nt_input = filter_length(args.nt_input,tmpdir,303)
@@ -458,18 +460,18 @@ def main(args=None):
 
                 fastafile = generate_fasta(args.output,queryfile,resultfile)
                 smorf_number = int(predicted_smorf_count(fastafile)/2)
-                summary.append(f'{str(smorf_number)} smORFs are aligned against GMSC in total.\n')
+                summary.append(f'{smorf_number} smORFs aligned against GMSC in total.\n')
 
                 if not args.noquality:
                     summary.append(f'# Quality')
-                    number,percentage = quality(args,resultfile)	
-                    summary.append(f'{str(number)}({str(round(percentage*100,2))}%) aligned smORFs are high quality.\n')
+                    number,percentage = quality(args,resultfile)
+                    summary.append(f'{number} ({percentage:.2%}) aligned smORFs are high quality.\n')
 
                 if not args.nohabitat:
                     summary.append(f'# Habitat')
                     single_number,single_percentage,multi_number,multi_percentage = habitat(args,resultfile)
-                    summary.append(f'{str(single_number)}({str(round(single_percentage*100,2))}%) aligned smORFs are single-habitat.')
-                    summary.append(f'{str(multi_number)}({str(round(multi_percentage*100,2))}%) aligned smORFs are multi-habitat.\n')
+                    summary.append(f'{single_number} ({single_percentage:.2%}) aligned smORFs are single-habitat.')
+                    summary.append(f'{multi_number} ({multi_percentage:.2%}) aligned smORFs are multi-habitat.\n')
 
                 if not args.notaxonomy:
                     summary.append(f'# Taxonomy')
