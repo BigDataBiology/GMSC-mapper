@@ -6,8 +6,11 @@ from os import path
 import pandas as pd
 import tempfile
 from atomicwrites import atomic_write
+import logging
 
 _ROOT = path.abspath(path.join(os.getcwd(), ".."))
+
+logger = logging.getLogger('GMSC-mapper')
 
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -250,7 +253,7 @@ def flatten(items, ignore_types=(str, bytes)):
 def predict(args,tmpdir):
     from gmsc_mapper.predict import predict_genes,filter_smorfs
 
-    print('Start smORF prediction...')
+    logger.debug('Starting smORF prediction...')
 
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
@@ -277,30 +280,25 @@ def translate_gene(args,tmpdir):
 
 def check_length(queryfile):
     from gmsc_mapper.fasta import fasta_iter
-    print('Start length checking...')
-    message_warning = '''GMSC-mapper Warning: Input sequences are all more than 303nt.
-                        Please check if your input consists of contigs, which should use -i not --nt-genes or --aa-genes as input.
-                        However, we will regard your input sequences as nucleotide genes and continue to process.\n'''
-    all_longer_flag = 1
+    logger.debug('Start length checking...')
+    if all(len(seq) < 303
+                for _, seq in fasta_iter(queryfile)):
+        logger.warning('GMSC-mapper Warning: Input sequences are all more than 303nt. '
+                       'Please check if your input consists of contigs, which should use -i not --nt-genes or --aa-genes as input. '
+                       'However, we will regard your input sequences as nucleotide genes and continue to process.\n')
 
-    for ID, seq in fasta_iter(queryfile):
-        if len(seq) < 303:
-            all_longer_flag = 0   
-            break
-    if all_longer_flag:
-        print(message_warning)
-    print('Length checking has done.\n')
+    logger.info('Length checking has done.\n')
 
 def filter_length(queryfile,tmpdir,N):
     from gmsc_mapper.filter_length import filter_length
-    print('Start length filter...')
+    logger.debug('Starting length filter...')
     filtered_file = filter_length(queryfile,tmpdir,N)
-    print('Length filter has done.\n')
+    logger.info('Length filter complete')
     return filtered_file
 
 def mapdb_diamond(args,queryfile):
-    print('Start smORF mapping...')
- 
+    logger.debug('Starting smORF mapping...')
+
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,length,qstart,qend,sstart,send,bitscore,pident,evalue,qcovhsp,scovhsp'
     
@@ -332,12 +330,12 @@ def mapdb_diamond(args,queryfile):
 
     subprocess.check_call([x for x in flatten(diamond_cmd)])  
 
-    print('\nsmORF mapping has done.\n')
+    logger.info('smORF mapping complete')
     return resultfile
 
-def mapdb_mmseqs(args,queryfile,tmpdir):
-    print('Start smORF mapping...')
-    
+def mapdb_mmseqs(args, queryfile, tmpdir):
+    logger.info('Start smORF mapping...')
+
     querydb = path.join(tmpdir,"query.db")
     resultdb = path.join(tmpdir,"result.db")
     tmp = path.join(tmpdir,"tmp","")
@@ -399,10 +397,10 @@ def generate_fasta(output,queryfile,resultfile):
     try:
         result = pd.read_csv(resultfile, sep='\t',header=None)
     except:
-        print('GMSC-mapper Warning: There is no alignment results between your input sequences and GMSC.\n')
+        logger.error('GMSC-mapper error: There is no alignment results between your input sequences and GMSC.\n')
         sys.exit(1)
 
-    print('Start smORF fasta file generating...')
+    logger.debug('Start smORF fasta file generation...')
     fastafile = path.join(output,"mapped.smorfs.faa")
 
     smorf_id = set(result.iloc[:, 0].tolist())
