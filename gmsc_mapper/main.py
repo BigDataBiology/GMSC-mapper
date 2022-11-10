@@ -1,14 +1,16 @@
 import subprocess
 import argparse
 import sys
-sys.path.append("..")
 import os
 from os import path
 import pandas as pd
 import tempfile
 from atomicwrites import atomic_write
+import logging
 
 _ROOT = path.abspath(path.join(os.getcwd(), ".."))
+
+logger = logging.getLogger('GMSC-mapper')
 
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -34,7 +36,10 @@ def parse_args(args):
                                help='Alignment tool (Diamond / MMseqs2)',
                                dest='mode',
                                default = None)
-    cmd_create_db.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
+    cmd_create_db.add_argument('--quiet',
+                                action='store_true',
+                                dest='quiet',
+                                help='Disable alignment console output')
 
     parser.add_argument('-i', '--input',
                         required=False,
@@ -58,7 +63,7 @@ def parse_args(args):
                         required=False,
                         help='Output directory (will be created if non-existent)',
                         dest='output',
-                        default=path.join(_ROOT, 'output'))	
+                        default=path.join(_ROOT, 'output'))
  
     parser.add_argument('--tool', '--tool',
                         required=False,
@@ -150,7 +155,7 @@ def check_install():
     has_mmseqs = False
     has_diamond = False
     dependencies = ['diamond', 'mmseqs']
-    print("Looking for dependencies...")
+    logger.debug("Looking for dependencies...")
 
     for dep in dependencies:
         p = which(dep)
@@ -164,11 +169,11 @@ def check_install():
                         'At least one of them is necessary to run GMSC-mapper.\n')
         sys.exit(1)
     elif has_diamond and not has_mmseqs:
-        print('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
+        logger.warning('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
     elif not has_diamond and has_mmseqs:
-        print('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
+        logger.warning('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
     else:
-        print('Dependencies installation is OK\n')
+        logger.info('Dependencies installation is OK\n')
     return has_diamond,has_mmseqs
 
 def validate_args(args,has_diamond,has_mmseqs):
@@ -229,29 +234,21 @@ def create_db(args):
         mmseqs_cmd = ['mmseqs','createdb',
                     args.target_faa,
                     out_db]
-    
+
     if args.mode == "diamond":
-        print('Start creating Diamond database...')
-        subprocess.check_call(diamond_cmd) 
-        print('\nDiamond database has been created successfully.\n')
+        logger.info('Start creating Diamond database...')
+        subprocess.check_call(diamond_cmd)
+        logger.info('Diamond database has been created successfully.')
 
     if args.mode == "mmseqs":
-        print('Start creating MMseqs database...')
-        subprocess.check_call(mmseqs_cmd) 
-        print('\nMMseqs database has been created successfully.\n')
-
-def flatten(items, ignore_types=(str, bytes)):
-    from collections.abc import Iterable
-    for x in items:
-        if isinstance(x, Iterable) and not isinstance(x, ignore_types):
-            yield from flatten(x)
-        else:
-            yield x
+        logger.debug('Start creating MMseqs database...')
+        subprocess.check_call(mmseqs_cmd)
+        logger.info('MMseqs database has been created successfully.')
 
 def predict(args,tmpdir):
     from gmsc_mapper.predict import predict_genes,filter_smorfs
 
-    print('Start smORF prediction...')
+    logger.debug('Starting smORF prediction...')
 
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
     filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
@@ -259,138 +256,98 @@ def predict(args,tmpdir):
     predict_genes(args.genome_fasta,predicted_smorf)
     if not path.getsize(predicted_smorf):
         sys.stderr.write("GMSC-mapper Error:No smORFs have been predicted.Please check your input file.\n")
-        sys.exit(1)          
+        sys.exit(1)
     else:
         filter_smorfs(predicted_smorf, filtered_smorf)
     if not path.getsize(filtered_smorf):
         sys.stderr.write("GMSC-mapper Error:No smORFs remained after filtering by length(<100aa).\n")
-        sys.exit(1)  
+        sys.exit(1)
     else:
-        print('\nsmORF prediction has done.\n')
+        logger.info('smORF prediction complete')
     return filtered_smorf
 
 def translate_gene(args,tmpdir):
     from gmsc_mapper.translate import translate_gene
-    print('Start gene translation...')
+    logger.debug('Starting gene translation...')
     translated_file = translate_gene(args.nt_input,tmpdir)
-    print('Gene translation has done.\n')
+    logger.info('Gene translation complete')
     return translated_file
 
 def check_length(queryfile):
     from gmsc_mapper.fasta import fasta_iter
-    print('Start length checking...')
-    message_warning = '''GMSC-mapper Warning: Input sequences are all more than 303nt.
-                        Please check if your input consists of contigs, which should use -i not --nt-genes or --aa-genes as input.
-                        However, we will regard your input sequences as nucleotide genes and continue to process.\n'''
-    all_longer_flag = 1
+    logger.debug('Start length checking...')
+    if all(len(seq) < 303
+                for _, seq in fasta_iter(queryfile)):
+        logger.warning('GMSC-mapper Warning: Input sequences are all more than 303nt. '
+                       'Please check if your input consists of contigs, which should use -i not --nt-genes or --aa-genes as input. '
+                       'However, we will regard your input sequences as nucleotide genes and continue to process.\n')
 
-    for ID, seq in fasta_iter(queryfile):
-        if len(seq) < 303:
-            all_longer_flag = 0   
-            break
-    if all_longer_flag:
-        print(message_warning)
-    print('Length checking has done.\n')
+    logger.info('Length checking has done.\n')
 
 def filter_length(queryfile,tmpdir,N):
     from gmsc_mapper.filter_length import filter_length
-    print('Start length filter...')
+    logger.debug('Starting length filter...')
     filtered_file = filter_length(queryfile,tmpdir,N)
-    print('Length filter has done.\n')
+    logger.info('Length filter complete')
     return filtered_file
 
 def mapdb_diamond(args,queryfile):
-    print('Start smORF mapping...')
- 
+    logger.debug('Starting smORF mapping...')
+
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,length,qstart,qend,sstart,send,bitscore,pident,evalue,qcovhsp,scovhsp'
-    
+
+    diamond_cmd = ['diamond','blastp',
+                    '-q',queryfile,
+                    '-d',args.database,
+                    '-o',resultfile,
+                    args.sensitivity,
+                    '-e',str(args.evalue),
+                    '--id',str(float(args.identity)*100),
+                    '--query-cover',str(float(args.coverage)*100),
+                    '--subject-cover',str(float(args.coverage)*100),
+                    '-p',str(args.threads),
+                    '--outfmt'] + outfmt.split(',')
     if args.quiet:
-        diamond_cmd = ['diamond','blastp',
-                        '-q',queryfile,
-                        '-d',args.database,
-                        '-o',resultfile,
-                        args.sensitivity,
-                        '-e',str(args.evalue),
-                        '--id',str(float(args.identity)*100),
-                        '--query-cover',str(float(args.coverage)*100),
-                        '--subject-cover',str(float(args.coverage)*100),
-                        '-p',str(args.threads),
-                        '--outfmt',outfmt.split(','),
-                        '--quiet']
-    else:
-        diamond_cmd = ['diamond','blastp',
-                        '-q',queryfile,
-                        '-d',args.database,
-                        '-o',resultfile,
-                        args.sensitivity,
-                        '-e',str(args.evalue),
-                        '--id',str(float(args.identity)*100),
-                        '--query-cover',str(float(args.coverage)*100),
-                        '--subject-cover',str(float(args.coverage)*100),
-                        '-p',str(args.threads),
-                        '--outfmt',outfmt.split(',')]
+        diamond_cmd.append('--quiet')
 
-    subprocess.check_call([x for x in flatten(diamond_cmd)])  
+    subprocess.check_call(diamond_cmd)
 
-    print('\nsmORF mapping has done.\n')
+    logger.info('smORF mapping complete')
     return resultfile
 
-def mapdb_mmseqs(args,queryfile,tmpdir):
-    print('Start smORF mapping...')
-    
+def mapdb_mmseqs(args, queryfile, tmpdir):
+    logger.info('Start smORF mapping...')
+
     querydb = path.join(tmpdir,"query.db")
     resultdb = path.join(tmpdir,"result.db")
     tmp = path.join(tmpdir,"tmp","")
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = 'query,target,qseq,tseq,qlen,tlen,alnlen,qstart,qend,tstart,tend,bits,pident,evalue,qcov,tcov'
-    
-    if args.quiet:
-        mmseqs_cmd_db = ['mmseqs','createdb',queryfile,querydb,'-v','0']
-        mmseqs_cmd_search = ['mmseqs','search',
-                            querydb,
-                            args.database,
-                            resultdb,
-                            tmp,
-                            '-s',str(args.sensitivity),
-                            '-e',str(args.evalue),
-                            '--min-seq-id',str(args.identity),
-                            '-c',str(args.coverage),
-                            '--threads',str(args.threads),
-                            '-v','0']
-        mmseqs_cmd_out = ['mmseqs','convertalis',
+
+    mmseqs_cmd_db = ['mmseqs', 'createdb', queryfile, querydb]
+    mmseqs_cmd_search = ['mmseqs','search',
                         querydb,
                         args.database,
                         resultdb,
-                        resultfile,
-                        '--format-output',outfmt,
-                        '-v','0']
-    else:
-        mmseqs_cmd_db = ['mmseqs','createdb',queryfile,querydb]
-        mmseqs_cmd_search = ['mmseqs','search',
-                            querydb,
-                            args.database,
-                            resultdb,
-                            tmp,
-                            '-s',str(args.sensitivity),
-                            '-e',str(args.evalue),
-                            '--min-seq-id',str(args.identity),
-                            '-c',str(args.coverage),
-                            '--threads',str(args.threads)]
-        mmseqs_cmd_out = ['mmseqs','convertalis',
-                        querydb,
-                        args.database,
-                        resultdb,
-                        resultfile,
-                        '--format-output',outfmt]
+                        tmp,
+                        '-s',str(args.sensitivity),
+                        '-e',str(args.evalue),
+                        '--min-seq-id',str(args.identity),
+                        '-c',str(args.coverage),
+                        '--threads',str(args.threads)]
+    mmseqs_cmd_out = ['mmseqs','convertalis',
+                    querydb,
+                    args.database,
+                    resultdb,
+                    resultfile,
+                    '--format-output', outfmt]
+    for mmseqs_cmd in [mmseqs_cmd_db,mmseqs_cmd_search,mmseqs_cmd_out]:
+        if args.quiet:
+            mmseqs_cmd.extend(['-v', '0'])
+        subprocess.check_call(mmseqs_cmd)
 
-    subprocess.check_call(mmseqs_cmd_db) 
-
-    subprocess.check_call(mmseqs_cmd_search)  
-
-    subprocess.check_call(mmseqs_cmd_out)		
-
-    print('\nsmORF mapping has done.\n')
+    logger.info('smORF mapping complete')
     return resultfile
 
 def generate_fasta(output,queryfile,resultfile):
@@ -400,10 +357,10 @@ def generate_fasta(output,queryfile,resultfile):
     try:
         result = pd.read_csv(resultfile, sep='\t',header=None)
     except:
-        print('GMSC-mapper Warning: There is no alignment results between your input sequences and GMSC.\n')
+        logger.error('GMSC-mapper error: There is no alignment results between your input sequences and GMSC.\n')
         sys.exit(1)
 
-    print('Start smORF fasta file generating...')
+    logger.debug('Start smORF fasta file generation...')
     fastafile = path.join(output,"mapped.smorfs.faa")
 
     smorf_id = set(result.iloc[:, 0].tolist())
@@ -412,34 +369,33 @@ def generate_fasta(output,queryfile,resultfile):
         for ID,seq in fasta_iter(queryfile):
             if ID in smorf_id:
                 f.write(f'>{ID}\n{seq}\n')
-    print('smORF fasta file generating has done.\n')
+    logger.debug('smORF fasta file generation complete')
     return fastafile
 
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
-    print('Start habitat annotation...')
+    logger.debug('Starting habitat annotation...')
     single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.habitatindex,args.output,args.habitat,resultfile)
-    print('habitat annotation has done.\n')
+    logger.info('habitat annotation has done.')
     return single_number,single_percentage,multi_number,multi_percentage 
 
 def taxonomy(args,resultfile,tmpdirname):
     from gmsc_mapper.map_taxonomy import deep_lca,taxa_summary
-    print('Start taxonomy annotation...')
+    logger.debug('Start taxonomy annotation...')
     deep_lca(args.taxonomyindex,args.taxonomy,args.output,resultfile,tmpdirname)
     annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
-    print('taxonomy annotation has done.\n')
+    logger.info('Taxonomy annotation complete.')
     return annotated_number,rank_number,rank_percentage
 
 def quality(args,resultfile):
     from gmsc_mapper.map_quality import smorf_quality
-    print('Start quality annotation...')
+    logger.debug('Start quality annotation...')
     number,percentage = smorf_quality(args.output,args.quality,resultfile)
-    print('quality annotation has done.\n')
+    logger.info('Quality annotation completed.')
     return number,percentage
 
 def predicted_smorf_count(file_name):
-    out = subprocess.getoutput("wc -l %s" % file_name)
-    return int(out.split()[0])
+    return sum(1 for _ in open(file_name, 'rt'))
 
 def main(args=None):
     if args is None:
@@ -459,30 +415,24 @@ def main(args=None):
         if args.tool == 'diamond':
             if args.database is None:
                 args.database = path.join(_ROOT, 'db/targetdb.dmnd')
-            if args.sensitivity is None:
-                args.sensitivity = '--more-sensitive'
-            if args.sensitivity == '1':
-                args.sensitivity = '--fast'
-            if args.sensitivity == '2':
-                args.sensitivity = '--mid-sensitive'
-            if args.sensitivity == '3':
-                args.sensitivity = '--default'
-            if args.sensitivity == '4':
-                args.sensitivity = '--sensitive'
-            if args.sensitivity == '5':
-                args.sensitivity = '--more-sensitive'
-            if args.sensitivity == '6':
-                args.sensitivity = '--very-sensitive'
-            if args.sensitivity == '7':
-                args.sensitivity = '--ultra-sensitive'
+            args.sensitivity = {
+                None: '--more-sensitive',
+                '1': '--fast',
+                '2': '--mid-sensitive',
+                '3': '--default',
+                '4': '--sensitive',
+                '5': '--more-sensitive',
+                '6': '--very-sensitive',
+                '7': '--ultra-sensitive',
+            }.get(args.sensitivity, args.sensitivity)
+
         if args.tool == 'mmseqs':
             if args.database is None:
                 args.database = path.join(_ROOT, 'db/targetdb')
             if args.sensitivity is None:
                 args.sensitivity = 5.7
 
-        if not os.path.exists(args.output):
-            os.makedirs(args.output)
+        os.makedirs(args.output, exist_ok=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             try:
@@ -491,7 +441,7 @@ def main(args=None):
                 if args.genome_fasta:
                     queryfile = predict(args,tmpdir)
                     smorf_number = int(predicted_smorf_count(queryfile)/2)
-                    summary.append(f'{str(smorf_number)} smORFs are predicted in total.')
+                    summary.append(f'{smorf_number} smORFs are predicted in total.')
                 if args.nt_input:
                     if args.filter:
                         args.nt_input = filter_length(args.nt_input,tmpdir,303)
@@ -510,18 +460,18 @@ def main(args=None):
 
                 fastafile = generate_fasta(args.output,queryfile,resultfile)
                 smorf_number = int(predicted_smorf_count(fastafile)/2)
-                summary.append(f'{str(smorf_number)} smORFs are aligned against GMSC in total.\n')
+                summary.append(f'{smorf_number} smORFs aligned against GMSC in total.\n')
 
                 if not args.noquality:
                     summary.append(f'# Quality')
-                    number,percentage = quality(args,resultfile)	
-                    summary.append(f'{str(number)}({str(round(percentage*100,2))}%) aligned smORFs are high quality.\n')
+                    number,percentage = quality(args,resultfile)
+                    summary.append(f'{number} ({percentage:.2%}) aligned smORFs are high quality.\n')
 
                 if not args.nohabitat:
                     summary.append(f'# Habitat')
                     single_number,single_percentage,multi_number,multi_percentage = habitat(args,resultfile)
-                    summary.append(f'{str(single_number)}({str(round(single_percentage*100,2))}%) aligned smORFs are single-habitat.')
-                    summary.append(f'{str(multi_number)}({str(round(multi_percentage*100,2))}%) aligned smORFs are multi-habitat.\n')
+                    summary.append(f'{single_number} ({single_percentage:.2%}) aligned smORFs are single-habitat.')
+                    summary.append(f'{multi_number} ({multi_percentage:.2%}) aligned smORFs are multi-habitat.\n')
 
                 if not args.notaxonomy:
                     summary.append(f'# Taxonomy')

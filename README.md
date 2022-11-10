@@ -3,7 +3,7 @@
 GMSC-mapper is a command line tool to query the Global Microbial smORFs Catalog (GMSC).
 
 GMSC-mapper can be used to 
-- Find query smORFs (< 100aa) homologous to Global Microbial smORFs Catalog (GMSC) by alignment.
+- Find query smORFs (&lt; 100aa) homologous to Global Microbial smORFs Catalog (GMSC) by alignment.
   - Support 3 types of input:
     - contigs (GMSC-mapper will predict smORFs from contigs first)
     - amino acid sequences
@@ -21,7 +21,7 @@ Clone GMSC-mapper repository
 git clone https://github.com/BigDataBiology/GMSC-mapper.git
 ```
 
-Create conda environment(only support python v3.8/v3.9)
+Create conda environment(only support python v3.8-10)
 
 ```bash
 conda create -n gmscmapper python=3.8

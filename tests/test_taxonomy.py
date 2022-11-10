@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from gmsc_mapper.map_taxonomy import store_index,smorf_taxonomy,deep_lca
 import pytest
 import os
@@ -30,6 +28,6 @@ def test_deep_lca():
         for line in f:
             deep_lca_taxonomy.append(line.replace("\n",""))
     assert deep_lca_taxonomy == known_taxonomy
-    
+
 if __name__ == '__main__':
     pytest.main()

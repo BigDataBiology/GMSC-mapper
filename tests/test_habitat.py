@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from gmsc_mapper.map_habitat import smorf_habitat
 import pytest
 import os

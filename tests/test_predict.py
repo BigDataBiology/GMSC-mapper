@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from gmsc_mapper.predict import predict_genes,filter_smorfs
 from gmsc_mapper.fasta import fasta_iter
 import pytest
@@ -15,19 +13,17 @@ known_filtered = {"smORF_0 # k141_87_1 # 455 # 679 # -1 # ID=2_1;partial=00;star
                   "smORF_1 # k141_87_4 # 4299 # 4520 # 1 # ID=2_4;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.396":"MATQTVEDSSRSGPRSTTVGKLLKPLNSEYGKVAPGWGTTPLMGVAMALFAVFLSIILEIYNSSVLLDGISVN*",
                   "smORF_2 # k141_87_5 # 5104 # 5358 # -1 # ID=2_5;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.294":"MEYKVLNLSLIQYYFLLFKDMKESKCESSSLWLNAKKSSKLIRLYVVLIVTGLLNLLDYLSLLSFFIWYLYGTGTGISSCFLYY*"}
 
-predict_dict = {}
-filter_dict = {}
 def test_predict_genes():
     predict_genes("./tests/test_contig.fa","./tests/predicted.faa")
-    for h,seq in fasta_iter("./tests/predicted.faa",full_header=True):
-        predict_dict[h] = seq
-    assert predict_dict == known_predicted
+    predict_out = {h:seq
+        for h,seq in fasta_iter("./tests/predicted.faa",full_header=True)}
+    assert predict_out == known_predicted
 
 def test_filter():
     filter_smorfs("./tests/predicted.faa", "./tests/filtered.faa")
-    for h,seq in fasta_iter("./tests/filtered.faa",full_header=True):
-        filter_dict[h] = seq
-    assert filter_dict == known_filtered
+    filter_out = {h:seq
+            for h,seq in fasta_iter("./tests/filtered.faa",full_header=True) }
+    assert filter_out == known_filtered
 
 if __name__ == '__main__':
     pytest.main()
