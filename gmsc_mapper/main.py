@@ -460,7 +460,7 @@ def main(args=None):
 
                 fastafile = generate_fasta(args.output,queryfile,resultfile)
                 smorf_number = int(predicted_smorf_count(fastafile)/2)
-                summary.append(f'{smorf_number} smORFs aligned against GMSC in total.\n')
+                summary.append(f'{smorf_number} smORFs are aligned against GMSC in total.\n')
 
                 if not args.noquality:
                     summary.append(f'# Quality')
@@ -476,14 +476,14 @@ def main(args=None):
                 if not args.notaxonomy:
                     summary.append(f'# Taxonomy')
                     annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)	
-                    summary.append(str(annotated_number)+'('+str(round((1-rank_percentage['no rank'])*100,2))+'%) aligned smORFs have taxonomy annotation.')
-                    summary.append(str(rank_number['kingdom'])+'('+str(round(rank_percentage['kingdom']*100,2))+'%) aligned smORFs are annotated on kingdom.')
-                    summary.append(str(rank_number['phylum'])+'('+str(round(rank_percentage['phylum']*100,2))+'%) aligned smORFs are annotated on phylum.')
-                    summary.append(str(rank_number['class'])+'('+str(round(rank_percentage['class']*100,2))+'%) aligned smORFs are annotated on class.')
-                    summary.append(str(rank_number['order'])+'('+str(round(rank_percentage['order']*100,2))+'%) aligned smORFs are annotated on order.')
-                    summary.append(str(rank_number['family'])+'('+str(round(rank_percentage['family']*100,2))+'%) aligned smORFs are annotated on family.')
-                    summary.append(str(rank_number['genus'])+'('+str(round(rank_percentage['genus']*100,2))+'%) aligned smORFs are annotated on genus.')
-                    summary.append(str(rank_number['species'])+'('+str(round(rank_percentage['species']*100,2))+'%) aligned smORFs are annotated on species.')
+                    summary.append(str(annotated_number)+' ('+str(round((1-rank_percentage['no rank'])*100,2))+'%) aligned smORFs have taxonomy annotation.')
+                    summary.append(str(rank_number['kingdom'])+' ('+str(round(rank_percentage['kingdom']*100,2))+'%) aligned smORFs are annotated on kingdom.')
+                    summary.append(str(rank_number['phylum'])+' ('+str(round(rank_percentage['phylum']*100,2))+'%) aligned smORFs are annotated on phylum.')
+                    summary.append(str(rank_number['class'])+' ('+str(round(rank_percentage['class']*100,2))+'%) aligned smORFs are annotated on class.')
+                    summary.append(str(rank_number['order'])+' ('+str(round(rank_percentage['order']*100,2))+'%) aligned smORFs are annotated on order.')
+                    summary.append(str(rank_number['family'])+' ('+str(round(rank_percentage['family']*100,2))+'%) aligned smORFs are annotated on family.')
+                    summary.append(str(rank_number['genus'])+' ('+str(round(rank_percentage['genus']*100,2))+'%) aligned smORFs are annotated on genus.')
+                    summary.append(str(rank_number['species'])+' ('+str(round(rank_percentage['species']*100,2))+'%) aligned smORFs are annotated on species.')
 
                 with atomic_write(f'{args.output}/summary.txt', overwrite=True) as ofile:
                     for s in summary:

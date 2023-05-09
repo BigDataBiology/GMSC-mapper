@@ -2,18 +2,18 @@
 29 smORFs are aligned against GMSC in total.
 
 # Quality
-8(27.59%) aligned smORFs are high quality.
+8 (27.59%) aligned smORFs are high quality.
 
 # Habitat
-26(89.66%) aligned smORFs are single-habitat.
-3(10.34%) aligned smORFs are multi-habitat.
+26 (89.66%) aligned smORFs are single-habitat.
+3 (10.34%) aligned smORFs are multi-habitat.
 
 # Taxonomy
-8(27.59%) aligned smORFs have taxonomy annotation.
-3(10.34%) aligned smORFs are annotated on kingdom.
-0(0%) aligned smORFs are annotated on phylum.
-1(3.45%) aligned smORFs are annotated on class.
-1(3.45%) aligned smORFs are annotated on order.
-0(0%) aligned smORFs are annotated on family.
-0(0%) aligned smORFs are annotated on genus.
-3(10.34%) aligned smORFs are annotated on species.
+8 (27.59%) aligned smORFs have taxonomy annotation.
+3 (10.34%) aligned smORFs are annotated on kingdom.
+0 (0%) aligned smORFs are annotated on phylum.
+1 (3.45%) aligned smORFs are annotated on class.
+1 (3.45%) aligned smORFs are annotated on order.
+0 (0%) aligned smORFs are annotated on family.
+0 (0%) aligned smORFs are annotated on genus.
+3 (10.34%) aligned smORFs are annotated on species.
