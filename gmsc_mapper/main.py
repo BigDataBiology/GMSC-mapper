@@ -146,12 +146,12 @@ def parse_args(args):
                         dest='quality',
                         default=path.join(_ROOT, 'db/ref_quality.tsv.xz'))
 
-    return parser.parse_args()
+    return parser.parse_args(args[1:])
 
 def check_install():
     from shutil import which
     import sys
-    
+
     has_mmseqs = False
     has_diamond = False
     dependencies = ['diamond', 'mmseqs']
