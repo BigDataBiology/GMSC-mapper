@@ -375,17 +375,17 @@ def generate_fasta(output,queryfile,resultfile):
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
     logger.debug('Starting habitat annotation...')
-    single_number,single_percentage,multi_number,multi_percentage = smorf_habitat(args.habitatindex,args.output,args.habitat,resultfile)
+    r_habitat = smorf_habitat(args.habitatindex,args.output,args.habitat,resultfile)
     logger.info('habitat annotation has done.')
-    return single_number,single_percentage,multi_number,multi_percentage 
+    return r_habitat
 
 def taxonomy(args,resultfile,tmpdirname):
     from gmsc_mapper.map_taxonomy import deep_lca,taxa_summary
     logger.debug('Start taxonomy annotation...')
     deep_lca(args.taxonomyindex,args.taxonomy,args.output,resultfile,tmpdirname)
-    annotated_number,rank_number,rank_percentage = taxa_summary(args.output)
+    r_summary = taxa_summary(args.output)
     logger.info('Taxonomy annotation complete.')
-    return annotated_number,rank_number,rank_percentage
+    return r_summary
 
 def quality(args,resultfile):
     from gmsc_mapper.map_quality import smorf_quality
