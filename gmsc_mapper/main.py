@@ -275,10 +275,10 @@ def translate_gene(args,tmpdir):
 
 def check_length(queryfile):
     from gmsc_mapper.fasta import fasta_iter
-    logger.debug('Start length checking...')
+    logger.debug('Start length check...')
     if all(len(seq) < 303
                 for _, seq in fasta_iter(queryfile)):
-        logger.warning('GMSC-mapper Warning: Input sequences are all more than 303nt. '
+        logger.warning('GMSC-mapper Warning: Input sequences are all greater than 300bps.\n'
                        'Please check if your input consists of contigs, which should use -i not --nt-genes or --aa-genes as input. '
                        'However, we will regard your input sequences as nucleotide genes and continue to process.\n')
 
@@ -401,9 +401,9 @@ def main(args=None):
     if args is None:
         args = sys.argv
     args = parse_args(args)
-    if not args.cmd and (not args.genome_fasta and not args.aa_input and not args.nt_input):
-        sys.stderr.write("GMSC-mapper Error: Please see gmsc-mapper -h. Assign the subcommand or input file.\n")
-        sys.exit(1)             
+    if not args.cmd and not args.genome_fasta and not args.aa_input and not args.nt_input:
+        sys.stderr.write("GMSC-mapper Error: Please see gmsc-mapper -h. Choose a subcommand or input file.\n")
+        sys.exit(1)
     has_diamond,has_mmseqs = check_install()
 
     if args.cmd == 'createdb':
@@ -475,15 +475,19 @@ def main(args=None):
 
                 if not args.notaxonomy:
                     summary.append(f'# Taxonomy')
-                    annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)	
-                    summary.append(str(annotated_number)+' ('+str(round((1-rank_percentage['no rank'])*100,2))+'%) aligned smORFs have taxonomy annotation.')
-                    summary.append(str(rank_number['kingdom'])+' ('+str(round(rank_percentage['kingdom']*100,2))+'%) aligned smORFs are annotated on kingdom.')
-                    summary.append(str(rank_number['phylum'])+' ('+str(round(rank_percentage['phylum']*100,2))+'%) aligned smORFs are annotated on phylum.')
-                    summary.append(str(rank_number['class'])+' ('+str(round(rank_percentage['class']*100,2))+'%) aligned smORFs are annotated on class.')
-                    summary.append(str(rank_number['order'])+' ('+str(round(rank_percentage['order']*100,2))+'%) aligned smORFs are annotated on order.')
-                    summary.append(str(rank_number['family'])+' ('+str(round(rank_percentage['family']*100,2))+'%) aligned smORFs are annotated on family.')
-                    summary.append(str(rank_number['genus'])+' ('+str(round(rank_percentage['genus']*100,2))+'%) aligned smORFs are annotated on genus.')
-                    summary.append(str(rank_number['species'])+' ('+str(round(rank_percentage['species']*100,2))+'%) aligned smORFs are annotated on species.')
+                    annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)
+                    summary.append(
+                            f'{annotated_number} ({1 - rank_percentage["no rank"]:.2%}) aligned smORFs have taxonomy annotation.')
+                    for rank in [
+                            'superkingdom',
+                            'phylum',
+                            'class',
+                            'order',
+                            'family',
+                            'genus',
+                            'species']:
+                        summary.append(
+                            f'{rank_number[rank]} ({rank_percentage["superkingdom"]:.2%}) aligned smORFs are annotated at level of {rank}.')
 
                 with atomic_write(f'{args.output}/summary.txt', overwrite=True) as ofile:
                     for s in summary:
