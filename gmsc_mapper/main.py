@@ -479,7 +479,7 @@ def main(args=None):
                     summary.append(
                             f'{annotated_number} ({1 - rank_percentage["no rank"]:.2%}) aligned smORFs have taxonomy annotation.')
                     for rank in [
-                            'superkingdom',
+                            'kingdom',
                             'phylum',
                             'class',
                             'order',
@@ -487,7 +487,7 @@ def main(args=None):
                             'genus',
                             'species']:
                         summary.append(
-                            f'{rank_number[rank]} ({rank_percentage["superkingdom"]:.2%}) aligned smORFs are annotated at level of {rank}.')
+                            f'{rank_number[rank]} ({rank_percentage[rank]:.2%}) aligned smORFs are annotated at level of {rank}.')
 
                 with atomic_write(f'{args.output}/summary.txt', overwrite=True) as ofile:
                     for s in summary:
