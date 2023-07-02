@@ -9,7 +9,7 @@ known_list = [">smORF_0","MVFVLLSEMYPTKVRGLAMSIAGFALWIGTYLIGQLTPWMLQNLTPAGTFFLFA
 fasta_list = []
 
 def test_generate_fasta():
-    fasta_file = generate_fasta(os.path.dirname(os.path.realpath(__file__)),"./tests/test.faa","./tests/alignment.tsv")
+    (fasta_file,ifsuccess) = generate_fasta(os.path.dirname(os.path.realpath(__file__)),"./tests/test.faa","./tests/alignment.tsv")
     with open(fasta_file,"rt") as f:
         for line in f:
             fasta_list.append(line.strip())
