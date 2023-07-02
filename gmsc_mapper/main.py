@@ -255,16 +255,16 @@ def predict(args,tmpdir):
 
     predict_genes(args.genome_fasta,predicted_smorf)
     if not path.getsize(predicted_smorf):
-        sys.stderr.write("GMSC-mapper Error:No smORFs have been predicted.Please check your input file.\n")
-        sys.exit(1)
+        logger.info("GMSC-mapper Info:No smORFs have been predicted.Please check your input file.\n")
+        return ("",False)
     else:
         filter_smorfs(predicted_smorf, filtered_smorf)
-    if not path.getsize(filtered_smorf):
-        sys.stderr.write("GMSC-mapper Error:No smORFs remained after filtering by length(<100aa).\n")
-        sys.exit(1)
-    else:
-        logger.info('smORF prediction complete')
-    return filtered_smorf
+        if not path.getsize(filtered_smorf):
+            logger.info("GMSC-mapper Info:No smORFs remained after filtering by length(<100aa).\n")
+            return ("",False)
+        else:
+            logger.info('smORF prediction complete')
+            return (filtered_smorf,True)
 
 def translate_gene(args,tmpdir):
     from gmsc_mapper.translate import translate_gene
@@ -357,20 +357,21 @@ def generate_fasta(output,queryfile,resultfile):
     try:
         result = pd.read_csv(resultfile, sep='\t',header=None)
     except:
-        logger.error('GMSC-mapper error: There is no alignment results between your input sequences and GMSC.\n')
-        sys.exit(1)
+        print('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
+        logger.info('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
+        return ("",False)
+    else:
+        logger.debug('Start smORF fasta file generation...')
+        fastafile = path.join(output,"mapped.smorfs.faa")
 
-    logger.debug('Start smORF fasta file generation...')
-    fastafile = path.join(output,"mapped.smorfs.faa")
-
-    smorf_id = set(result.iloc[:, 0].tolist())
+        smorf_id = set(result.iloc[:, 0].tolist())
     
-    with open(fastafile,"wt") as f:
-        for ID,seq in fasta_iter(queryfile):
-            if ID in smorf_id:
-                f.write(f'>{ID}\n{seq}\n')
-    logger.debug('smORF fasta file generation complete')
-    return fastafile
+        with open(fastafile,"wt") as f:
+            for ID,seq in fasta_iter(queryfile):
+                if ID in smorf_id:
+                    f.write(f'>{ID}\n{seq}\n')
+        logger.debug('smORF fasta file generation complete')
+        return (fastafile,True)
 
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
@@ -439,9 +440,12 @@ def main(args=None):
                 summary = []
                 summary.append(f'# Total number')
                 if args.genome_fasta:
-                    queryfile = predict(args,tmpdir)
-                    smorf_number = int(predicted_smorf_count(queryfile)/2)
-                    summary.append(f'{smorf_number} smORFs are predicted in total.')
+                    (queryfile,ifpredict) = predict(args,tmpdir)
+                    if ifpredict:
+                        smorf_number = int(predicted_smorf_count(queryfile)/2)
+                        summary.append(f'{smorf_number} smORFs are predicted in total.')
+                    else:
+                        summary.append(f'No smORFs are predicted.')
                 if args.nt_input:
                     if args.filter:
                         args.nt_input = filter_length(args.nt_input,tmpdir,303)
@@ -452,43 +456,38 @@ def main(args=None):
                     if args.filter:
                         args.aa_input = filter_length(args.aa_input,tmpdir,100)
                     queryfile = args.aa_input
+                
+                if (args.genome_fasta and ifpredict) or args.nt_input or args.aa_input:
+                    if args.tool == 'diamond':
+                        resultfile = mapdb_diamond(args,queryfile)
+                    if args.tool == 'mmseqs':
+                        resultfile = mapdb_mmseqs(args,queryfile,tmpdir)
 
-                if args.tool == 'diamond':
-                    resultfile = mapdb_diamond(args,queryfile)
-                if args.tool == 'mmseqs':
-                    resultfile = mapdb_mmseqs(args,queryfile,tmpdir)
+                    (fastafile,ifsuccess) = generate_fasta(args.output,queryfile,resultfile)
+                    if ifsuccess:
+                        smorf_number = int(predicted_smorf_count(fastafile)/2)
+                        summary.append(f'{smorf_number} smORFs are aligned against GMSC in total.\n')
 
-                fastafile = generate_fasta(args.output,queryfile,resultfile)
-                smorf_number = int(predicted_smorf_count(fastafile)/2)
-                summary.append(f'{smorf_number} smORFs are aligned against GMSC in total.\n')
+                        if not args.noquality:
+                            summary.append(f'# Quality')
+                            number,percentage = quality(args,resultfile)
+                            summary.append(f'{number} ({percentage:.2%}) aligned smORFs are high quality.\n')
 
-                if not args.noquality:
-                    summary.append(f'# Quality')
-                    number,percentage = quality(args,resultfile)
-                    summary.append(f'{number} ({percentage:.2%}) aligned smORFs are high quality.\n')
+                        if not args.nohabitat:
+                            summary.append(f'# Habitat')
+                            single_number,single_percentage,multi_number,multi_percentage = habitat(args,resultfile)
+                            summary.append(f'{single_number} ({single_percentage:.2%}) aligned smORFs are single-habitat.')
+                            summary.append(f'{multi_number} ({multi_percentage:.2%}) aligned smORFs are multi-habitat.\n')
 
-                if not args.nohabitat:
-                    summary.append(f'# Habitat')
-                    single_number,single_percentage,multi_number,multi_percentage = habitat(args,resultfile)
-                    summary.append(f'{single_number} ({single_percentage:.2%}) aligned smORFs are single-habitat.')
-                    summary.append(f'{multi_number} ({multi_percentage:.2%}) aligned smORFs are multi-habitat.\n')
-
-                if not args.notaxonomy:
-                    summary.append(f'# Taxonomy')
-                    annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)
-                    summary.append(
-                            f'{annotated_number} ({1 - rank_percentage["no rank"]:.2%}) aligned smORFs have taxonomy annotation.')
-                    for rank in [
-                            'kingdom',
-                            'phylum',
-                            'class',
-                            'order',
-                            'family',
-                            'genus',
-                            'species']:
-                        summary.append(
-                            f'{rank_number[rank]} ({rank_percentage[rank]:.2%}) aligned smORFs are annotated at level of {rank}.')
-
+                        if not args.notaxonomy:
+                            summary.append(f'# Taxonomy')
+                            annotated_number,rank_number,rank_percentage = taxonomy(args,resultfile,tmpdir)	
+                            summary.append(f'{annotated_number} ({1 - rank_percentage["no rank"]:.2%}) aligned smORFs have taxonomy annotation.')
+                            for rank in ['kingdom','phylum','class','order','family','genus','species']:
+                                summary.append(f'{rank_number[rank]} ({rank_percentage[rank]:.2%}) aligned smORFs are annotated at level of {rank}.')
+                    else:
+                        summary.append(f'None of sequences are aligned against GMSC.\n')
+                
                 with atomic_write(f'{args.output}/summary.txt', overwrite=True) as ofile:
                     for s in summary:
                         print(s)
