@@ -1,14 +1,13 @@
-atomicwrites==1.4.0
+atomicwrites
 biopython
 Bottleneck
 certifi
-mkl-service==2.4.0
 numexpr
 numpy
 packaging
-pandas==1.4.3
+pandas
 pyparsing
-pyrodigal==1.1.1
+pyrodigal
 python-dateutil
 pytz
 six

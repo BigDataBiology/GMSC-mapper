@@ -18,13 +18,10 @@ Clone GMSC-mapper repository
 git clone https://github.com/BigDataBiology/GMSC-mapper.git
 ```
 
-Create conda environment(only support python v3.8-9)
+Create conda environment
 
 ```bash
-conda create -n gmscmapper python=3.8
-conda activate gmscmapper
-or
-conda create -n gmscmapper python=3.9
+conda create -n gmscmapper python
 conda activate gmscmapper
 ```
 
@@ -36,7 +33,7 @@ You will need the following dependencies:
 The easiest way to install the dependencies is with [conda](https://conda.io):
 
 ```bash
-conda install -c conda-forge -c bioconda mmseqs2
+conda install -c bioconda -c conda-forge mmseqs2
 conda install -c bioconda -c conda-forge diamond=2.0.13
 ```
 

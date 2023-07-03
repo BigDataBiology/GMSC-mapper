@@ -19,6 +19,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
     ],
     packages=['gmsc_mapper'],  
     install_requires=open('./requirements.txt', 'r').read().splitlines(),
