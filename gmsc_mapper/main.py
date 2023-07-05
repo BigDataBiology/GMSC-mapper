@@ -8,7 +8,7 @@ import tempfile
 from atomicwrites import atomic_write
 import logging
 
-_ROOT = path.abspath(path.join(os.getcwd(), ".."))
+_ROOT = path.abspath(path.join(os.getcwd(), "."))
 
 logger = logging.getLogger('GMSC-mapper')
 
@@ -18,7 +18,20 @@ def parse_args(args):
     subparsers = parser.add_subparsers(title='GMSC-mapper subcommands',
                                        dest='cmd',
                                        metavar='')
-
+    
+    cmd_download_db = subparsers.add_parser('downloaddb', 
+                                          help='Download target database')
+    
+    cmd_download_db.add_argument('--dbdir',
+                               required=False,
+                               help='Path to the database files.',
+                               dest='dbdir',
+                               default = path.join(_ROOT, 'db'))
+    cmd_download_db.add_argument('--all', action="store_true", dest='all',
+                                help='Download all database')
+    cmd_download_db.add_argument('-f', action="store_true", dest='force',
+                                help='Force download even if the files exist')
+    
     cmd_create_db = subparsers.add_parser('createdb', 
                                           help='Create target database')
     cmd_create_db.add_argument('-i',
@@ -116,43 +129,44 @@ def parse_args(args):
     parser.add_argument('--db', '--db',
                         required=False,
                         help='Path to the GMSC database file.',
-                        dest='database')
+                        dest='database',
+                        default=path.join(_ROOT, 'db/targetdb.dmnd'))
 
     parser.add_argument('--habitat', '--habitat',
                         required=False,
                         help='Path to the habitat file',
                         dest='habitat',
-                        default=path.join(_ROOT, 'db/ref_habitat.npy'))
+                        default=path.join(_ROOT, 'db/GMSC10.90AA.habitat.npy'))
 
     parser.add_argument('--habitat-index', '--habitat-index',
                         required=False,
                         help='Path to the habitat index file',
                         dest='habitatindex',
-                        default=path.join(_ROOT, 'db/ref_habitat_index.tsv'))
+                        default=path.join(_ROOT, 'db/GMSC10.90AA.habitat.index.tsv'))
 
     parser.add_argument('--taxonomy', '--taxonomy',
                         required=False,
                         help='Path to the taxonomy file',
                         dest='taxonomy',
-                        default=path.join(_ROOT, 'db/ref_taxonomy.npy'))
+                        default=path.join(_ROOT, 'db/GMSC10.90AA.taxonomy.npy'))
 
     parser.add_argument('--taxonomy-index', '--taxonomy-index',
                         required=False,
                         help='Path to the taxonomy index file',
                         dest='taxonomyindex',
-                        default=path.join(_ROOT, 'db/ref_taxonomy_index.tsv'))
+                        default=path.join(_ROOT, 'db/GMSC10.90AA.taxonomy.index.tsv'))
 
     parser.add_argument('--quality', '--quality',
                         required=False,
                         help='Path to the quality file',
                         dest='quality',
-                        default=path.join(_ROOT, 'db/ref_quality.tsv.xz'))
+                        default=path.join(_ROOT, 'db/GMSC10.90AA.high_quality.tsv.xz'))
     
     parser.add_argument('--domain', '--domain',
                         required=False,
                         help='Path to the conserved domain file',
                         dest='domain',
-                        default=path.join(_ROOT, 'db/ref_domain.tsv.xz'))
+                        default=path.join(_ROOT, 'db/GMSC10.90AA.cdd.tsv.xz'))
 
     return parser.parse_args(args[1:])
 
@@ -223,6 +237,68 @@ def validate_args(args,has_diamond,has_mmseqs):
 
     if not args.nodomain and args.domain:
         expect_file(args.domain)
+
+def download_db(args):
+    from gmsc_mapper.utils import ask
+
+    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.faa.gz')):
+        if args.all or ask("Download 90AA fasta file (~11G)?") == 'y':
+            logger.info('Start downloading 90AA fasta file...')
+            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.faa.gz',
+                                '-P',args.dbdir])
+            logger.info('90AA fasta file has been downloaded successfully.')
+        else:
+            print('Skip downloading 90AA fasta file.')
+    else:
+        print('90AA fasta file already exists. Skip downloading 90AA fasta file. Use -f to force download')
+
+    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.index.tsv')):
+        if args.all or ask("Download habitat index file (~2.3G)?") == 'y':
+            logger.info('Start downloading habitat index file...')
+            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.npy',
+                                '-P',args.dbdir])
+            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.index.tsv',
+                                '-P',args.dbdir])
+            logger.info('Habitat index file has been downloaded successfully.')
+        else:
+            print('Skip downloading habitat index file.')
+    else:
+        print('Habitat index file already exists. Skip downloading habitat index file. Use -f to force download')
+
+    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.index.tsv')):
+        if args.all or ask("Download taxonomy index file (~2.3G)?") == 'y':
+            logger.info('Start downloading taxonomy index file...')
+            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.npy',
+                                '-P',args.dbdir])
+            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.index.tsv',
+                                '-P',args.dbdir])
+            logger.info('Taxonomy index file has been downloaded successfully.')
+        else:
+            print('Skip downloading taxonomy index file.')
+    else:
+        print('Taxonomy index file already exists. Skip downloading taxonomy index file. Use -f to force download')
+
+    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.high_quality.tsv.xz')):        
+        if args.all or ask("Download quality index file (2.6M)?") == 'y':
+            logger.info('Start downloading quality index file...')
+            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.high_quality.tsv.xz',
+                                '-P',args.dbdir])
+            logger.info('Quality index file has been downloaded successfully.')
+        else:
+            print('Skip downloading quality index file.')
+    else:
+        print('Quality index file already exists. Skip downloading quality index file. Use -f to force download')
+ 
+    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.cdd.tsv.xz')):               
+        if args.all or ask("Download conserved domain index file (88M)?") == 'y':
+            logger.info('Start downloading conserved domain index file...')
+            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.cdd.tsv.xz',
+                                '-P',args.dbdir])
+            logger.info('Conserved domain index file has been downloaded successfully.')
+        else:
+            print('Skip downloading conserved domain index file.')
+    else:
+        print('Conserved domain index file already exists. Skip downloading conserved domain index file. Use -f to force download')
 
 def create_db(args):
     if not os.path.exists(args.output):
@@ -427,6 +503,9 @@ def main(args=None):
 
     if args.cmd == 'createdb':
         create_db(args)
+    
+    if args.cmd == 'downloaddb':
+        download_db(args)
 
     if not args.cmd:
         validate_args(args,has_diamond,has_mmseqs)

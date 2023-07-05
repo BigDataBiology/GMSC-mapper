@@ -90,21 +90,30 @@ gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --db ./examples/targe
 ```
 
 ## Usage
-Please make `GMSC-mapper/gmsc_mapper` as your work directory.
+Please make `GMSC-mapper` as your work directory.
 
-### Create GMSC database index
+### Download GMSC database
+`--dbdir`: Path to database output directory.(default: `GMSC-mapper/db`)
+
+`--all`: Download all database
+
+`-f`: Force download even if the files exist
+
+```
+gmsc-mapper downloaddb
+```
+
+### Create GMSC database index of Diamond/MMseqs2
 `-o`: Path to database output directory.(default: `GMSC-mapper/db`)
 
 `-m`: Alignment tool (Diamond / MMseqs2).
 
 ```
-cd gmsc_mapper
-gmsc-mapper createdb -i ../db/90AA_GMSC.faa.gz -m diamond
+gmsc-mapper createdb -i ./db/GMSC10.90AA.faa.gz -m diamond
 ```
 or
 ```
-cd gmsc_mapper
-gmsc-mapper createdb -i ../db/90AA_GMSC.faa.gz -m mmseqs
+gmsc-mapper createdb -i ./db/GMSC10.90AA.faa.gz -m mmseqs
 ```
 
 ### Default
@@ -113,33 +122,33 @@ GMSC database / habitat / taxonomy / quality / domain file path and output direc
 1. Input is genome contig sequences.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa
+gmsc-mapper -i ./examples/example.fa
 ```
 
 2. Input is amino acid sequences.
 
 ```bash
-gmsc-mapper --aa-genes ../examples/example.faa 
+gmsc-mapper --aa-genes ./examples/example.faa 
 ```
 
 3. Input is nucleotide gene sequences.
 
 ```bash
-gmsc-mapper --nt-genes ../examples/example.fna
+gmsc-mapper --nt-genes ./examples/example.fna
 ```
 
 ### Alignment tool: Diamond / MMseqs2 is optional
 If you want to change alignment tool (Diamond / MMseqs2), you can use `--tool`.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --tool mmseqs
+gmsc-mapper -i ./examples/example.fa --tool mmseqs
 ```
 
 ### Habitat / taxonomy / quality / domain annotation is optional
 If you don't want to annotate habitat / taxonomy / quality / domain you can use `--no-habitat`/`--no-taxonomy`/`--no-quality`/`--no-domain`.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --no-habitat --no-taxonomy --no-quality --no-domain
+gmsc-mapper -i ./examples/example.fa --no-habitat --no-taxonomy --no-quality --no-domain
 ```
 
 ## Output files
