@@ -103,12 +103,14 @@ def parse_args(args):
 
     parser.add_argument('--filter','--filter',action='store_true', help='Use this to filter <100 aa or <303 nt input sequences.')
 
-    parser.add_argument('--nohabitat','--nohabitat',action='store_true', help='Use this if no need to annotate habitat')
+    parser.add_argument('--no-habitat','--no-habitat',action='store_true', dest='nohabitat', help='Use this if no need to annotate habitat')
 
-    parser.add_argument('--notaxonomy', '--notaxonomy',action='store_true', help='Use this if no need to annotate taxonomy')
+    parser.add_argument('--no-taxonomy', '--no-taxonomy',action='store_true', dest='notaxonomy', help='Use this if no need to annotate taxonomy')
 
-    parser.add_argument('--noquality', '--noquality',action='store_true', help='Use this if no need to annotate quality')
+    parser.add_argument('--no-quality', '--no-quality',action='store_true', dest='noquality', help='Use this if no need to annotate quality')
     
+    parser.add_argument('--no-domain', '--no-domain',action='store_true', dest='nodomain', help='Use this if no need to annotate quality')
+
     parser.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
 
     parser.add_argument('--db', '--db',
@@ -145,6 +147,12 @@ def parse_args(args):
                         help='Path to the quality file',
                         dest='quality',
                         default=path.join(_ROOT, 'db/ref_quality.tsv.xz'))
+    
+    parser.add_argument('--domain', '--domain',
+                        required=False,
+                        help='Path to the conserved domain file',
+                        dest='domain',
+                        default=path.join(_ROOT, 'db/ref_domain.tsv.xz'))
 
     return parser.parse_args(args[1:])
 
@@ -212,6 +220,9 @@ def validate_args(args,has_diamond,has_mmseqs):
 
     if not args.noquality and args.quality:
         expect_file(args.quality)
+
+    if not args.nodomain and args.domain:
+        expect_file(args.domain)
 
 def create_db(args):
     if not os.path.exists(args.output):
@@ -395,6 +406,13 @@ def quality(args,resultfile):
     logger.info('Quality annotation completed.')
     return number,percentage
 
+def domain(args,resultfile):
+    from gmsc_mapper.map_domain import smorf_domain
+    logger.debug('Start domain annotation...')
+    number = smorf_domain(args.domain,args.output,resultfile)
+    logger.info('Domain annotation completed.')
+    return number
+
 def predicted_smorf_count(file_name):
     return sum(1 for _ in open(file_name, 'rt'))
 
@@ -485,6 +503,11 @@ def main(args=None):
                             summary.append(f'{annotated_number} ({1 - rank_percentage["no rank"]:.2%}) aligned smORFs have taxonomy annotation.')
                             for rank in ['kingdom','phylum','class','order','family','genus','species']:
                                 summary.append(f'{rank_number[rank]} ({rank_percentage[rank]:.2%}) aligned smORFs are annotated at level of {rank}.')
+
+                        if not args.nodomain:
+                            summary.append(f'\n# Conserved domain')
+                            number = domain(args,resultfile)
+                            summary.append(f'{number} aligned smORFs are annotated with CDD database.\n')
                     else:
                         summary.append(f'None of sequences are aligned against GMSC.\n')
                 

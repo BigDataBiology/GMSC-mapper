@@ -49,42 +49,44 @@ Because the whole GMSC database is large, and takes some minutes to process.
 
 If you want to check if the installation works well, you can test with mock datasets easily and fast.
 
+Please make `GMSC-mapper` as your work directory.
+
 - Create GMSC database index
 
 Default alignment tool is Diamond.
 
 ```bash
-gmsc-mapper createdb -i examples/target.faa -o examples/ -m diamond
+gmsc-mapper createdb -i ./examples/target.faa -o ./examples/ -m diamond
 ```
 
 If you want to use MMseqs2 as your alignment tool, you need to create GMSC database index in MMseqs2 format.
 
 ```bash
-gmsc-mapper createdb -i examples/target.faa -o examples/ -m mmseqs
+gmsc-mapper createdb -i ./examples/target.faa -o ./examples/ -m mmseqs
 ```
 
 - Input is genome contig sequences.
 
 ```bash
-gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv
+gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv --domain ./examples/ref_domain.txt
 ```
 
 - Input is amino acid sequences.
 
 ```bash
-gmsc-mapper --aa-genes ./examples/example.faa -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv
+gmsc-mapper --aa-genes ./examples/example.faa -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv --domain ./examples/ref_domain.txt
 ```
 
 - Input is nucleotide gene sequences.
 
 ```bash
-gmsc-mapper --nt-genes ./examples/example.fna -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv
+gmsc-mapper --nt-genes ./examples/example.fna -o ./examples_output/ --db ./examples/targetdb.dmnd --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv --domain ./examples/ref_domain.txt
 ```
 
 - Check another alignment tool: MMseqs2
 
 ```bash
-gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --db ./examples/targetdb --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv --tool mmseqs
+gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --db ./examples/targetdb --habitat ./examples/ref_habitat.npy --habitat-index ./examples/ref_habitat_index.tsv --quality ./examples/ref_quality.txt --taxonomy ./examples/ref_taxonomy.npy --taxonomy-index ./examples/ref_taxonomy_index.tsv --domain ./examples/ref_domain.txt --tool mmseqs
 ```
 
 ## Usage
@@ -106,7 +108,7 @@ gmsc-mapper createdb -i ../db/90AA_GMSC.faa.gz -m mmseqs
 ```
 
 ### Default
-GMSC database / habitat / taxonomy / quality file path and output directory path can be assigned on your own.Default is `GMSC-mapper/db` and `GMSC-mapper/output`.
+GMSC database / habitat / taxonomy / quality / domain file path and output directory path can be assigned on your own.Default is `GMSC-mapper/db` and `GMSC-mapper/output`.
 
 1. Input is genome contig sequences.
 
@@ -133,11 +135,11 @@ If you want to change alignment tool (Diamond / MMseqs2), you can use `--tool`.
 gmsc-mapper -i ../examples/example.fa --tool mmseqs
 ```
 
-### Habitat / taxonomy / quality annotation is optional
-If you don't want to annotate habitat / taxonomy / quality you can use `--nohabitat`/`--notaxonomy`/`--noquality`.
+### Habitat / taxonomy / quality / domain annotation is optional
+If you don't want to annotate habitat / taxonomy / quality / domain you can use `--no-habitat`/`--no-taxonomy`/`--no-quality`/`--no-domain`.
 
 ```bash
-gmsc-mapper -i ../examples/example.fa --nohabitat --notaxonomy --noquality
+gmsc-mapper -i ../examples/example.fa --no-habitat --no-taxonomy --no-quality --no-domain
 ```
 
 ## Output files
@@ -191,17 +193,17 @@ The output folder will contain
 
 - Habitat annotation of smORFs (optional) (habitat.out.smorfs.tsv) 
 
-  A file listing the habitat annotation for each smORF homologous to GMSC.
+  This file lists the habitat annotations of the query/predicted sequence, where the habitat is obtained from the sequence annotations of its homologous origin in GMSC.
 
   There are two columns in the file:
 
   `qseqid`: Query seq id
 
-  `habitat`: Habitat, ',' separated if the sequences is from multiple habitats
+  `habitat`: Habitat, ',' separated if the sequence is from multiple habitats
 
 - Taxonomy annotation of smORFs (optional) (taxonomy.out.smorfs.tsv)
 
-  A file listing the taxonomy annotation for each smORF homologous to GMSC.
+  This file lists the taxonomy annotations of the query/predicted sequence, where the taxonomy is obtained from the sequence annotations of its homologous origin in GMSC.
 
   There are two columns in the file:
 
@@ -211,13 +213,21 @@ The output folder will contain
 
 - Quality annotation of smORFs (optional) (quality.out.smorfs.tsv)
 
-  A file listing the quality annotation for each smORF homologous to GMSC.
+  This file lists the quality annotations of the query/predicted sequence, where the quality is obtained from the sequence annotations of its homologous origin in GMSC.
 
   `qseqid`: Query seq id
 
   `quality`: Quality label
 
-- Summry (summary.txt)
+- Conserved domain annotation of smORFs (optional) (domain.out.smorfs.tsv)
+
+  This file lists the conservative domain annotations of the query/predicted sequence, where the conservative domain is obtained from the sequence annotations of its homologous origin in GMSC.
+
+  `qseqid`: Query seq id
+
+  `cdd`: Identifiers from Conserved domain database, ',' separated if the sequence is annotated with multiple conserved domains.
+
+- Summary (summary.txt)
 
   A file providing a human-readable summary of the results.
 
@@ -244,11 +254,13 @@ The output folder will contain
 
 * `--filter`: Use this to filter <100 aa or <303 nt input sequences. (default: False)
 
-* `--nohabitat`: Use this if no need to annotate habitat. (default: False)
+* `--no-habitat`: Use this if no need to annotate habitat. (default: False)
 
-* `--notaxonomy`: Use this if no need to annotate taxonomy. (default: False)
+* `--no-taxonomy`: Use this if no need to annotate taxonomy. (default: False)
 
-* `--noquality`: Use this if no need to annotate quality. (default: False)
+* `--no-quality`: Use this if no need to annotate quality. (default: False)
+
+* `--no-domain`: Use this if no need to annotate conserved domain. (default: False)
 
 * `--quiet`: Disable alignment console output. (default:False)
 
