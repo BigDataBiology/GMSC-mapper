@@ -193,7 +193,7 @@ def check_install():
                                 './bin/mmseqs-linux-avx2.tar.gz'])
         subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
                                 '-P','./bin'])
-        subprocess.check_call(['tar','xzf',
+        subprocess.check_call(['tar','xzfz',
                                 './bin/diamond-linux64.tar.gz'])
         
     elif has_diamond and not has_mmseqs:
