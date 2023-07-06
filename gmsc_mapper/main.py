@@ -129,8 +129,7 @@ def parse_args(args):
     parser.add_argument('--db', '--db',
                         required=False,
                         help='Path to the GMSC database file.',
-                        dest='database',
-                        default=path.join(_ROOT, 'db/targetdb.dmnd'))
+                        dest='database')
 
     parser.add_argument('--habitat', '--habitat',
                         required=False,
@@ -303,24 +302,26 @@ def download_db(args):
 def create_db(args):
     if not os.path.exists(args.output):
         os.makedirs(args.output)
-    out_db = path.join(args.output,"targetdb")
+
+    diamond_out_db = path.join(args.output,"diamond_targetdb")
+    mmseqs_out_db = path.join(args.output,"mmseqs_targetdb")
 
     if args.quiet:
         diamond_cmd = ['diamond','makedb',
                         '--in',args.target_faa,
-                        '-d',out_db,
+                        '-d',diamond_out_db,
                         '--quiet']
         mmseqs_cmd = ['mmseqs','createdb',
                         args.target_faa,
-                        out_db,
+                        mmseqs_out_db,
                         '-v','0']    
     else:                    
         diamond_cmd = ['diamond','makedb',
                     '--in',args.target_faa,
-                    '-d',out_db]
+                    '-d',diamond_out_db]
         mmseqs_cmd = ['mmseqs','createdb',
                     args.target_faa,
-                    out_db]
+                    mmseqs_out_db]
 
     if args.mode == "diamond":
         logger.info('Start creating Diamond database...')
@@ -512,7 +513,7 @@ def main(args=None):
 
         if args.tool == 'diamond':
             if args.database is None:
-                args.database = path.join(_ROOT, 'db/targetdb.dmnd')
+                args.database = path.join(_ROOT, 'db/diamond_targetdb.dmnd')
             args.sensitivity = {
                 None: '--more-sensitive',
                 '1': '--fast',
@@ -526,7 +527,7 @@ def main(args=None):
 
         if args.tool == 'mmseqs':
             if args.database is None:
-                args.database = path.join(_ROOT, 'db/targetdb')
+                args.database = path.join(_ROOT, 'db/mmseqs_targetdb')
             if args.sensitivity is None:
                 args.sensitivity = 5.7
 

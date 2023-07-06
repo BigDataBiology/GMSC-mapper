@@ -1,34 +1,37 @@
 import filecmp
 import sys
 
-alignment_flag = filecmp.cmp("./tests/diamond_gene/alignment.out.smorfs.tsv", "./examples_output/alignment.out.smorfs.tsv")
+def checkf(f):
+    return filecmp.cmp(f"./tests/diamond_gene/{f}",
+                        f"./examples_output/{f}")
+
 ok = True
-if not alignment_flag:
+
+if not checkf("alignment.out.smorfs.tsv"):
     ok = False
     print('\nGene input of Diamond mode alignment results have something wrong.\n')
 
-fasta_flag = filecmp.cmp("./tests/diamond_gene/mapped.smorfs.faa", "./examples_output/mapped.smorfs.faa")
-if not fasta_flag:
+if not checkf("mapped.smorfs.faa"):
     ok = False
     print('\nGene input of Diamond mode mapped fasta results have something wrong.\n')
 
-habitat_flag = filecmp.cmp("./tests/diamond_gene/habitat.out.smorfs.tsv", "./examples_output/habitat.out.smorfs.tsv")
-if not habitat_flag:
+if not checkf("habitat.out.smorfs.tsv"):
     ok = False
     print('\nGene input of Diamond mode habitat results have something wrong.\n')
 
-taxonomy_flag = filecmp.cmp("./tests/diamond_gene/taxonomy.out.smorfs.tsv", "./examples_output/taxonomy.out.smorfs.tsv")
-if not taxonomy_flag:
+if not checkf("taxonomy.out.smorfs.tsv"):
     ok = False
     print('\nGene input of Diamond mode taxonomy results have something wrong.\n')
 
-quality_flag = filecmp.cmp("./tests/diamond_gene/quality.out.smorfs.tsv", "./examples_output/quality.out.smorfs.tsv")
-if not quality_flag:
+if not checkf("quality.out.smorfs.tsv"):
     ok = False
     print('\nGene input of Diamond mode quality results have something wrong.\n')
 
-summary_flag = filecmp.cmp("./tests/diamond_gene/summary.txt", "./examples_output/summary.txt")
-if not summary_flag:
+if not checkf("domain.out.smorfs.tsv"):
+    ok = False
+    print('\nGene input of Diamond mode domain results have something wrong.\n')
+    
+if not checkf("summary.txt"):
     ok = False
     print('\nGene input of Diamond mode summary results have something wrong.\n')
 
