@@ -32,7 +32,9 @@ jobs:
         pip install pandas
         pip install biopython
         conda install -c bioconda -c conda-forge mmseqs2
-        conda install -c bioconda -c conda-forge diamond=2.0.13
+        wget http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz
+        tar xzf diamond-linux64.tar.gz
+        export PATH=.:$PATH 
         python ./setup.py install
     - name: Test with pytest
       run: |
