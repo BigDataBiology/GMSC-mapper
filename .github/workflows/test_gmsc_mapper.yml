@@ -31,6 +31,8 @@ jobs:
         pip install pyrodigal
         pip install pandas
         pip install biopython
+        conda install -c bioconda -c conda-forge mmseqs2
+        conda install -c bioconda -c conda-forge diamond=2.0.13
         python ./setup.py install
     - name: Test with pytest
       run: |
