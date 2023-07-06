@@ -32,10 +32,6 @@ jobs:
         pip install pyrodigal
         pip install pandas
         pip install biopython
-        wget https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz -P ./bin
-        tar xvfz ./bin/mmseqs-linux-avx2.tar.gz
-        wget http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz -P ./bin
-        tar xzf ./bin/diamond-linux64.tar.gz
         python ./setup.py install
     - name: Test with pytest
       run: |

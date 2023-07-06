@@ -186,13 +186,20 @@ def check_install():
             if dep == 'mmseqs':
                 has_mmseqs = True
     if not has_diamond and not has_mmseqs:
-        sys.stderr.write('GMSC-mapper Error: Neither diamond nor mmseqs appear to be available!\n'
-                        'At least one of them is necessary to run GMSC-mapper.\n')
-        sys.exit(1)
+        logger.warning('GMSC-mapper Warning: Neither diamond nor mmseqs appear to be available! It will download diamond and mmseqs2.\n')
+        subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xvfz',
+                                './bin/mmseqs-linux-avx2.tar.gz'])
+        subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xzf',
+                                './bin/diamond-linux64.tar.gz'])
+        
     elif has_diamond and not has_mmseqs:
-        logger.warning('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
+        logger.warning('GMSC-mapper Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
     elif not has_diamond and has_mmseqs:
-        logger.warning('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
+        logger.warning('GMSC-mapper Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
     else:
         logger.info('Dependencies installation is OK\n')
     return has_diamond,has_mmseqs
@@ -526,7 +533,7 @@ def main(args=None):
     if not args.cmd and not args.genome_fasta and not args.aa_input and not args.nt_input:
         sys.stderr.write("GMSC-mapper Error: Please see gmsc-mapper -h. Choose a subcommand or input file.\n")
         sys.exit(1)
-    #has_diamond,has_mmseqs = check_install()
+    has_diamond,has_mmseqs = check_install()
 
     if args.cmd == 'createdb':
         create_db(args)
