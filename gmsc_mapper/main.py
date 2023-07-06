@@ -318,12 +318,12 @@ def create_db(args):
     if which('diamond'):
         diamond = 'diamond'
     else:
-        diamond = path.join(_ROOT, 'bin/diamond')
+        diamond = './bin/diamond'
     
     if which('mmseqs'):
         mmseqs = 'mmseqs'
     else:
-        mmseqs = path.join(_ROOT, 'bin/mmseqs/bin/mmseqs')
+        mmseqs = './bin/mmseqs/bin/mmseqs'
 
     if args.quiet:
         diamond_cmd = [diamond,'makedb',
@@ -409,7 +409,7 @@ def mapdb_diamond(args,queryfile):
     if which('diamond'):
         diamond = 'diamond'
     else:
-        diamond = path.join(_ROOT, 'bin/diamond')
+        diamond = './bin/diamond'
 
     diamond_cmd = [diamond,'blastp',
                     '-q',queryfile,
@@ -444,7 +444,7 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
     if which('mmseqs'):
         mmseqs = 'mmseqs'
     else:
-        mmseqs = path.join(_ROOT, 'bin/mmseqs/bin/mmseqs')
+        mmseqs = './bin/mmseqs/bin/mmseqs'
 
     mmseqs_cmd_db = [mmseqs, 'createdb', queryfile, querydb]
     mmseqs_cmd_search = [mmseqs,'search',
