@@ -31,6 +31,7 @@ jobs:
         pip install pyrodigal
         pip install pandas
         pip install biopython
+        python ./setup.py install
     - name: Test with pytest
       run: |
         python -m pytest ./tests
