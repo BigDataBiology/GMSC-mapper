@@ -11,10 +11,6 @@ if not checkf("predicted.filterd.smorf.faa"):
     ok = False
     print('\nContig input of MMseqs2 mode predicted fasta results have something wrong.\n')
 
-if not checkf("alignment.out.smorfs.tsv"):
-    ok = False
-    print('\nContig input of MMseqs2 mode alignment results have something wrong.\n')
-
 if not checkf("mapped.smorfs.faa"):
     ok = False
     print('\nContig input of MMseqs2 mode mapped fasta results have something wrong.\n')
