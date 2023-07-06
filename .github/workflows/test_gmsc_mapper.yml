@@ -25,19 +25,16 @@ jobs:
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
     - name: Install dependencies
-      shell: bash
       run: |
         pip install pytest
         pip install atomicwrites
         pip install pyrodigal
         pip install pandas
         pip install biopython
-        wget https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz
-        tar xvfz ./mmseqs-linux-avx2.tar.gz
-        export PATH=./mmseqs/bin/:$PATH
-        wget http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz
-        tar xzf ./diamond-linux64.tar.gz
-        export PATH=.:$PATH 
+        wget https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz -P ./bin
+        tar xvfz ./bin/mmseqs-linux-avx2.tar.gz
+        wget http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz -P ./bin
+        tar xzf ./bin/diamond-linux64.tar.gz
         python ./setup.py install
     - name: Test with pytest
       run: |

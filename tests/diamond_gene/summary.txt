@@ -9,11 +9,15 @@
 0 (0.00%) aligned smORFs are multi-habitat.
 
 # Taxonomy
-0 (0.0%) aligned smORFs have taxonomy annotation.
-0 (0%) aligned smORFs are annotated on kingdom.
-0 (0%) aligned smORFs are annotated on phylum.
-0 (0%) aligned smORFs are annotated on class.
-0 (0%) aligned smORFs are annotated on order.
-0 (0%) aligned smORFs are annotated on family.
-0 (0%) aligned smORFs are annotated on genus.
-0 (0%) aligned smORFs are annotated on species.
+0 (0.00%) aligned smORFs have taxonomy annotation.
+0 (0.00%) aligned smORFs are annotated at level of kingdom.
+0 (0.00%) aligned smORFs are annotated at level of phylum.
+0 (0.00%) aligned smORFs are annotated at level of class.
+0 (0.00%) aligned smORFs are annotated at level of order.
+0 (0.00%) aligned smORFs are annotated at level of family.
+0 (0.00%) aligned smORFs are annotated at level of genus.
+0 (0.00%) aligned smORFs are annotated at level of species.
+
+# Conserved domain
+0 aligned smORFs are annotated with CDD database.
+
