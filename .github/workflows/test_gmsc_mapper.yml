@@ -31,9 +31,11 @@ jobs:
         pip install pyrodigal
         pip install pandas
         pip install biopython
-        conda install -c bioconda -c conda-forge mmseqs2
+        wget https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz
+        tar xvfz ./mmseqs-linux-avx2.tar.gz
+        export PATH=./mmseqs/bin/:$PATH
         wget http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz
-        tar xzf diamond-linux64.tar.gz
+        tar xzf ./diamond-linux64.tar.gz
         export PATH=.:$PATH 
         python ./setup.py install
     - name: Test with pytest
