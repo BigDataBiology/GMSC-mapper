@@ -186,7 +186,7 @@ def check_install():
             if dep == 'mmseqs':
                 has_mmseqs = True
     if not has_diamond and not has_mmseqs:
-        logger.warning('GMSC-mapper Warning: Neither diamond nor mmseqs appear to be available! It will download diamond and mmseqs2.\n')
+        logger.warning('GMSC-mapper Warning: Neither diamond nor mmseqs appear to be available! It will download diamond and mmseqs.\n')
         subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
                                 '-P','./bin'])
         subprocess.check_call(['tar','xvfz',
@@ -197,16 +197,11 @@ def check_install():
         subprocess.check_call(['tar','xvfz',
                                 './bin/diamond-linux64.tar.gz',
                                 '-C','./bin'])
-        
-    elif has_diamond and not has_mmseqs:
-        logger.warning('GMSC-mapper Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
-    elif not has_diamond and has_mmseqs:
-        logger.warning('GMSC-mapper Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
     else:
         logger.info('Dependencies installation is OK\n')
     return has_diamond,has_mmseqs
 
-def validate_args(args):
+def validate_args(args,has_diamond,has_mmseqs):
     def expect_file(f):
         if not os.path.exists(f):
             sys.stderr.write(f"GMSC-mapper Error: Expected file '{f}' does not exist\n")
@@ -224,12 +219,20 @@ def validate_args(args):
         sys.stderr.write("GMSC-mapper Error: --input or --aa-genes or --nt_genes shouldn't be assigned at the same time\n")
         sys.exit(1)
     
-    #if args.tool == "diamond" and not has_diamond:
-    #    sys.stderr.write("GMSC-mapper Error:diamond is not available.Please add diamond into your path or use the `--tool mmseqs` option.\n")
-    #    sys.exit(1)       
-    #if args.tool == "mmseqs" and not has_mmseqs:
-    #    sys.stderr.write("GMSC-mapper Error:mmseqs is not available.Please add mmseqs into your path or use the `--tool diamond` option(default).\n")
-    #    sys.exit(1)
+    if args.tool == "diamond" and not has_diamond:
+        logger.warning("GMSC-mapper Warning:mmseqs is not available.It will download diamond.\n")
+        subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xvfz',
+                                './bin/diamond-linux64.tar.gz',
+                                '-C','./bin'])      
+    if args.tool == "mmseqs" and not has_mmseqs:
+        logger.warning("GMSC-mapper Warning:mmseqs is not available.It will download mmseqs.\n")
+        subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xvfz',
+                                './bin/mmseqs-linux-avx2.tar.gz',
+                                '-C','./bin'])
 
     if args.database:
         expect_file(args.database)      
@@ -544,9 +547,8 @@ def main(args=None):
         download_db(args)
 
     if not args.cmd:
-        #validate_args(args,has_diamond,has_mmseqs)
-        validate_args(args)
-
+        validate_args(args,has_diamond,has_mmseqs)
+        
         if args.tool == 'diamond':
             if args.database is None:
                 args.database = path.join(_ROOT, 'db/diamond_targetdb.dmnd')
