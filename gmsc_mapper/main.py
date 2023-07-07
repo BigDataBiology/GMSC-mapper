@@ -186,13 +186,17 @@ def check_install():
             if dep == 'mmseqs':
                 has_mmseqs = True
     if not has_diamond and not has_mmseqs:
-        sys.stderr.write('GMSC-mapper Error: Neither diamond nor mmseqs appear to be available!\n'
-                        'At least one of them is necessary to run GMSC-mapper.\n')
-        sys.exit(1)
-    elif has_diamond and not has_mmseqs:
-        logger.warning('Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
-    elif not has_diamond and has_mmseqs:
-        logger.warning('Warning: diamond does not appear to be available.You can only use the `--tool mmseqs` option.')
+        logger.warning('GMSC-mapper Warning: Neither diamond nor mmseqs appear to be available! It will download diamond and mmseqs.\n')
+        subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xvfz',
+                                './bin/mmseqs-linux-avx2.tar.gz',
+                                '-C','./bin'])
+        subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xvfz',
+                                './bin/diamond-linux64.tar.gz',
+                                '-C','./bin'])
     else:
         logger.info('Dependencies installation is OK\n')
     return has_diamond,has_mmseqs
@@ -216,11 +220,19 @@ def validate_args(args,has_diamond,has_mmseqs):
         sys.exit(1)
     
     if args.tool == "diamond" and not has_diamond:
-        sys.stderr.write("GMSC-mapper Error:diamond is not available.Please add diamond into your path or use the `--tool mmseqs` option.\n")
-        sys.exit(1)       
+        logger.warning("GMSC-mapper Warning:mmseqs is not available.It will download diamond.\n")
+        subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xvfz',
+                                './bin/diamond-linux64.tar.gz',
+                                '-C','./bin'])      
     if args.tool == "mmseqs" and not has_mmseqs:
-        sys.stderr.write("GMSC-mapper Error:mmseqs is not available.Please add mmseqs into your path or use the `--tool diamond` option(default).\n")
-        sys.exit(1)
+        logger.warning("GMSC-mapper Warning:mmseqs is not available.It will download mmseqs.\n")
+        subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
+                                '-P','./bin'])
+        subprocess.check_call(['tar','xvfz',
+                                './bin/mmseqs-linux-avx2.tar.gz',
+                                '-C','./bin'])
 
     if args.database:
         expect_file(args.database)      
@@ -300,26 +312,38 @@ def download_db(args):
         print('Conserved domain index file already exists. Skip downloading conserved domain index file. Use -f to force download')
 
 def create_db(args):
+    from shutil import which
+
     if not os.path.exists(args.output):
         os.makedirs(args.output)
 
     diamond_out_db = path.join(args.output,"diamond_targetdb")
     mmseqs_out_db = path.join(args.output,"mmseqs_targetdb")
+    
+    if which('diamond'):
+        diamond = 'diamond'
+    else:
+        diamond = './bin/diamond'
+    
+    if which('mmseqs'):
+        mmseqs = 'mmseqs'
+    else:
+        mmseqs = './bin/mmseqs/bin/mmseqs'
 
     if args.quiet:
-        diamond_cmd = ['diamond','makedb',
+        diamond_cmd = [diamond,'makedb',
                         '--in',args.target_faa,
                         '-d',diamond_out_db,
                         '--quiet']
-        mmseqs_cmd = ['mmseqs','createdb',
+        mmseqs_cmd = [mmseqs,'createdb',
                         args.target_faa,
                         mmseqs_out_db,
                         '-v','0']    
     else:                    
-        diamond_cmd = ['diamond','makedb',
+        diamond_cmd = [diamond,'makedb',
                     '--in',args.target_faa,
                     '-d',diamond_out_db]
-        mmseqs_cmd = ['mmseqs','createdb',
+        mmseqs_cmd = [mmseqs,'createdb',
                     args.target_faa,
                     mmseqs_out_db]
 
@@ -380,12 +404,19 @@ def filter_length(queryfile,tmpdir,N):
     return filtered_file
 
 def mapdb_diamond(args,queryfile):
+    from shutil import which
+
     logger.debug('Starting smORF mapping...')
 
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,length,qstart,qend,sstart,send,bitscore,pident,evalue,qcovhsp,scovhsp'
 
-    diamond_cmd = ['diamond','blastp',
+    if which('diamond'):
+        diamond = 'diamond'
+    else:
+        diamond = './bin/diamond'
+
+    diamond_cmd = [diamond,'blastp',
                     '-q',queryfile,
                     '-d',args.database,
                     '-o',resultfile,
@@ -405,6 +436,8 @@ def mapdb_diamond(args,queryfile):
     return resultfile
 
 def mapdb_mmseqs(args, queryfile, tmpdir):
+    from shutil import which
+
     logger.info('Start smORF mapping...')
 
     querydb = path.join(tmpdir,"query.db")
@@ -413,8 +446,13 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = 'query,target,qseq,tseq,qlen,tlen,alnlen,qstart,qend,tstart,tend,bits,pident,evalue,qcov,tcov'
 
-    mmseqs_cmd_db = ['mmseqs', 'createdb', queryfile, querydb]
-    mmseqs_cmd_search = ['mmseqs','search',
+    if which('mmseqs'):
+        mmseqs = 'mmseqs'
+    else:
+        mmseqs = './bin/mmseqs/bin/mmseqs'
+
+    mmseqs_cmd_db = [mmseqs, 'createdb', queryfile, querydb]
+    mmseqs_cmd_search = [mmseqs,'search',
                         querydb,
                         args.database,
                         resultdb,
@@ -424,7 +462,7 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
                         '--min-seq-id',str(args.identity),
                         '-c',str(args.coverage),
                         '--threads',str(args.threads)]
-    mmseqs_cmd_out = ['mmseqs','convertalis',
+    mmseqs_cmd_out = [mmseqs,'convertalis',
                     querydb,
                     args.database,
                     resultdb,
@@ -510,7 +548,7 @@ def main(args=None):
 
     if not args.cmd:
         validate_args(args,has_diamond,has_mmseqs)
-
+        
         if args.tool == 'diamond':
             if args.database is None:
                 args.database = path.join(_ROOT, 'db/diamond_targetdb.dmnd')

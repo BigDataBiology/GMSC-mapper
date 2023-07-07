@@ -11,21 +11,21 @@ def test_diamond_contig():
     ok = True
 
     subprocess.check_call(['gmsc-mapper','createdb',
-                          '-i','examples/target.faa',
-                          '-o','examples/',
+                          '-i','./examples/target.faa',
+                          '-o','./examples/',
                           '-m','diamond',
                           '--quiet'])
     
     subprocess.check_call(['gmsc-mapper',
-                          '-i','examples/example.fa',
-                          '-o','examples_output/',
-                          '--db','examples/diamond_targetdb.dmnd',
-                          '--habitat','examples/ref_habitat.npy',
-                          '--habitat-index','examples/ref_habitat_index.tsv',
-                          '--quality','examples/ref_quality.txt',
-                          '--taxonomy','examples/ref_taxonomy.npy',
-                          '--taxonomy-index','examples/ref_taxonomy_index.tsv',
-                          '--domain','examples/ref_domain.txt','--quiet'])
+                          '-i','./examples/example.fa',
+                          '-o','./examples_output/',
+                          '--db','./examples/diamond_targetdb.dmnd',
+                          '--habitat','./examples/ref_habitat.npy',
+                          '--habitat-index','./examples/ref_habitat_index.tsv',
+                          '--quality','./examples/ref_quality.txt',
+                          '--taxonomy','./examples/ref_taxonomy.npy',
+                          '--taxonomy-index','./examples/ref_taxonomy_index.tsv',
+                          '--domain','./examples/ref_domain.txt','--quiet'])
 
     if not checkf("predicted.filterd.smorf.faa"):
         ok = False
