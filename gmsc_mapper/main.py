@@ -190,11 +190,13 @@ def check_install():
         subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
                                 '-P','./bin'])
         subprocess.check_call(['tar','xvfz',
-                                './bin/mmseqs-linux-avx2.tar.gz'])
+                                './bin/mmseqs-linux-avx2.tar.gz',
+                                '-C','./bin'])
         subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
                                 '-P','./bin'])
         subprocess.check_call(['tar','xvfz',
-                                './bin/diamond-linux64.tar.gz'])
+                                './bin/diamond-linux64.tar.gz',
+                                '-C','./bin'])
         
     elif has_diamond and not has_mmseqs:
         logger.warning('GMSC-mapper Warning: mmseqs does not appear to be available.You can only use the `--tool diamond` option(default).')
