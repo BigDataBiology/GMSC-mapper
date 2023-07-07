@@ -125,47 +125,12 @@ def parse_args(args):
     parser.add_argument('--no-domain', '--no-domain',action='store_true', dest='nodomain', help='Use this if no need to annotate quality')
 
     parser.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
-
-    parser.add_argument('--db', '--db',
-                        required=False,
-                        help='Path to the GMSC database file.',
-                        dest='database')
-
-    parser.add_argument('--habitat', '--habitat',
-                        required=False,
-                        help='Path to the habitat file',
-                        dest='habitat',
-                        default=path.join(_ROOT, 'db/GMSC10.90AA.habitat.npy'))
-
-    parser.add_argument('--habitat-index', '--habitat-index',
-                        required=False,
-                        help='Path to the habitat index file',
-                        dest='habitatindex',
-                        default=path.join(_ROOT, 'db/GMSC10.90AA.habitat.index.tsv'))
-
-    parser.add_argument('--taxonomy', '--taxonomy',
-                        required=False,
-                        help='Path to the taxonomy file',
-                        dest='taxonomy',
-                        default=path.join(_ROOT, 'db/GMSC10.90AA.taxonomy.npy'))
-
-    parser.add_argument('--taxonomy-index', '--taxonomy-index',
-                        required=False,
-                        help='Path to the taxonomy index file',
-                        dest='taxonomyindex',
-                        default=path.join(_ROOT, 'db/GMSC10.90AA.taxonomy.index.tsv'))
-
-    parser.add_argument('--quality', '--quality',
-                        required=False,
-                        help='Path to the quality file',
-                        dest='quality',
-                        default=path.join(_ROOT, 'db/GMSC10.90AA.high_quality.tsv.xz'))
     
-    parser.add_argument('--domain', '--domain',
+    parser.add_argument('--dbdir', '--dbdir',
                         required=False,
-                        help='Path to the conserved domain file',
-                        dest='domain',
-                        default=path.join(_ROOT, 'db/GMSC10.90AA.cdd.tsv.xz'))
+                        help='Path to the GMSC database directory.',
+                        dest='dbdir',
+                        default = path.join(_ROOT, 'db'))
 
     return parser.parse_args(args[1:])
 
@@ -185,6 +150,7 @@ def check_install():
                 has_diamond = True
             if dep == 'mmseqs':
                 has_mmseqs = True
+
     if not has_diamond and not has_mmseqs:
         logger.warning('GMSC-mapper Warning: Neither diamond nor mmseqs appear to be available! It will download diamond and mmseqs.\n')
         subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
@@ -206,7 +172,12 @@ def validate_args(args,has_diamond,has_mmseqs):
         if not os.path.exists(f):
             sys.stderr.write(f"GMSC-mapper Error: Expected file '{f}' does not exist\n")
             sys.exit(1)
-    
+
+    def expect_database(f):
+        if not os.path.exists(f):
+            sys.stderr.write(f"GMSC-mapper Error: Expected file '{f}' does not exist. Please use --dbdir to assign your database directory.\n")
+            sys.exit(1)
+
     if not args.genome_fasta and not args.aa_input and not args.nt_input:
         pass
     elif args.genome_fasta and not args.aa_input and not args.nt_input:
@@ -233,21 +204,25 @@ def validate_args(args,has_diamond,has_mmseqs):
         subprocess.check_call(['tar','xvfz',
                                 './bin/mmseqs-linux-avx2.tar.gz',
                                 '-C','./bin'])
+    
+    if args.tool == "diamond":
+        expect_database(path.join(args.dbdir, "diamond_targetdb.dmnd"))
+    if args.tool == "mmseqs":
+        expect_database(path.join(args.dbdir, "mmseqs_targetdb"))
 
-    if args.database:
-        expect_file(args.database)      
+    if not args.nohabitat:
+        expect_database(path.join(args.dbdir, "GMSC10.90AA.habitat.index.tsv"))
+        expect_database(path.join(args.dbdir, "GMSC10.90AA.habitat.npy"))
 
-    if not args.nohabitat and args.habitat:
-        expect_file(args.habitat)
+    if not args.notaxonomy:
+        expect_database(path.join(args.dbdir, "GMSC10.90AA.taxonomy.index.tsv"))
+        expect_database(path.join(args.dbdir, "GMSC10.90AA.taxonomy.npy"))
 
-    if not args.notaxonomy and args.taxonomy:
-        expect_file(args.taxonomy)
+    if not args.noquality:
+        expect_database(path.join(args.dbdir, "GMSC10.90AA.high_quality.tsv.xz"))
 
-    if not args.noquality and args.quality:
-        expect_file(args.quality)
-
-    if not args.nodomain and args.domain:
-        expect_file(args.domain)
+    if not args.nodomain:
+        expect_database(path.join(args.dbdir, "GMSC10.90AA.cdd.tsv.xz"))
 
 def download_db(args):
     from gmsc_mapper.utils import ask
@@ -415,10 +390,12 @@ def mapdb_diamond(args,queryfile):
         diamond = 'diamond'
     else:
         diamond = './bin/diamond'
+    
+    database = path.join(args.dbdir, "diamond_targetdb.dmnd")
 
     diamond_cmd = [diamond,'blastp',
                     '-q',queryfile,
-                    '-d',args.database,
+                    '-d',database,
                     '-o',resultfile,
                     args.sensitivity,
                     '-e',str(args.evalue),
@@ -451,10 +428,12 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
     else:
         mmseqs = './bin/mmseqs/bin/mmseqs'
 
+    database = path.join(args.dbdir, "mmseqs_targetdb")
+
     mmseqs_cmd_db = [mmseqs, 'createdb', queryfile, querydb]
     mmseqs_cmd_search = [mmseqs,'search',
                         querydb,
-                        args.database,
+                        database,
                         resultdb,
                         tmp,
                         '-s',str(args.sensitivity),
@@ -464,7 +443,7 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
                         '--threads',str(args.threads)]
     mmseqs_cmd_out = [mmseqs,'convertalis',
                     querydb,
-                    args.database,
+                    database,
                     resultdb,
                     resultfile,
                     '--format-output', outfmt]
@@ -502,29 +481,42 @@ def generate_fasta(output,queryfile,resultfile):
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
     logger.debug('Starting habitat annotation...')
-    r_habitat = smorf_habitat(args.habitatindex,args.output,args.habitat,resultfile)
+
+    habitatindex = path.join(args.dbdir, "GMSC10.90AA.habitat.index.tsv")
+    habitat = path.join(args.dbdir, "GMSC10.90AA.habitat.npy")
+    r_habitat = smorf_habitat(habitatindex,args.output,habitat,resultfile)
+
     logger.info('habitat annotation has done.')
     return r_habitat
 
 def taxonomy(args,resultfile,tmpdirname):
     from gmsc_mapper.map_taxonomy import deep_lca,taxa_summary
     logger.debug('Start taxonomy annotation...')
-    deep_lca(args.taxonomyindex,args.taxonomy,args.output,resultfile,tmpdirname)
+    
+    taxonomyindex = path.join(args.dbdir, "GMSC10.90AA.taxonomy.index.tsv")
+    taxonomy = path.join(args.dbdir, "GMSC10.90AA.taxonomy.npy")
+    deep_lca(taxonomyindex,taxonomy,args.output,resultfile,tmpdirname)
     r_summary = taxa_summary(args.output)
+
     logger.info('Taxonomy annotation complete.')
     return r_summary
 
 def quality(args,resultfile):
     from gmsc_mapper.map_quality import smorf_quality
     logger.debug('Start quality annotation...')
-    number,percentage = smorf_quality(args.output,args.quality,resultfile)
+
+    quality = path.join(args.dbdir, "GMSC10.90AA.high_quality.tsv.xz")
+    number,percentage = smorf_quality(args.output,quality,resultfile)
+
     logger.info('Quality annotation completed.')
     return number,percentage
 
 def domain(args,resultfile):
     from gmsc_mapper.map_domain import smorf_domain
     logger.debug('Start domain annotation...')
-    number = smorf_domain(args.domain,args.output,resultfile)
+
+    domain = path.join(args.dbdir, "GMSC10.90AA.cdd.tsv.xz")
+    number = smorf_domain(domain,args.output,resultfile)
     logger.info('Domain annotation completed.')
     return number
 
@@ -550,8 +542,6 @@ def main(args=None):
         validate_args(args,has_diamond,has_mmseqs)
         
         if args.tool == 'diamond':
-            if args.database is None:
-                args.database = path.join(_ROOT, 'db/diamond_targetdb.dmnd')
             args.sensitivity = {
                 None: '--more-sensitive',
                 '1': '--fast',
@@ -564,8 +554,6 @@ def main(args=None):
             }.get(args.sensitivity, args.sensitivity)
 
         if args.tool == 'mmseqs':
-            if args.database is None:
-                args.database = path.join(_ROOT, 'db/mmseqs_targetdb')
             if args.sensitivity is None:
                 args.sensitivity = 5.7
 

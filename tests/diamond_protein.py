@@ -36,7 +36,7 @@ if not checkf("summary.txt"):
     print('\nProtein input of Diamond mode summary results have something wrong.\n')
 
 if ok:
-    print('\nGene input of Diamond mode checking has passed.\n')
+    print('\nProtein input of Diamond mode checking has passed.\n')
 else:
     sys.exit(1)
 

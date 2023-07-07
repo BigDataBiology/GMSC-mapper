@@ -19,13 +19,8 @@ def test_mmseqs_contig():
     subprocess.check_call(['gmsc-mapper',
                           '-i','examples/example.fa',
                           '-o','examples_output/',
-                          '--db','examples/mmseqs_targetdb',
-                          '--habitat','examples/ref_habitat.npy',
-                          '--habitat-index','examples/ref_habitat_index.tsv',
-                          '--quality','examples/ref_quality.txt',
-                          '--taxonomy','examples/ref_taxonomy.npy',
-                          '--taxonomy-index','examples/ref_taxonomy_index.tsv',
-                          '--domain','examples/ref_domain.txt','--quiet',
+                          '--dbdir','./examples/',
+                          '--quiet',
                           '--tool','mmseqs'])
 
     if not checkf("predicted.filterd.smorf.faa"):
