@@ -392,8 +392,9 @@ def mapdb_diamond(args,queryfile):
         diamond = './bin/diamond'
     
     database = path.join(args.dbdir, "diamond_targetdb.dmnd")
-
-    diamond_cmd = [diamond,'blastp',
+    
+    if args.sensitivity != '--default':
+        diamond_cmd = [diamond,'blastp',
                     '-q',queryfile,
                     '-d',database,
                     '-o',resultfile,
@@ -404,6 +405,14 @@ def mapdb_diamond(args,queryfile):
                     '--subject-cover',str(float(args.coverage)*100),
                     '-p',str(args.threads),
                     '--outfmt'] + outfmt.split(',')
+    else:
+        diamond_cmd = [diamond,'blastp',
+                    '-q',queryfile,
+                    '-d',database,
+                    '-o',resultfile,
+                    '-e',str(args.evalue),
+                    '--id',str(float(args.identity)*100),                                                                                   '--query-cover',str(float(args.coverage)*100),
+                    '--subject-cover',str(float(args.coverage)*100),                                                                        '-p',str(args.threads),                                                                                                 '--outfmt'] + outfmt.split(',')
     if args.quiet:
         diamond_cmd.append('--quiet')
 
@@ -545,8 +554,8 @@ def main(args=None):
             args.sensitivity = {
                 None: '--more-sensitive',
                 '1': '--fast',
-                '2': '--mid-sensitive',
-                '3': '--default',
+                '2': '--default',
+                '3': '--mid-sensitive',
                 '4': '--sensitive',
                 '5': '--more-sensitive',
                 '6': '--very-sensitive',
