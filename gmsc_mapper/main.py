@@ -552,7 +552,7 @@ def main(args=None):
         
         if args.tool == 'diamond':
             args.sensitivity = {
-                None: '--more-sensitive',
+                None: '--sensitive',
                 '1': '--fast',
                 '2': '--default',
                 '3': '--mid-sensitive',
