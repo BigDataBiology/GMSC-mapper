@@ -3,12 +3,12 @@
 GMSC-mapper is a command line tool to query the Global Microbial smORFs Catalog (GMSC).
 
 GMSC-mapper can be used to 
-- Find query smORFs (&lt; 100aa) homologous to Global Microbial smORFs Catalog (GMSC) by alignment.
+- Find query smORFs (&lt; 100aa) homologous to Global Microbial smORFs Catalogue (GMSC) by alignment.
   - Support 3 types of input:
     - contigs (GMSC-mapper will predict smORFs from contigs first)
     - amino acid sequences
     - nucleotide gene sequences
-- Annotate query/predicted smORFs with quality, habitat and taxonomy information constructed manually in detail.
+- Annotate query / predicted smORFs with quality, habitat and taxonomy information constructed manually in detail.
 
 ## Installation
 
@@ -44,10 +44,8 @@ cd GMSC-mapper
 python setup.py install
 ```
 
-### Example test
-Because the whole GMSC database is large, and takes some minutes to process. 
-
-If you want to check if the installation works well, you can test with mock datasets easily and fast.
+#### Example test
+As the whole GMSC database is large and takes some minutes to process. To check if the installation works well, you can test with mock datasets easily and fast.
 
 Please make `GMSC-mapper` as your work directory.
 
@@ -57,31 +55,25 @@ cd GMSC-mapper
 
 - Create GMSC database index
 
-Default alignment tool is Diamond.
+Default alignment tool is DIAMOND.
 
 ```bash
 gmsc-mapper createdb -i ./examples/target.faa -o ./examples/ -m diamond
 ```
 
-If you want to use MMseqs2 as your alignment tool, you need to create GMSC database index in MMseqs2 format.
-
-```bash
-gmsc-mapper createdb -i ./examples/target.faa -o ./examples/ -m mmseqs
-```
-
-- Input is genome contig sequences.
+- When input is genome contig sequences:
 
 ```bash
 gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --dbdir ./examples/ 
 ```
 
-- Input is amino acid sequences.
+- When input is amino acid sequences:
 
 ```bash
 gmsc-mapper --aa-genes ./examples/example.faa -o ./examples_output/ --dbdir ./examples/
 ```
 
-- Input is nucleotide gene sequences.
+- When input is nucleotide gene sequences:
 
 ```bash
 gmsc-mapper --nt-genes ./examples/example.fna -o ./examples_output/ --dbdir ./examples/
@@ -89,54 +81,51 @@ gmsc-mapper --nt-genes ./examples/example.fna -o ./examples_output/ --dbdir ./ex
 
 - Check another alignment tool: MMseqs2
 
+The default alignment tool is DIAMOND, if you want to use MMseqs2 as your alignment tool, you need to create GMSC database index in MMseqs2 format.
+
+```bash
+gmsc-mapper createdb -i ./examples/target.faa -o ./examples/ -m mmseqs
+```
+
+After index creation, you can specify tool as mmseqs and other usage is the same as above.
+
 ```bash
 gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --dbdir ./examples/ --tool mmseqs
 ```
 
 ## Usage
 
-### Download GMSC database
+### Default usage
+
+#### Download GMSC database and create index
 
 We recommend to use `GMSC-mapper` as your current work directory. You can derectly follow the commonds below.
-
-`--dbdir`: Path to GMSC database annotation index files. (default: `./db`. If `GMSC-mapper` is your current work directory, the database files will be downloaded at `GMSC-mapper/db`)
 
 ```bash
 cd GMSC-mapper
 ```
+
+Download GMSC database
 
 ```bash
 gmsc-mapper downloaddb --dbdir ./db
 ```
 
-Otherwise if you want to use custom `--dbdir` directory, it should be consistent with `-o` (Path to database index output of Diamond and MMseqs2) in the creating index step
+The default `--dbdir` is `./db`. If you want to use custom `--dbdir` directory, it should be consistent with `-o` in the next creating database index step.
 
-### Create GMSC database index of Diamond/MMseqs2
-
-We also recommend to use `GMSC-mapper` as your current work directory. You can derectly follow the commonds below.
-
-The input (`i`) is the fasta file (`GMSC10.90AA.faa.gz`) downloaded to the dbdir (default: `./db`. If `GMSC-mapper` is your current work directory, the dbdir is `GMSC-mapper/db`) in the downloading step.
-
-`-o`: Path to database index output of Diamond and MMseqs2. (default: `./db`. If `GMSC-mapper` is your current work directory, the database files will be created at `GMSC-mapper/db`)
-
-`-m`: Alignment tool (Diamond / MMseqs2).
-
-```bash
-cd GMSC-mapper
-```
+Create GMSC database index
 
 ```bash
 gmsc-mapper createdb -i ./db/GMSC10.90AA.faa.gz -o ./db -m diamond
 ```
-or
-```bash
-gmsc-mapper createdb -i ./db/GMSC10.90AA.faa.gz -o ./db -m mmseqs
-```
 
-Otherwise if you want to use custom `-o` directory, it should be consistent with `--dbdir` (Path to GMSC database annotation index files) in the download step.
+The input (`i`) is the fasta file (`GMSC10.90AA.faa.gz`) downloaded to the dbdir (default: `./db`) in the downloading step.
 
-### Default
-GMSC Database directory (`--dbdir`) and output directory (`-o`) can be assigned on your own. Default is `./db` and `./output`. If `GMSC-mapper` is your current work directory, they will be `GMSC-mapper/db` and `GMSC-mapper/output`. 
+The default `-o` is `./db`. If you want to use custom `-o` directory, it should be consistent with `--dbdir` in the last downloading database step.
+
+#### GMSC Annotation
+
+GMSC Database directory (`--dbdir`) and output directory (`-o`) can be assigned on your own. Default is `./db` and `./output`. 
 
 If you use `GMSC-mapper` as your current work directory. You can derectly follow the commonds below. Otherwise, you need to assign your custom `--dbdir` which contains database files.
 
@@ -162,18 +151,28 @@ gmsc-mapper --aa-genes ./examples/example.faa --dbdir ./db
 gmsc-mapper --nt-genes ./examples/example.fna --dbdir ./db
 ```
 
-### Alignment tool: Diamond / MMseqs2 is optional
-If you want to change alignment tool (Diamond / MMseqs2), you can use `--tool`.
+### Further usage
 
-```bash
-gmsc-mapper -i ./examples/example.fa --dbdir ./db --tool mmseqs
-```
+#### Habitat / taxonomy / quality / domain annotation is optional
 
-### Habitat / taxonomy / quality / domain annotation is optional
-If you don't want to annotate habitat / taxonomy / quality / domain you can use `--no-habitat`/`--no-taxonomy`/`--no-quality`/`--no-domain`.
+If you don't want to annotate habitat / taxonomy / quality you can use `--no-habitat`/`--no-taxonomy`/`--no-quality` / `--no-domain`.
 
 ```bash
 gmsc-mapper -i ./examples/example.fa --dbdir ./db --no-habitat --no-taxonomy --no-quality --no-domain
+```
+
+#### Alignment tool: DIAMOND / MMseqs2 is optional
+
+The default alignment tool is DIAMOND, if you want to use MMseqs2 as your alignment tool, you need to create GMSC database index in MMseqs2 format.
+
+```bash
+gmsc-mapper createdb -i ./db/GMSC10.90AA.faa.gz -o ./db -m mmseqs
+```
+
+Then you can assign`--tool` as mmseqs.
+
+```bash
+gmsc-mapper -i ./examples/example.fa --dbdir ./db --tool mmseqs
 ```
 
 ## Output files
