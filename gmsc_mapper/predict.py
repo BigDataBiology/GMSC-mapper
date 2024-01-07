@@ -1,15 +1,19 @@
-def create_pyrodigal_orffinder():
+def create_pyrodigal_orffinders():
     import pyrodigal
     
-    # generating orf_finder
-    gorf = pyrodigal.OrfFinder(closed=True,
-                               min_gene=33,
-                               max_overlap=0)       
-    
-    morf_finder = pyrodigal.OrfFinder(meta=True,
-                                      closed=True,
-                                      min_gene=33,
-                                      max_overlap=0)
+    # Prior to version 3.0, pyrodigal called the GeneFinder class
+    # OrfFinder. This little bit of code allows us to use either
+    if hasattr(pyrodigal, 'OrfFinder'):
+        GeneFinder = pyrodigal.OrfFinder
+    else:
+        GeneFinder = pyrodigal.GeneFinder
+    gorf = GeneFinder(closed=True,
+                      min_gene=33,
+                      max_overlap=0)
+    morf_finder = GeneFinder(meta=True,
+                      closed=True,
+                      min_gene=33,
+                      max_overlap=0)
     return gorf, morf_finder
     
 
@@ -34,7 +38,7 @@ def predict_genes(infile, ofile):
     from .fasta import fasta_iter
     from atomicwrites import atomic_write
     
-    gorf, morf_finder = create_pyrodigal_orffinder()
+    gorf, morf_finder = create_pyrodigal_orffinders()
     
     # predict genes
     with atomic_write(ofile, overwrite=True) as odb:
