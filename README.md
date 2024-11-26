@@ -10,6 +10,10 @@ GMSC-mapper can be used to
     - nucleotide gene sequences
 - Annotate query / predicted smORFs with quality, habitat and taxonomy information constructed manually in detail.
 
+If you use this tool in a publication, please cite:
+
+Duan, Y., Santos-Júnior, C.D., Schmidt, T.S. et al. A catalog of small proteins from the global microbiome. Nat Commun 15, 7563 (2024). https://doi.org/10.1038/s41467-024-51894-6
+
 ## Installation
 
 Clone GMSC-mapper repository
