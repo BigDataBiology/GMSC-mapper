@@ -320,7 +320,7 @@ def predict(args,tmpdir):
     logger.debug('Starting smORF prediction...')
 
     predicted_smorf = path.join(tmpdir,"predicted.smorf.faa")
-    filtered_smorf = path.join(args.output,"predicted.filterd.smorf.faa")
+    filtered_smorf = path.join(args.output,"predicted.filtered.smorf.faa")
 
     predict_genes(args.genome_fasta,predicted_smorf)
     if not path.getsize(predicted_smorf):
