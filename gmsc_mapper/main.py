@@ -124,6 +124,8 @@ def parse_args(args):
     
     parser.add_argument('--no-domain', '--no-domain',action='store_true', dest='nodomain', help='Use this if no need to annotate quality')
 
+    parser.add_argument('--no-annotation', '--no-annotation',action='store_true', dest='noannotation', help='Quit after generating the filtered smorfs faa file (skip alignment and annotation)')
+
     parser.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
     
     parser.add_argument('--dbdir', '--dbdir',
@@ -178,6 +180,10 @@ def validate_args(args,has_diamond,has_mmseqs):
             sys.stderr.write(f"GMSC-mapper Error: Expected file '{f}' does not exist. Please use --dbdir to assign your database directory.\n")
             sys.exit(1)
 
+    if args.noannotation and not args.genome_fasta:
+        sys.stderr.write("GMSC-mapper Error: --no-annotation requires --input (genome fasta) to be specified\n")
+        sys.exit(1)
+    
     if not args.genome_fasta and not args.aa_input and not args.nt_input:
         pass
     elif args.genome_fasta and not args.aa_input and not args.nt_input:
@@ -189,6 +195,10 @@ def validate_args(args,has_diamond,has_mmseqs):
     else:
         sys.stderr.write("GMSC-mapper Error: --input or --aa-genes or --nt_genes shouldn't be assigned at the same time\n")
         sys.exit(1)
+    
+    # Skip tool and database checks if --no-annotation is used
+    if args.noannotation:
+        return
     
     if args.tool == "diamond" and not has_diamond:
         logger.warning("GMSC-mapper Warning:mmseqs is not available.It will download diamond.\n")
@@ -577,6 +587,13 @@ def main(args=None):
                     if ifpredict:
                         smorf_number = int(predicted_smorf_count(queryfile)/2)
                         summary.append(f'{smorf_number} smORFs are predicted in total.')
+                        if args.noannotation:
+                            logger.info('Stopping after generating filtered smorfs faa file (--no-annotation flag used)')
+                            with atomic_write(f'{args.output}/summary.txt', overwrite=True) as ofile:
+                                for s in summary:
+                                    print(s)
+                                    ofile.write(f'{s}\n')
+                            return
                     else:
                         summary.append(f'No smORFs are predicted.')
                 if args.nt_input:
