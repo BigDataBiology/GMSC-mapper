@@ -7,7 +7,7 @@ name = "GMSC-mapper"
 version = "0.1.0"
 description = "Command line tool to query the Global Microbial smORFs Catalog (GMSC)"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 authors = [
     { name = "Luis Pedro Coelho", email = "luis@luispedro.org" },
     { name = "Yiqian Duan", email = "yqduan20@fudan.edu.cn" },
@@ -16,7 +16,6 @@ license = { text = "MIT" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
