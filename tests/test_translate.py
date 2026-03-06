@@ -1,7 +1,6 @@
-from gmsc_mapper.translate import translate_gene,check_frame
+from gmsc_mapper.translate import translate_nucleotide_fasta,check_frame
 from gmsc_mapper.fasta import fasta_iter
 import pytest
-import os
 
 known_seq = {"ATGGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCTGCGGCATAA":"ATGGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCTGCGGCATAA",
              "GTGGCAGCGGCTGCGGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGTGGCGGTGGCTGTGGCGGCTGCGGCGACAGCGGCATGA":"ATGGCAGCGGCTGCGGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGTGGCGGTGGCTGTGGCGGCTGCGGCGACAGCGGCATGA",
@@ -19,8 +18,9 @@ def test_check_frame():
         assert check_frame(key) == value
 
 translate_dict = {}
-def test_translate():
-    translated_file = translate_gene("./tests/test.fna",os.path.dirname(os.path.realpath(__file__)))
+def test_translate(tmp_path):
+    translated_file = tmp_path / "translated.faa.gz"
+    translated_file = translate_nucleotide_fasta("./tests/test.fna", str(translated_file))
     for h,seq in fasta_iter(translated_file,full_header=True):
         translate_dict[h] = seq
     assert translate_dict == known_translated

@@ -355,12 +355,6 @@ def predict(args,tmpdir):
             logger.info('smORF prediction complete')
             return (filtered_smorf,True)
 
-def translate_gene(args,tmpdir):
-    from gmsc_mapper.translate import translate_gene
-    logger.debug('Starting gene translation...')
-    translated_file = translate_gene(args.nt_input,tmpdir)
-    logger.info('Gene translation complete')
-    return translated_file
 
 def check_length(queryfile):
     from gmsc_mapper.fasta import fasta_iter
@@ -587,7 +581,10 @@ def main(args=None):
                         args.nt_input = filter_length(args.nt_input,tmpdir,303)
                     else:
                         check_length(args.nt_input)
-                    queryfile = translate_gene(args,tmpdir)  
+                    from gmsc_mapper.translate import translate_nucleotide_fasta
+                    logger.debug(f'Starting gene translation {args} to {tmpdir}...')
+                    translated_file = path.join(tmpdir, "translated.faa.gz")
+                    queryfile = translate_nucleotide_fasta(args.nt_input, translated_file)
                 if args.aa_input:
                     if args.filter:
                         args.aa_input = filter_length(args.aa_input,tmpdir,100)
