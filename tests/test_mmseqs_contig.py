@@ -3,10 +3,13 @@ import sys
 import pytest
 import subprocess
 
+from conftest import requires_binary
+
 def checkf(f):
     return filecmp.cmp(f"./tests/mmseqs_contig/{f}",
                         f"./examples_output/{f}")
 
+@requires_binary("mmseqs")
 def test_mmseqs_contig():
     ok = True
 

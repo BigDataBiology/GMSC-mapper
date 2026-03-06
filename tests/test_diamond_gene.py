@@ -3,10 +3,13 @@ import sys
 import subprocess
 import pytest
 
+from conftest import requires_binary
+
 def checkf(f):
     return filecmp.cmp(f"./tests/diamond_gene/{f}",
                         f"./examples_output/{f}")
 
+@requires_binary("diamond")
 def test_diamond_contig():
     ok = True
 
