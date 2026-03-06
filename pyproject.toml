@@ -9,6 +9,7 @@ description = "Command line tool to query the Global Microbial smORFs Catalog (G
 readme = "README.md"
 requires-python = ">=3.7"
 authors = [
+    { name = "Luis Pedro Coelho", email = "luis@luispedro.org" },
     { name = "Yiqian Duan", email = "yqduan20@fudan.edu.cn" },
 ]
 license = { text = "MIT" }
