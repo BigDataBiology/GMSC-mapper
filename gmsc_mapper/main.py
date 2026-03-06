@@ -13,8 +13,10 @@ _ROOT = path.abspath(path.join(os.getcwd(), "."))
 logger = logging.getLogger('GMSC-mapper')
 
 def parse_args(args):
+    from gmsc_mapper.gmsc_mapper_version import __version__
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                                      description='GMSC-mapper')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     subparsers = parser.add_subparsers(title='GMSC-mapper subcommands',
                                        dest='cmd',
                                        metavar='')
