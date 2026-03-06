@@ -46,6 +46,7 @@ def parse_args(args):
                                default = path.join(_ROOT, 'db'))
     cmd_create_db.add_argument('-m', '--mode',
                                required=True,
+                               choices=['diamond', 'mmseqs'],
                                help='Alignment tool (Diamond / MMseqs2)',
                                dest='mode',
                                default = None)
@@ -326,11 +327,12 @@ def create_db(args):
         logger.info('Start creating Diamond database...')
         subprocess.check_call(diamond_cmd)
         logger.info('Diamond database has been created successfully.')
-
-    if args.mode == "mmseqs":
+    elif args.mode == "mmseqs":
         logger.debug('Start creating MMseqs database...')
         subprocess.check_call(mmseqs_cmd)
         logger.info('MMseqs database has been created successfully.')
+    else:
+        raise ValueError(f"Unsupported database mode: {args.mode}")
 
 def predict(args,tmpdir):
     from gmsc_mapper.predict import predict_genes,filter_smorfs
