@@ -32,20 +32,20 @@ def smorf_domain(cddfile, outdir, resultfile):
 
     mapped_sseqid_cdd = {}
     for item in mapped_sseqid:
-        if item in cdd_dict.keys():
+        if item in cdd_dict:
             mapped_sseqid_cdd[item] = cdd_dict[item]
-    result['cdd'] = result['sseqid'].map(lambda g: mapped_sseqid_cdd.get(g))
+    result['cdd'] = result['sseqid'].map(mapped_sseqid_cdd.get)
 
     output = result[['qseqid', 'cdd']]
     output = output.sort_values(by='qseqid')
     output = output.groupby('qseqid',
                             as_index=False,
-                            sort=False) 
-    output = output.agg({'cdd':lambda x : fixdf(x)})
-    output['cdd'] = output['cdd'].apply(lambda x: formatlabel(x))
+                            sort=False)
+    output = output.agg({'cdd': fixdf})
+    output['cdd'] = output['cdd'].apply(formatlabel)
     output.to_csv(cdd_file,
                   sep='\t',
-                  index=False)    
+                  index=False)
     
     annotated = output[output['cdd']!='']['cdd'].count()
     return annotated
