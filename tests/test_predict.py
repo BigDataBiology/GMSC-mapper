@@ -13,16 +13,20 @@ known_filtered = {"smORF_0 # k141_87_1 # 455 # 679 # -1 # ID=2_1;partial=00;star
                   "smORF_1 # k141_87_4 # 4299 # 4520 # 1 # ID=2_4;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.396":"MATQTVEDSSRSGPRSTTVGKLLKPLNSEYGKVAPGWGTTPLMGVAMALFAVFLSIILEIYNSSVLLDGISVN*",
                   "smORF_2 # k141_87_5 # 5104 # 5358 # -1 # ID=2_5;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.294":"MEYKVLNLSLIQYYFLLFKDMKESKCESSSLWLNAKKSSKLIRLYVVLIVTGLLNLLDYLSLLSFFIWYLYGTGTGISSCFLYY*"}
 
-def test_predict_genes():
-    predict_genes("./tests/test_contig.fa","./tests/predicted.faa")
+def test_predict_genes(tmp_path):
+    predicted_faa = str(tmp_path / "predicted.faa")
+    predict_genes("./tests/test_contig.fa", predicted_faa)
     predict_out = {h:seq
-        for h,seq in fasta_iter("./tests/predicted.faa",full_header=True)}
+        for h,seq in fasta_iter(predicted_faa, full_header=True)}
     assert predict_out == known_predicted
 
-def test_filter():
-    filter_smorfs("./tests/predicted.faa", "./tests/filtered.faa")
+def test_filter(tmp_path):
+    predicted_faa = str(tmp_path / "predicted.faa")
+    filtered_faa = str(tmp_path / "filtered.faa")
+    predict_genes("./tests/test_contig.fa", predicted_faa)
+    filter_smorfs(predicted_faa, filtered_faa)
     filter_out = {h:seq
-            for h,seq in fasta_iter("./tests/filtered.faa",full_header=True) }
+            for h,seq in fasta_iter(filtered_faa, full_header=True) }
     assert filter_out == known_filtered
 
 if __name__ == '__main__':

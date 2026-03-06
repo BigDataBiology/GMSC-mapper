@@ -1,29 +1,33 @@
 import filecmp
+import shutil
 import sys
 import subprocess
 import pytest
 
 from conftest import requires_binary
 
-def checkf(f):
-    return filecmp.cmp(f"./tests/diamond_gene/{f}",
-                        f"./examples_output/{f}")
-
 @requires_binary("diamond")
-def test_diamond_contig():
+def test_diamond_gene(tmp_path):
     ok = True
+    dbdir = str(tmp_path / "db")
+    outdir = str(tmp_path / "output")
+    shutil.copytree("./examples", dbdir)
 
     subprocess.check_call(['gmsc-mapper','createdb',
                           '-i','./examples/target.faa',
-                          '-o','./examples/',
+                          '-o', dbdir,
                           '-m','diamond',
                           '--quiet'])
-    
+
     subprocess.check_call(['gmsc-mapper',
                           '--nt-genes','./examples/example.fna',
-                          '-o','./examples_output/',
-                          '--dbdir','./examples/',
+                          '-o', outdir,
+                          '--dbdir', dbdir,
                           '--quiet'])
+
+    def checkf(f):
+        return filecmp.cmp(f"./tests/diamond_gene/{f}",
+                            f"{outdir}/{f}")
 
     if not checkf("alignment.out.smorfs.tsv"):
         ok = False
@@ -48,7 +52,7 @@ def test_diamond_contig():
     if not checkf("domain.out.smorfs.tsv"):
         ok = False
         print('\nGene input of Diamond mode domain results have something wrong.\n')
-        
+
     if not checkf("summary.txt"):
         ok = False
         print('\nGene input of Diamond mode summary results have something wrong.\n')
@@ -57,5 +61,3 @@ def test_diamond_contig():
 
 if __name__ == '__main__':
     pytest.main()
-
-

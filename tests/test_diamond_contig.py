@@ -1,29 +1,33 @@
 import filecmp
+import shutil
 import sys
 import pytest
 import subprocess
 
 from conftest import requires_binary
 
-def checkf(f):
-    return filecmp.cmp(f"./tests/diamond_contig/{f}",
-                        f"./examples_output/{f}")
-
 @requires_binary("diamond")
-def test_diamond_contig():
+def test_diamond_contig(tmp_path):
     ok = True
+    dbdir = str(tmp_path / "db")
+    outdir = str(tmp_path / "output")
+    shutil.copytree("./examples", dbdir)
 
     subprocess.check_call(['gmsc-mapper','createdb',
                           '-i','./examples/target.faa',
-                          '-o','./examples/',
+                          '-o', dbdir,
                           '-m','diamond',
                           '--quiet'])
-    
+
     subprocess.check_call(['gmsc-mapper',
                           '-i','./examples/example.fa',
-                          '-o','./examples_output/',
-                          '--dbdir','./examples/',
+                          '-o', outdir,
+                          '--dbdir', dbdir,
                           '--quiet'])
+
+    def checkf(f):
+        return filecmp.cmp(f"./tests/diamond_contig/{f}",
+                            f"{outdir}/{f}")
 
     if not checkf("predicted.filterd.smorf.faa"):
         ok = False

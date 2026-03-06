@@ -1,30 +1,34 @@
 import filecmp
+import shutil
 import sys
 import pytest
 import subprocess
 
 from conftest import requires_binary
 
-def checkf(f):
-    return filecmp.cmp(f"./tests/mmseqs_contig/{f}",
-                        f"./examples_output/{f}")
-
 @requires_binary("mmseqs")
-def test_mmseqs_contig():
+def test_mmseqs_contig(tmp_path):
     ok = True
+    dbdir = str(tmp_path / "db")
+    outdir = str(tmp_path / "output")
+    shutil.copytree("./examples", dbdir)
 
     subprocess.check_call(['gmsc-mapper','createdb',
                           '-i','examples/target.faa',
-                          '-o','examples/',
+                          '-o', dbdir,
                           '-m','mmseqs',
                           '--quiet'])
-    
+
     subprocess.check_call(['gmsc-mapper',
                           '-i','examples/example.fa',
-                          '-o','examples_output/',
-                          '--dbdir','./examples/',
+                          '-o', outdir,
+                          '--dbdir', dbdir,
                           '--quiet',
                           '--tool','mmseqs'])
+
+    def checkf(f):
+        return filecmp.cmp(f"./tests/mmseqs_contig/{f}",
+                            f"{outdir}/{f}")
 
     if not checkf("predicted.filterd.smorf.faa"):
         ok = False

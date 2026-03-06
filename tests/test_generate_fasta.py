@@ -6,10 +6,10 @@ import os
 known_list = [">smORF_0","MVFVLLSEMYPTKVRGLAMSIAGFALWIGTYLIGQLTPWMLQNLTPAGTFFLFAVMCVPYMLIVWKLVPETTGKSLEEIERYWTRSEQ*",
               ">smORF_1","MTFSVAGINAQGTTVIEDAECVDVSYPNFYEQLQMLAGQ*",
               ">smORF_2","MDELTKMGARIQVDGRTAIITGVKLFTGADVSAPDLRAGAALVIAGLAADGYTTVSDIGYIYRGYEGFEKKIQNLGGDIQLVNSEKEIARFKLRIV*"]
-fasta_list = []
 
-def test_generate_fasta():
-    (fasta_file,ifsuccess) = generate_fasta(os.path.dirname(os.path.realpath(__file__)),"./tests/test.faa","./tests/alignment.tsv")
+def test_generate_fasta(tmp_path):
+    fasta_list = []
+    (fasta_file,ifsuccess) = generate_fasta(str(tmp_path),"./tests/test.faa","./tests/alignment.tsv")
     with open(fasta_file,"rt") as f:
         for line in f:
             fasta_list.append(line.strip())

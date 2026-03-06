@@ -6,10 +6,11 @@ known_domain = {"qseqid":"cdd",
                  "smORF_0":"197696",
                  "smORF_1":"",
                  "smORF_2":"198061,429147,429887"}
-domain_dict={}
-def test_smorf_domain():
-    smorf_domain('./tests/test_domain.txt',os.path.dirname(os.path.realpath(__file__)),'./tests/alignment.tsv')
-    with open('./tests/domain.out.smorfs.tsv',"rt") as f:
+
+def test_smorf_domain(tmp_path):
+    domain_dict={}
+    smorf_domain('./tests/test_domain.txt',str(tmp_path),'./tests/alignment.tsv')
+    with open(tmp_path / 'domain.out.smorfs.tsv',"rt") as f:
         for line in f:
             qseqid,domain = line.split("\t")
             domain_dict[qseqid] = domain.strip()
