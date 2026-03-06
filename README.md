@@ -3,7 +3,7 @@
 GMSC-mapper is a command line tool to query the Global Microbial smORFs Catalog (GMSC).
 
 GMSC-mapper can be used to 
-- Find query smORFs (&lt; 100aa) homologous to Global Microbial smORFs Catalogue (GMSC) by alignment.
+- Find query smORFs (&lt; 100aa) homologous to Global Microbial smORFs Catalog (GMSC) by alignment.
   - Support 3 types of input:
     - contigs (GMSC-mapper will predict smORFs from contigs first)
     - amino acid sequences
@@ -49,9 +49,9 @@ pip install .
 ```
 
 #### Example test
-As the whole GMSC database is large and takes some minutes to process. To check if the installation works well, you can test with mock datasets easily and fast.
+As the whole GMSC database is large and takes some minutes to process, you can test with mock datasets to check if the installation works well.
 
-Please make `GMSC-mapper` as your work directory.
+Please use `GMSC-mapper` as your work directory.
 
 ```bash
 cd GMSC-mapper
@@ -103,7 +103,7 @@ gmsc-mapper -i ./examples/example.fa -o ./examples_output/ --dbdir ./examples/ -
 
 #### Download GMSC database and create index
 
-We recommend to use `GMSC-mapper` as your current work directory. You can derectly follow the commonds below.
+We recommend to use `GMSC-mapper` as your current work directory. You can directly follow the commands below.
 
 ```bash
 cd GMSC-mapper
@@ -123,15 +123,15 @@ Create GMSC database index
 gmsc-mapper createdb -i ./db/GMSC10.90AA.faa.gz -o ./db -m diamond
 ```
 
-The input (`i`) is the fasta file (`GMSC10.90AA.faa.gz`) downloaded to the dbdir (default: `./db`) in the downloading step.
+The input (`-i`) is the fasta file (`GMSC10.90AA.faa.gz`) downloaded to the dbdir (default: `./db`) in the downloading step.
 
-The default `-o` is `./db`. If you want to use custom `-o` directory, it should be consistent with `--dbdir` in the last downloading database step.
+The default `-o` is `./db`. If you want to use custom `-o` directory, it should be consistent with `--dbdir` in the previous download step.
 
 #### GMSC Annotation
 
 GMSC Database directory (`--dbdir`) and output directory (`-o`) can be assigned on your own. Default is `./db` and `./output`. 
 
-If you use `GMSC-mapper` as your current work directory. You can derectly follow the commonds below. Otherwise, you need to assign your custom `--dbdir` which contains database files.
+If you use `GMSC-mapper` as your current work directory. You can directly follow the commands below. Otherwise, you need to assign your custom `--dbdir` which contains database files.
 
 ```bash
 cd GMSC-mapper
@@ -173,7 +173,7 @@ The default alignment tool is DIAMOND, if you want to use MMseqs2 as your alignm
 gmsc-mapper createdb -i ./db/GMSC10.90AA.faa.gz -o ./db -m mmseqs
 ```
 
-Then you can assign`--tool` as mmseqs.
+Then you can assign `--tool` as mmseqs.
 
 ```bash
 gmsc-mapper -i ./examples/example.fa --dbdir ./db --tool mmseqs
@@ -182,7 +182,7 @@ gmsc-mapper -i ./examples/example.fa --dbdir ./db --tool mmseqs
 ## Output files
 The output folder will contain
 
-- Outputs of smORFs prediction (predicted.filterd.smorf.faa)
+- Outputs of smORFs prediction (predicted.filtered.smorf.faa)
 
   A FASTA file with the sequences of the predicted smORFs. It is generated when the input file is contigs.
 
@@ -190,7 +190,7 @@ The output folder will contain
 
   A file listing all the query hits of GMSC, from Diamond or MMseqs2.
 
-  The file format is followed by a space-separated list of these keywords:
+  The file contains the following tab-separated columns:
 
   `qseqid`: Query seq id
 
@@ -258,7 +258,7 @@ The output folder will contain
 
 - Conserved domain annotation of smORFs (optional) (domain.out.smorfs.tsv)
 
-  This file lists the conservative domain annotations of the query/predicted sequence, where the conservative domain is obtained from the sequence annotations of its homologous origin in GMSC.
+  This file lists the conserved domain annotations of the query/predicted sequence, where the conserved domain is obtained from the sequence annotations of its homologous origin in GMSC.
 
   `qseqid`: Query seq id
 
@@ -291,7 +291,7 @@ The output folder will contain
 
 * `-t/--threads`: Number of CPU threads. (default: 1)
 
-* `--filter`: Use this to filter <100 aa or <303 nt input sequences. (default: False)
+* `--filter`: Use this to filter &lt;100 aa or &lt;303 nt input sequences. (default: False)
 
 * `--no-habitat`: Use this if no need to annotate habitat. (default: False)
 

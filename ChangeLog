@@ -1,5 +1,7 @@
 Unreleased
 	* Use requests library instead of wget for database downloads
+	* Fix typo in output filename: predicted.filterd.smorf.faa →
+	  predicted.filtered.smorf.faa
 	* Fix FutureWarning from newer pandas in taxonomy mapping
 	* Remove auto-download/install of diamond and mmseqs; show an error if
 	  the tools are not installed
