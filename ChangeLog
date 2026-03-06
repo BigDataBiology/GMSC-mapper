@@ -6,7 +6,17 @@ Unreleased
 	* Remove auto-download/install of diamond and mmseqs; show an error if
 	  the tools are not installed
 	* cli: Add --version option
+	* Validate --mode argument in createdb subcommand
+	* Fix inverted condition in contig length check
+	* Fix duplicate sequence filtering in filter_smorfs()
+	* Fix overly broad exception handling in generate_fasta()
+	* Fix resource leak in predicted_smorf_count()
 	* Convert project packaging from setup.py to pyproject.toml
+	* Internal: update testing to use uv
+	* Internal: test in newer versions of Python
+	* Internal: use tmp_path fixture in tests
+	* Internal: skip diamond/mmseqs tests when binaries are not in PATH
+	* Internal: remove outdated installation helpers
 
 Version 0.1.0 11 Jan 2024 by BigDataBiology
 	* First release
