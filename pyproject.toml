@@ -36,6 +36,7 @@ dependencies = [
     "pyrodigal",
     "python-dateutil",
     "pytz",
+    "requests",
     "six",
 ]
 

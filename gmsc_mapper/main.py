@@ -203,15 +203,25 @@ def validate_args(args,has_diamond,has_mmseqs):
     if not args.nodomain:
         expect_database(path.join(args.dbdir, "GMSC10.90AA.cdd.tsv.xz"))
 
+def _download_file(url, destdir):
+    import requests
+    basename = url.rsplit('/', 1)[-1]
+    fname = os.path.join(destdir, basename)
+    logger.info(f'Downloading {basename}...')
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(fname, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    logger.info(f'{basename} downloaded successfully.')
+
 def download_db(args):
     from gmsc_mapper.utils import ask
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.faa.gz')):
         if args.all or ask("Download 90AA fasta file (~11G)?") == 'y':
-            logger.info('Start downloading 90AA fasta file...')
-            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.faa.gz',
-                                '-P',args.dbdir])
-            logger.info('90AA fasta file has been downloaded successfully.')
+            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.faa.gz',
+                                args.dbdir)
         else:
             print('Skip downloading 90AA fasta file.')
     else:
@@ -219,12 +229,10 @@ def download_db(args):
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.index.tsv')):
         if args.all or ask("Download habitat index file (~2.3G)?") == 'y':
-            logger.info('Start downloading habitat index file...')
-            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.npy',
-                                '-P',args.dbdir])
-            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.index.tsv',
-                                '-P',args.dbdir])
-            logger.info('Habitat index file has been downloaded successfully.')
+            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.npy',
+                                args.dbdir)
+            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.index.tsv',
+                                args.dbdir)
         else:
             print('Skip downloading habitat index file.')
     else:
@@ -232,34 +240,28 @@ def download_db(args):
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.index.tsv')):
         if args.all or ask("Download taxonomy index file (~2.3G)?") == 'y':
-            logger.info('Start downloading taxonomy index file...')
-            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.npy',
-                                '-P',args.dbdir])
-            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.index.tsv',
-                                '-P',args.dbdir])
-            logger.info('Taxonomy index file has been downloaded successfully.')
+            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.npy',
+                                args.dbdir)
+            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.index.tsv',
+                                args.dbdir)
         else:
             print('Skip downloading taxonomy index file.')
     else:
         print('Taxonomy index file already exists. Skip downloading taxonomy index file. Use -f to force download')
 
-    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.high_quality.tsv.xz')):        
+    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.high_quality.tsv.xz')):
         if args.all or ask("Download quality index file (2.6M)?") == 'y':
-            logger.info('Start downloading quality index file...')
-            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.high_quality.tsv.xz',
-                                '-P',args.dbdir])
-            logger.info('Quality index file has been downloaded successfully.')
+            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.high_quality.tsv.xz',
+                                args.dbdir)
         else:
             print('Skip downloading quality index file.')
     else:
         print('Quality index file already exists. Skip downloading quality index file. Use -f to force download')
- 
-    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.cdd.tsv.xz')):               
+
+    if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.cdd.tsv.xz')):
         if args.all or ask("Download conserved domain index file (88M)?") == 'y':
-            logger.info('Start downloading conserved domain index file...')
-            subprocess.check_call(['wget','https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.cdd.tsv.xz',
-                                '-P',args.dbdir])
-            logger.info('Conserved domain index file has been downloaded successfully.')
+            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.cdd.tsv.xz',
+                                args.dbdir)
         else:
             print('Skip downloading conserved domain index file.')
     else:

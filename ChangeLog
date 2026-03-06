@@ -1,4 +1,5 @@
 Unreleased
+	* Use requests library instead of wget for database downloads
 	* Fix FutureWarning from newer pandas in taxonomy mapping
 	* Remove auto-download/install of diamond and mmseqs; show an error if
 	  the tools are not installed
