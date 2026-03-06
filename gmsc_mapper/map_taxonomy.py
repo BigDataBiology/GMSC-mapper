@@ -86,9 +86,9 @@ def deep_lca(indexfile,taxfile, outdirname, resultfile, tmpdirname):
                          header=None,
                          names=['smorf', 'gmsc', 'taxonomy'])
     
-    data['taxonomy'].replace('Unknown','',inplace=True)
-    data.taxonomy = data.taxonomy.apply(lambda x: fixformat(x))
-    data = data.groupby('smorf').apply(lambda x: x.taxonomy.tolist())
+    data['taxonomy'] = data['taxonomy'].replace('Unknown','')
+    data['taxonomy'] = data['taxonomy'].apply(fixformat)
+    data = data.groupby('smorf')['taxonomy'].apply(list)
     data = data.reset_index()
     data = data.rename({0: 'taxonomy'}, axis=1)
     
