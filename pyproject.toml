@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "GMSC-mapper"
+version = "0.1.0"
+description = "Command line tool to query the Global Microbial smORFs Catalog (GMSC)"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.7"
+authors = [
+    { name = "Yiqian Duan", email = "yqduan20@fudan.edu.cn" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "atomicwrites",
+    "biopython",
+    "Bottleneck",
+    "certifi",
+    "numexpr",
+    "numpy",
+    "packaging",
+    "pandas",
+    "pyparsing",
+    "pyrodigal",
+    "python-dateutil",
+    "pytz",
+    "six",
+]
+
+[project.urls]
+Homepage = "https://github.com/BigDataBiology/GMSC-mapper"
+
+[project.scripts]
+gmsc-mapper = "gmsc_mapper.main:main"
+
+[tool.setuptools.packages.find]
+include = ["gmsc_mapper*"]

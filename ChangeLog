@@ -2,6 +2,7 @@ Unreleased
 	* Remove auto-download/install of diamond and mmseqs; show an error if
 	  the tools are not installed
 	* cli: Add --version option
+	* Convert project packaging from setup.py to pyproject.toml
 
 Version 0.1.0 11 Jan 2024 by BigDataBiology
 	* First release
