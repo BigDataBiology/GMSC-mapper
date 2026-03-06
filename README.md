@@ -45,7 +45,7 @@ Once the dependencies are installed, you can install GMSC-mapper by running:
 
 ```bash
 cd GMSC-mapper
-python setup.py install
+pip install .
 ```
 
 #### Example test
