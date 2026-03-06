@@ -3,9 +3,7 @@ import argparse
 import sys
 import os
 from os import path
-import pandas as pd
 import tempfile
-from atomicwrites import atomic_write
 import logging
 
 _ROOT = path.abspath(path.join(os.getcwd(), "."))
@@ -622,6 +620,7 @@ def main(args=None):
                     else:
                         summary.append(f'None of sequences are aligned against GMSC.\n')
                 
+                from atomicwrites import atomic_write
                 with atomic_write(f'{args.output}/summary.txt', overwrite=True) as ofile:
                     for s in summary:
                         print(s)

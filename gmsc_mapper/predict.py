@@ -33,8 +33,6 @@ def ppyrodigal_out(contig, ind, idx, pred):
 
 
 def predict_genes(infile, ofile):
-    import random
-    import pandas as pd
     from .fasta import fasta_iter
     from atomicwrites import atomic_write
     
