@@ -137,36 +137,18 @@ def parse_args(args):
 
 def check_install():
     from shutil import which
-    import sys
 
-    has_mmseqs = False
-    has_diamond = False
-    dependencies = ['diamond', 'mmseqs']
+    has_diamond = which('diamond') is not None
+    has_mmseqs = which('mmseqs') is not None
     logger.debug("Looking for dependencies...")
 
-    for dep in dependencies:
-        p = which(dep)
-        if p:
-            if dep == 'diamond':
-                has_diamond = True
-            if dep == 'mmseqs':
-                has_mmseqs = True
-
     if not has_diamond and not has_mmseqs:
-        logger.warning('GMSC-mapper Warning: Neither diamond nor mmseqs appear to be available! It will download diamond and mmseqs.\n')
-        subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
-                                '-P','./bin'])
-        subprocess.check_call(['tar','xvfz',
-                                './bin/mmseqs-linux-avx2.tar.gz',
-                                '-C','./bin'])
-        subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
-                                '-P','./bin'])
-        subprocess.check_call(['tar','xvfz',
-                                './bin/diamond-linux64.tar.gz',
-                                '-C','./bin'])
-    else:
-        logger.info('Dependencies installation is OK\n')
-    return has_diamond,has_mmseqs
+        sys.stderr.write('GMSC-mapper Error: Neither diamond nor mmseqs appear to be installed.\n'
+                         'Please install at least one of them and make sure it is available in your PATH.\n')
+        sys.exit(1)
+
+    logger.info('Dependencies check OK\n')
+    return has_diamond, has_mmseqs
 
 def validate_args(args,has_diamond,has_mmseqs):
     def expect_file(f):
@@ -192,19 +174,13 @@ def validate_args(args,has_diamond,has_mmseqs):
         sys.exit(1)
     
     if args.tool == "diamond" and not has_diamond:
-        logger.warning("GMSC-mapper Warning:mmseqs is not available.It will download diamond.\n")
-        subprocess.check_call(['wget','http://github.com/bbuchfink/diamond/releases/download/v2.1.8/diamond-linux64.tar.gz',
-                                '-P','./bin'])
-        subprocess.check_call(['tar','xvfz',
-                                './bin/diamond-linux64.tar.gz',
-                                '-C','./bin'])      
+        sys.stderr.write("GMSC-mapper Error: diamond is not installed but --tool diamond was selected.\n"
+                         "Please install diamond and make sure it is available in your PATH.\n")
+        sys.exit(1)
     if args.tool == "mmseqs" and not has_mmseqs:
-        logger.warning("GMSC-mapper Warning:mmseqs is not available.It will download mmseqs.\n")
-        subprocess.check_call(['wget','https://mmseqs.com/latest/mmseqs-linux-avx2.tar.gz',
-                                '-P','./bin'])
-        subprocess.check_call(['tar','xvfz',
-                                './bin/mmseqs-linux-avx2.tar.gz',
-                                '-C','./bin'])
+        sys.stderr.write("GMSC-mapper Error: mmseqs is not installed but --tool mmseqs was selected.\n"
+                         "Please install mmseqs and make sure it is available in your PATH.\n")
+        sys.exit(1)
     
     if args.tool == "diamond":
         expect_database(path.join(args.dbdir, "diamond_targetdb.dmnd"))
@@ -296,15 +272,17 @@ def create_db(args):
     diamond_out_db = path.join(args.output,"diamond_targetdb")
     mmseqs_out_db = path.join(args.output,"mmseqs_targetdb")
     
-    if which('diamond'):
-        diamond = 'diamond'
-    else:
-        diamond = './bin/diamond'
-    
-    if which('mmseqs'):
-        mmseqs = 'mmseqs'
-    else:
-        mmseqs = './bin/mmseqs/bin/mmseqs'
+    diamond = 'diamond'
+    mmseqs = 'mmseqs'
+
+    if args.mode == 'diamond' and not which('diamond'):
+        sys.stderr.write("GMSC-mapper Error: diamond is not installed.\n"
+                         "Please install diamond and make sure it is available in your PATH.\n")
+        sys.exit(1)
+    if args.mode == 'mmseqs' and not which('mmseqs'):
+        sys.stderr.write("GMSC-mapper Error: mmseqs is not installed.\n"
+                         "Please install mmseqs and make sure it is available in your PATH.\n")
+        sys.exit(1)
 
     if args.quiet:
         diamond_cmd = [diamond,'makedb',
@@ -375,18 +353,13 @@ def filter_length(queryfile,tmpdir,N):
     return filtered_file
 
 def mapdb_diamond(args,queryfile):
-    from shutil import which
-
     logger.debug('Starting smORF mapping...')
 
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = '6,qseqid,sseqid,full_qseq,full_sseq,qlen,slen,length,qstart,qend,sstart,send,bitscore,pident,evalue,qcovhsp,scovhsp'
 
-    if which('diamond'):
-        diamond = 'diamond'
-    else:
-        diamond = './bin/diamond'
-    
+    diamond = 'diamond'
+
     database = path.join(args.dbdir, "diamond_targetdb.dmnd")
     
     if args.sensitivity != '--default':
@@ -418,8 +391,6 @@ def mapdb_diamond(args,queryfile):
     return resultfile
 
 def mapdb_mmseqs(args, queryfile, tmpdir):
-    from shutil import which
-
     logger.info('Start smORF mapping...')
 
     querydb = path.join(tmpdir,"query.db")
@@ -428,10 +399,7 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
     outfmt = 'query,target,qseq,tseq,qlen,tlen,alnlen,qstart,qend,tstart,tend,bits,pident,evalue,qcov,tcov'
 
-    if which('mmseqs'):
-        mmseqs = 'mmseqs'
-    else:
-        mmseqs = './bin/mmseqs/bin/mmseqs'
+    mmseqs = 'mmseqs'
 
     database = path.join(args.dbdir, "mmseqs_targetdb")
 
