@@ -10,6 +10,13 @@ _ROOT = path.abspath(path.join(os.getcwd(), "."))
 
 logger = logging.getLogger('GMSC-mapper')
 
+CITATION = (
+    "Duan, Y., Santos-Júnior, C.D., Schmidt, T.S. et al. "
+    "A catalog of small proteins from the global microbiome. "
+    "Nat Commun 15, 7563 (2024). "
+    "https://doi.org/10.1038/s41467-024-51894-6"
+)
+
 def parse_args(args):
     from gmsc_mapper.gmsc_mapper_version import __version__
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -54,6 +61,9 @@ def parse_args(args):
                                 action='store_true',
                                 dest='quiet',
                                 help='Disable alignment console output')
+
+    subparsers.add_parser('citation',
+                          help='Print the citation for the GMSC paper')
 
     parser.add_argument('-i', '--input',
                         required=False,
@@ -534,6 +544,11 @@ def main(args=None):
     if not args.cmd and not args.genome_fasta and not args.aa_input and not args.nt_input:
         sys.stderr.write("GMSC-mapper Error: Please see gmsc-mapper -h. Choose a subcommand or input file.\n")
         sys.exit(1)
+
+    if args.cmd == 'citation':
+        print(CITATION)
+        return
+
     has_diamond,has_mmseqs = check_install()
 
     if args.cmd == 'createdb':

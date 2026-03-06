@@ -14,6 +14,8 @@ If you use this tool in a publication, please cite:
 
 Duan, Y., Santos-Júnior, C.D., Schmidt, T.S. et al. A catalog of small proteins from the global microbiome. Nat Commun 15, 7563 (2024). https://doi.org/10.1038/s41467-024-51894-6
 
+You can print this citation with `gmsc-mapper citation`.
+
 ## Installation
 
 Clone GMSC-mapper repository
