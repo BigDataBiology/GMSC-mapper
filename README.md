@@ -38,7 +38,7 @@ The easiest way to install the dependencies is with [conda](https://conda.io):
 
 ```bash
 conda install -c bioconda -c conda-forge mmseqs2
-conda install -c bioconda -c conda-forge diamond=2.0.13
+conda install -c bioconda -c conda-forge diamond
 ```
 
 Once the dependencies are installed, you can install GMSC-mapper by running:
