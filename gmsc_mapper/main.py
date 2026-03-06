@@ -220,16 +220,22 @@ def _download_xz_to_gz(url, destdir, dest_basename):
     import gzip
     import requests
     fname = os.path.join(destdir, dest_basename)
+    tmp_fname = fname + '.tmp'
     logger.info(f'Downloading {url.rsplit("/", 1)[-1]} and converting to {dest_basename}...')
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        decompressor = lzma.LZMADecompressor()
-        with gzip.open(fname, 'wb') as gzf:
-            for chunk in r.iter_content(chunk_size=8192):
-                try:
+    try:
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            decompressor = lzma.LZMADecompressor()
+            with gzip.open(tmp_fname, 'wb') as gzf:
+                for chunk in r.iter_content(chunk_size=8192):
                     gzf.write(decompressor.decompress(chunk))
-                except lzma.LZMAError:
-                    break
+                    if decompressor.eof:
+                        break
+        os.rename(tmp_fname, fname)
+    except:
+        if os.path.exists(tmp_fname):
+            os.unlink(tmp_fname)
+        raise
     logger.info(f'{dest_basename} downloaded and converted successfully.')
 
 def download_db(args):
