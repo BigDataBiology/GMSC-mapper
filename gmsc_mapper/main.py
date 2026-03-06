@@ -79,7 +79,7 @@ def parse_args(args):
                         dest='output',
                         default=path.join(_ROOT, 'output'))
  
-    parser.add_argument('--tool', '--tool',
+    parser.add_argument('--tool',
                         required=False,
                         choices=['diamond', 'mmseqs'],
                         help='Sequence alignment tool (Diamond / MMseqs).',
@@ -91,43 +91,47 @@ def parse_args(args):
                         help='Sensitivity.',
                         dest='sensitivity')
 
-    parser.add_argument('--id', '--id',
+    parser.add_argument('--id',
                         required=False,
+                        type=float,
                         help='Minimum identity to report an alignment (range 0.0-1.0).',
                         dest='identity',
                         default=0.0)
 
-    parser.add_argument('--cov', '--cov',
+    parser.add_argument('--cov',
                         required=False,
+                        type=float,
                         help='Minimum coverage to report an alignment (range 0.0-1.0).',
                         dest='coverage',
                         default=0.9)
 
     parser.add_argument('-e', '--evalue',
                         required=False,
+                        type=float,
                         help='Maximum e-value to report alignments.',
                         dest='evalue',
                         default=0.00001)
 
     parser.add_argument('-t', '--threads',
                         required=False,
+                        type=int,
                         help='Number of CPU threads.',
                         dest='threads',
                         default=1)
 
-    parser.add_argument('--filter','--filter',action='store_true', help='Use this to filter <100 aa or <303 nt input sequences.')
+    parser.add_argument('--filter',action='store_true', help='Use this to filter <100 aa or <303 nt input sequences.')
 
-    parser.add_argument('--no-habitat','--no-habitat',action='store_true', dest='nohabitat', help='Use this if no need to annotate habitat')
+    parser.add_argument('--no-habitat',action='store_true', dest='nohabitat', help='Use this if no need to annotate habitat')
 
-    parser.add_argument('--no-taxonomy', '--no-taxonomy',action='store_true', dest='notaxonomy', help='Use this if no need to annotate taxonomy')
+    parser.add_argument('--no-taxonomy',action='store_true', dest='notaxonomy', help='Use this if no need to annotate taxonomy')
 
-    parser.add_argument('--no-quality', '--no-quality',action='store_true', dest='noquality', help='Use this if no need to annotate quality')
+    parser.add_argument('--no-quality',action='store_true', dest='noquality', help='Use this if no need to annotate quality')
     
-    parser.add_argument('--no-domain', '--no-domain',action='store_true', dest='nodomain', help='Use this if no need to annotate conserved domain')
+    parser.add_argument('--no-domain',action='store_true', dest='nodomain', help='Use this if no need to annotate conserved domain')
 
-    parser.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
+    parser.add_argument('--quiet',action='store_true', help='Disable alignment console output')
     
-    parser.add_argument('--dbdir', '--dbdir',
+    parser.add_argument('--dbdir',
                         required=False,
                         help='Path to the GMSC database directory.',
                         dest='dbdir',
