@@ -27,18 +27,10 @@ classifiers = [
 dependencies = [
     "atomicwrites",
     "biopython",
-    "Bottleneck",
-    "certifi",
-    "numexpr",
     "numpy",
-    "packaging",
     "pandas",
-    "pyparsing",
     "pyrodigal",
-    "python-dateutil",
-    "pytz",
     "requests",
-    "six",
 ]
 
 [project.urls]
