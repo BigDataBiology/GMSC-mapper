@@ -123,7 +123,7 @@ def parse_args(args):
 
     parser.add_argument('--no-quality', '--no-quality',action='store_true', dest='noquality', help='Use this if no need to annotate quality')
     
-    parser.add_argument('--no-domain', '--no-domain',action='store_true', dest='nodomain', help='Use this if no need to annotate quality')
+    parser.add_argument('--no-domain', '--no-domain',action='store_true', dest='nodomain', help='Use this if no need to annotate conserved domain')
 
     parser.add_argument('--quiet','--quiet',action='store_true', help='Disable alignment console output')
     
@@ -170,7 +170,7 @@ def validate_args(args,has_diamond,has_mmseqs):
     elif args.nt_input and not args.genome_fasta and not args.aa_input:
         expect_file(args.nt_input)
     else:
-        sys.stderr.write("GMSC-mapper Error: --input or --aa-genes or --nt_genes shouldn't be assigned at the same time\n")
+        sys.stderr.write("GMSC-mapper Error: --input or --aa-genes or --nt-genes shouldn't be assigned at the same time\n")
         sys.exit(1)
     
     if args.tool == "diamond" and not has_diamond:

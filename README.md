@@ -186,7 +186,7 @@ The output folder will contain
 
   A FASTA file with the sequences of the predicted smORFs. It is generated when the input file is contigs.
 
-- Complete alignment result table (diamond.out.smorfs.tsv / mmseqs.out.smorfs.tsv)
+- Complete alignment result table (alignment.out.smorfs.tsv)
 
   A file listing all the query hits of GMSC, from Diamond or MMseqs2.
 
@@ -281,7 +281,7 @@ The output folder will contain
 
 * `--tool`: Sequence alignment tool (Diamond / MMseqs). (default: diamond)
 
-*  `-s/--sensitivity`: Sensitivity. (default: --more-sensitive (Diamond) 5.7 (mmseqs))
+*  `-s/--sensitivity`: Sensitivity. (default: --sensitive (Diamond) 5.7 (mmseqs))
 
 * `--id`: Minimum identity to report an alignment (range 0.0-1.0). (default: 0.0)
 
