@@ -363,7 +363,7 @@ def translate_gene(args,tmpdir):
 def check_length(queryfile):
     from gmsc_mapper.fasta import fasta_iter
     logger.debug('Start length check...')
-    if all(len(seq) < 303
+    if all(len(seq) > 300
                 for _, seq in fasta_iter(queryfile)):
         logger.warning('GMSC-mapper Warning: Input sequences are all greater than 300bps.\n'
                        'Please check if your input consists of contigs, which should use -i not --nt-genes or --aa-genes as input. '
@@ -470,7 +470,7 @@ def generate_fasta(output,queryfile,resultfile):
 
     try:
         result = pd.read_csv(resultfile, sep='\t',header=None)
-    except:
+    except (FileNotFoundError, pd.errors.EmptyDataError):
         print('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
         logger.info('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
         return ("",False)
@@ -530,7 +530,8 @@ def domain(args,resultfile):
     return number
 
 def predicted_smorf_count(file_name):
-    return sum(1 for _ in open(file_name, 'rt'))
+    with open(file_name, 'rt') as f:
+        return sum(1 for _ in f)
 
 def main(args=None):
     if args is None:
@@ -632,7 +633,7 @@ def main(args=None):
                         ofile.write(f'{s}\n')		
 
             except Exception as e:
-                sys.stderr.write('GMGC-mapper Error: ')
+                sys.stderr.write('GMSC-mapper Error: ')
                 sys.stderr.write(str(e))
                 sys.stderr.write('\n')
                 sys.exit(1)		
