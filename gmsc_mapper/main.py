@@ -215,13 +215,31 @@ def _download_file(url, destdir):
                 f.write(chunk)
     logger.info(f'{basename} downloaded successfully.')
 
+def _download_xz_to_gz(url, destdir, dest_basename):
+    import lzma
+    import gzip
+    import requests
+    fname = os.path.join(destdir, dest_basename)
+    logger.info(f'Downloading {url.rsplit("/", 1)[-1]} and converting to {dest_basename}...')
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        decompressor = lzma.LZMADecompressor()
+        with gzip.open(fname, 'wb') as gzf:
+            for chunk in r.iter_content(chunk_size=8192):
+                try:
+                    gzf.write(decompressor.decompress(chunk))
+                except lzma.LZMAError:
+                    break
+    logger.info(f'{dest_basename} downloaded and converted successfully.')
+
 def download_db(args):
     from gmsc_mapper.utils import ask
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.faa.gz')):
         if args.all or ask("Download 90AA fasta file (~11G)?") == 'y':
-            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.faa.gz',
-                                args.dbdir)
+            _download_xz_to_gz('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.faa.xz',
+                                args.dbdir,
+                                'GMSC10.90AA.faa.gz')
         else:
             print('Skip downloading 90AA fasta file.')
     else:
