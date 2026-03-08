@@ -469,27 +469,34 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
     return resultfile
 
 def generate_fasta(output,queryfile,resultfile):
-    import pandas as pd
     from gmsc_mapper.fasta import fasta_iter
 
     try:
-        result = pd.read_csv(resultfile, sep='\t',header=None)
-    except (FileNotFoundError, pd.errors.EmptyDataError):
+        smorf_id = set()
+        with open(resultfile, "rt") as rfile:
+            for line in rfile:
+                line = line.rstrip("\n")
+                if not line:
+                    continue
+                smorf_id.add(line.split("\t", 1)[0])
+    except FileNotFoundError:
         print('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
         logger.info('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
         return ("",False)
-    else:
-        logger.debug('Start smORF fasta file generation...')
-        fastafile = path.join(output,"mapped.smorfs.faa")
+    if not smorf_id:
+        print('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
+        logger.info('GMSC-mapper info: There is no alignment results between your input sequences and GMSC.\n')
+        return ("",False)
 
-        smorf_id = set(result.iloc[:, 0].tolist())
-    
-        with open(fastafile,"wt") as f:
-            for ID,seq in fasta_iter(queryfile):
-                if ID in smorf_id:
-                    f.write(f'>{ID}\n{seq}\n')
-        logger.debug('smORF fasta file generation complete')
-        return (fastafile,True)
+    logger.debug('Start smORF fasta file generation...')
+    fastafile = path.join(output,"mapped.smorfs.faa")
+
+    with open(fastafile,"wt") as f:
+        for ID,seq in fasta_iter(queryfile):
+            if ID in smorf_id:
+                f.write(f'>{ID}\n{seq}\n')
+    logger.debug('smORF fasta file generation complete')
+    return (fastafile,True)
 
 def habitat(args,resultfile):
     from gmsc_mapper.map_habitat import smorf_habitat
