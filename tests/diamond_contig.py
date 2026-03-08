@@ -7,7 +7,7 @@ def checkf(f):
 
 ok = True
 
-if not checkf("predicted.filterd.smorf.faa"):
+if not checkf("predicted.filtered.smorf.faa"):
     ok = False
     print('\nContig input of Diamond mode predicted fasta results have something wrong.\n')
 

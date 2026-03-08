@@ -29,7 +29,7 @@ def test_diamond_contig(tmp_path):
         return filecmp.cmp(f"./tests/diamond_contig/{f}",
                             f"{outdir}/{f}")
 
-    if not checkf("predicted.filterd.smorf.faa"):
+    if not checkf("predicted.filtered.smorf.faa"):
         ok = False
         print('\nContig input of Diamond mode predicted fasta results have something wrong.\n')
 
