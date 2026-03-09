@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "GMSC-mapper"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Command line tool to query the Global Microbial smORFs Catalog (GMSC)"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -40,3 +40,6 @@ gmsc-mapper = "gmsc_mapper.main:main"
 
 [tool.setuptools.packages.find]
 include = ["gmsc_mapper*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "gmsc_mapper.gmsc_mapper_version.__version__"}

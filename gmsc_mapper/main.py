@@ -217,10 +217,11 @@ def validate_args(args,has_diamond,has_mmseqs):
 
 def _download_file(url, destdir):
     import requests
+    from gmsc_mapper.gmsc_mapper_version import __version__
     basename = url.rsplit('/', 1)[-1]
     fname = os.path.join(destdir, basename)
     logger.info(f'Downloading {basename}...')
-    with requests.get(url, stream=True) as r:
+    with requests.get(url, stream=True, headers={'User-Agent': f'GMSC-mapper {__version__}'}) as r:
         r.raise_for_status()
         with open(fname, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
@@ -231,11 +232,12 @@ def _download_xz_to_gz(url, destdir, dest_basename):
     import lzma
     import gzip
     import requests
+    from gmsc_mapper.gmsc_mapper_version import __version__
     fname = os.path.join(destdir, dest_basename)
     tmp_fname = fname + '.tmp'
     logger.info(f'Downloading {url.rsplit("/", 1)[-1]} and converting to {dest_basename}...')
     try:
-        with requests.get(url, stream=True) as r:
+        with requests.get(url, stream=True, headers={'User-Agent': f'GMSC-mapper {__version__}'}) as r:
             r.raise_for_status()
             decompressor = lzma.LZMADecompressor()
             with gzip.open(tmp_fname, 'wb') as gzf:
