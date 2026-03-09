@@ -1,4 +1,6 @@
 Unreleased
+
+Version 0.2.0 9 Mar 2026 by Luis Pedro Coelho
 	* Add `# GMSC-mapper version ...` comments to generated TSV outputs and
 	  `summary.txt`
 	* cli: Add `citation` subcommand to print the paper citation
