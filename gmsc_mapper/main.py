@@ -541,8 +541,8 @@ def domain(args,resultfile):
     return number
 
 def predicted_smorf_count(file_name):
-    with open(file_name, 'rt') as f:
-        return sum(1 for _ in f)
+    from gmsc_mapper.fasta import fasta_iter
+    return sum(1 for _ in fasta_iter(file_name))
 
 def main(args=None):
     if args is None:
@@ -592,7 +592,7 @@ def main(args=None):
                 if args.genome_fasta:
                     (queryfile,ifpredict) = predict(args,tmpdir)
                     if ifpredict:
-                        smorf_number = int(predicted_smorf_count(queryfile)/2)
+                        smorf_number = predicted_smorf_count(queryfile)
                         summary.append(f'{smorf_number} smORFs are predicted in total.')
                     else:
                         summary.append(f'No smORFs are predicted.')
@@ -618,7 +618,7 @@ def main(args=None):
 
                     (fastafile,ifsuccess) = generate_fasta(args.output,queryfile,resultfile)
                     if ifsuccess:
-                        smorf_number = int(predicted_smorf_count(fastafile)/2)
+                        smorf_number = predicted_smorf_count(fastafile)
                         summary.append(f'{smorf_number} smORFs are aligned against GMSC in total.\n')
 
                         if not args.noquality:
