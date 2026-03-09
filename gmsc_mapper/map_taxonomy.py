@@ -1,6 +1,9 @@
+import logging
 import numpy as np
 import pandas as pd
 from os import path
+
+logger = logging.getLogger('GMSC-mapper')
 
 def store_index(indexfile):
     index_tax = pd.read_csv(indexfile,
@@ -11,7 +14,7 @@ def store_index(indexfile):
     return index_tax_dict
 
 def smorf_taxonomy(index_tax_dict,taxfile,resultfile,tmpdirname):
-    print('Start taxonomy mapping...') 
+    logger.debug('Start taxonomy mapping...')
     tax = np.load(taxfile,mmap_mode='r')
     taxonomy_file = path.join(tmpdirname,"taxonomy.out.smorfs.tmp.tsv") 
 
@@ -38,7 +41,7 @@ def smorf_taxonomy(index_tax_dict,taxfile,resultfile,tmpdirname):
                   index=False,
                   header=False)
     
-    print('Finish taxonomy mapping.')
+    logger.debug('Finish taxonomy mapping.')
     return taxonomy_file
     
 def fixformat(x):
