@@ -1,4 +1,6 @@
 Unreleased
+	* Add `# GMSC-mapper version ...` comments to generated TSV outputs and
+	  `summary.txt`
 	* cli: Add `citation` subcommand to print the paper citation
 	* Download xz-compressed FASTA and convert to gzip on the fly
 	* Use requests library instead of wget for database downloads

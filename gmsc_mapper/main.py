@@ -395,6 +395,8 @@ def filter_length(queryfile,tmpdir,N):
     return filtered_file
 
 def mapdb_diamond(args,queryfile):
+    from gmsc_mapper.utils import prepend_version_comment
+
     logger.debug('Starting smORF mapping...')
 
     resultfile = path.join(args.output,"alignment.out.smorfs.tsv")
@@ -428,11 +430,14 @@ def mapdb_diamond(args,queryfile):
         diamond_cmd.append('--quiet')
 
     subprocess.check_call(diamond_cmd)
+    prepend_version_comment(resultfile)
 
     logger.info('smORF mapping complete')
     return resultfile
 
 def mapdb_mmseqs(args, queryfile, tmpdir):
+    from gmsc_mapper.utils import prepend_version_comment
+
     logger.info('Start smORF mapping...')
 
     querydb = path.join(tmpdir,"query.db")
@@ -466,6 +471,7 @@ def mapdb_mmseqs(args, queryfile, tmpdir):
         if args.quiet:
             mmseqs_cmd.extend(['-v', '0'])
         subprocess.check_call(mmseqs_cmd)
+    prepend_version_comment(resultfile)
 
     logger.info('smORF mapping complete')
     return resultfile
@@ -478,7 +484,7 @@ def generate_fasta(output,queryfile,resultfile):
         with open(resultfile, "rt") as rfile:
             for line in rfile:
                 line = line.rstrip("\n")
-                if not line:
+                if not line or line.startswith('#'):
                     continue
                 smorf_id.add(line.split("\t", 1)[0])
     except FileNotFoundError:
@@ -648,8 +654,9 @@ def main(args=None):
                     else:
                         summary.append(f'None of sequences are aligned against GMSC.\n')
                 
-                from atomicwrites import atomic_write
-                with atomic_write(f'{args.output}/summary.txt', overwrite=True) as ofile:
+                from gmsc_mapper.utils import open_output, write_version_comment
+                with open_output(f'{args.output}/summary.txt') as ofile:
+                    write_version_comment(ofile)
                     for s in summary:
                         print(s)
                         ofile.write(f'{s}\n')		

@@ -1,6 +1,7 @@
 from gmsc_mapper.map_domain import smorf_domain
 import pytest
-import os
+
+from conftest import VERSION_COMMENT
 
 known_domain = {"qseqid":"cdd",
                  "smORF_0":"197696",
@@ -12,6 +13,9 @@ def test_smorf_domain(tmp_path):
     smorf_domain('./tests/test_domain.txt',str(tmp_path),'./tests/alignment.tsv')
     with open(tmp_path / 'domain.out.smorfs.tsv',"rt") as f:
         for line in f:
+            if line.startswith('#'):
+                assert line.strip() == VERSION_COMMENT
+                continue
             qseqid,domain = line.split("\t")
             domain_dict[qseqid] = domain.strip()
     assert domain_dict == known_domain

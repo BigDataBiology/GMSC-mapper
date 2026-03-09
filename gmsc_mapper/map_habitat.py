@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from os import path
 
+from gmsc_mapper.utils import open_output, write_version_comment
+
 def fixdf(x):
     x = x.dropna()
     x = x.drop_duplicates()
@@ -26,7 +28,8 @@ def smorf_habitat(indexfile, outdir, habitatfile, resultfile):
 
     result = pd.read_csv(resultfile,
                          sep='\t',
-                         header=None)                       
+                         header=None,
+                         comment='#')
     result.rename({0: 'qseqid', 1: 'sseqid'},
                   axis=1,
                   inplace=True)
@@ -49,9 +52,11 @@ def smorf_habitat(indexfile, outdir, habitatfile, resultfile):
                             sort=False) 
     output = output.agg({'habitat':lambda x : fixdf(x)})
     output['habitat'] = output['habitat'].apply(lambda x: formatlabel(x))
-    output.to_csv(habitat_file,
-                  sep='\t',
-                  index=False)
+    with open_output(habitat_file) as out:
+        write_version_comment(out)
+        output.to_csv(out,
+                      sep='\t',
+                      index=False)
 
     wdf = output['habitat'].apply(lambda x: len(x.split(',')))
     number_dict = dict(wdf.value_counts())

@@ -1,6 +1,8 @@
 import pandas as pd
 from os import path
 
+from gmsc_mapper.utils import open_output, write_version_comment
+
 def fixdf(x):
     x = x.dropna()
     x = x.drop_duplicates()
@@ -22,7 +24,8 @@ def smorf_domain(cddfile, outdir, resultfile):
 
     result = pd.read_csv(resultfile,
                          sep='\t',
-                         header=None)                       
+                         header=None,
+                         comment='#')
     result.rename({0: 'qseqid', 1: 'sseqid'},
                   axis=1,
                   inplace=True)
@@ -43,9 +46,11 @@ def smorf_domain(cddfile, outdir, resultfile):
                             sort=False)
     output = output.agg({'cdd': fixdf})
     output['cdd'] = output['cdd'].apply(formatlabel)
-    output.to_csv(cdd_file,
-                  sep='\t',
-                  index=False)
+    with open_output(cdd_file) as out:
+        write_version_comment(out)
+        output.to_csv(out,
+                      sep='\t',
+                      index=False)
     
     annotated = output[output['cdd']!='']['cdd'].count()
     return annotated

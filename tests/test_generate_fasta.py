@@ -1,6 +1,8 @@
 from gmsc_mapper.main import generate_fasta
 import pytest
 
+from conftest import VERSION_COMMENT
+
 known_list = [">smORF_0","MVFVLLSEMYPTKVRGLAMSIAGFALWIGTYLIGQLTPWMLQNLTPAGTFFLFAVMCVPYMLIVWKLVPETTGKSLEEIERYWTRSEQ*",
               ">smORF_1","MTFSVAGINAQGTTVIEDAECVDVSYPNFYEQLQMLAGQ*",
               ">smORF_2","MDELTKMGARIQVDGRTAIITGVKLFTGADVSAPDLRAGAALVIAGLAADGYTTVSDIGYIYRGYEGFEKKIQNLGGDIQLVNSEKEIARFKLRIV*"]
@@ -30,6 +32,21 @@ def test_generate_fasta_empty_alignment(tmp_path):
     )
     assert fasta_file == ""
     assert not ifsuccess
+
+
+def test_generate_fasta_ignores_version_comment(tmp_path):
+    alignment = tmp_path / "alignment.tsv"
+    alignment.write_text(
+        f"{VERSION_COMMENT}\nsmORF_1\tref_1\n"
+    )
+
+    fasta_list = []
+    fasta_file, ifsuccess = generate_fasta(str(tmp_path), "./tests/test.faa", str(alignment))
+    with open(fasta_file, "rt") as f:
+        for line in f:
+            fasta_list.append(line.strip())
+    assert fasta_list == [">smORF_1", known_list[3]]
+    assert ifsuccess
 
 if __name__ == '__main__':
     pytest.main()

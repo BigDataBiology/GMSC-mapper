@@ -1,7 +1,22 @@
 import filecmp
 import sys
 
+from conftest import has_version_comment, read_text_without_version_comment
+
+versioned_outputs = {
+    "alignment.out.smorfs.tsv",
+    "habitat.out.smorfs.tsv",
+    "taxonomy.out.smorfs.tsv",
+    "quality.out.smorfs.tsv",
+    "domain.out.smorfs.tsv",
+    "summary.txt",
+}
+
 def checkf(f):
+    if f in versioned_outputs:
+        assert has_version_comment(f"./examples_output/{f}")
+        return read_text_without_version_comment(f"./tests/diamond_protein/{f}") == \
+            read_text_without_version_comment(f"./examples_output/{f}")
     return filecmp.cmp(f"./tests/diamond_protein/{f}",
                         f"./examples_output/{f}")
 
@@ -39,4 +54,3 @@ if ok:
     print('\nProtein input of Diamond mode checking has passed.\n')
 else:
     sys.exit(1)
-

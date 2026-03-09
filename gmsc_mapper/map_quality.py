@@ -2,6 +2,8 @@ import pandas as pd
 
 from os import path
 
+from gmsc_mapper.utils import open_output, write_version_comment
+
 
 def judgefunc(x):
     x = x.split(',')
@@ -14,7 +16,8 @@ def judgefunc(x):
 def smorf_quality(outdir:str, qualityfile:str, resultfile:str) -> tuple:
     result = pd.read_csv(resultfile,
                          sep='\t',
-                         header=None)
+                         header=None,
+                         comment='#')
     
     result = result.rename({0:'qseqid', 1:'sseqid'},
                            axis=1)
@@ -54,8 +57,10 @@ def smorf_quality(outdir:str, qualityfile:str, resultfile:str) -> tuple:
         number = 0
         percentage = 0
     
-    output.to_csv(quality_file,
-                  sep='\t',
-                  index=False)
+    with open_output(quality_file) as out:
+        write_version_comment(out)
+        output.to_csv(out,
+                      sep='\t',
+                      index=False)
     
     return (number, percentage)

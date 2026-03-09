@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import shutil
 
 @contextmanager
 def open_output(ofile, mode='wt'):
@@ -15,6 +16,37 @@ def open_output(ofile, mode='wt'):
 
         with atomic_write(ofile, mode=mode, overwrite=True) as out:
             yield out
+
+
+def version_comment(prefix='#'):
+    from gmsc_mapper.gmsc_mapper_version import __version__
+
+    return f'{prefix} GMSC-mapper version {__version__}'
+
+
+def write_version_comment(out, prefix='#'):
+    out.write(f'{version_comment(prefix)}\n')
+
+
+def prepend_version_comment(ofile, prefix='#'):
+    comment = f'{version_comment(prefix)}\n'
+    with open(ofile, 'rt') as src:
+        first = src.readline()
+        if first == comment:
+            return
+        try:
+            from atomicwrites import atomic_write
+        except ImportError:
+            remainder = first + src.read()
+            with open(ofile, 'wt') as out:
+                out.write(comment)
+                out.write(remainder)
+            return
+
+        with atomic_write(ofile, overwrite=True) as out:
+            out.write(comment)
+            out.write(first)
+            shutil.copyfileobj(src, out)
 
 def ask(string, valid_values=None, default=-1, case_sensitive=False):    
     """ Asks for a keyborad answer """

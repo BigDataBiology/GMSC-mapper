@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from os import path
 
+from gmsc_mapper.utils import open_output, write_version_comment
+
 logger = logging.getLogger('GMSC-mapper')
 
 def store_index(indexfile):
@@ -20,7 +22,8 @@ def smorf_taxonomy(index_tax_dict,taxfile,resultfile,tmpdirname):
 
     result =  pd.read_csv(resultfile,
                           sep="\t",
-                          header=None)
+                          header=None,
+                          comment='#')
     result.rename({0: 'qseqid', 1: 'sseqid'},
                   axis=1,
                   inplace=True)
@@ -107,15 +110,17 @@ def deep_lca(indexfile,taxfile, outdirname, resultfile, tmpdirname):
                             columns=['q_seqid',
                                      'taxonomy'])
     
-    lca_list.to_csv(taxonomy_dlca_file,
-                    sep='\t', 
-                    header=True, 
-                    index=None)
+    with open_output(taxonomy_dlca_file) as out:
+        write_version_comment(out)
+        lca_list.to_csv(out,
+                        sep='\t',
+                        header=True,
+                        index=None)
    
 def taxa_summary(outdir):
     taxonomy_dlca_file = path.join(outdir,"taxonomy.out.smorfs.tsv")
 
-    output = pd.read_csv(taxonomy_dlca_file, sep='\t')
+    output = pd.read_csv(taxonomy_dlca_file, sep='\t', comment='#')
 
     rank = {1:'kingdom',
             2:'phylum',

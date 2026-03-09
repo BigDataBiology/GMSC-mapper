@@ -1,6 +1,7 @@
 from gmsc_mapper.map_habitat import smorf_habitat
 import pytest
-import os
+
+from conftest import VERSION_COMMENT
 
 known_habitat = {"qseqid":"habitat",
                  "smORF_0":"soil",
@@ -12,6 +13,9 @@ def test_habitat(tmp_path):
     smorf_habitat('./tests/test_habitat_index.txt', str(tmp_path), './tests/test_habitat.npy', './tests/alignment.tsv')
     with open(tmp_path / 'habitat.out.smorfs.tsv',"rt") as f:
         for line in f:
+            if line.startswith('#'):
+                assert line.strip() == VERSION_COMMENT
+                continue
             qseqid,habitat = line.strip().split("\t")
             habitat_dict[qseqid] = habitat
     assert habitat_dict == known_habitat

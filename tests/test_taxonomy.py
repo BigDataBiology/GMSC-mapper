@@ -1,6 +1,7 @@
 from gmsc_mapper.map_taxonomy import store_index,smorf_taxonomy,deep_lca
 import pytest
-import os
+
+from conftest import VERSION_COMMENT
 
 known_mapped_taxonomy = ["smORF_0\t4\td__Bacteria",
                          "smORF_1\t3\tUnknown",
@@ -28,6 +29,9 @@ def test_deep_lca(tmp_path):
              str(tmp_path))
     with open(tmp_path / 'taxonomy.out.smorfs.tsv',"rt") as f:
         for line in f:
+            if line.startswith('#'):
+                assert line.strip() == VERSION_COMMENT
+                continue
             deep_lca_taxonomy.append(line.replace("\n",""))
     assert deep_lca_taxonomy == known_taxonomy
 
