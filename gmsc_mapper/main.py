@@ -297,6 +297,8 @@ def download_db(args):
     from gmsc_mapper.utils import ask
     quiet = args.quiet
 
+    os.makedirs(args.dbdir, exist_ok=True)
+
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.faa.gz')):
         if args.all or ask("Download 90AA fasta file (~11G)?") == 'y':
             _download_xz_to_gz('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.faa.xz',
