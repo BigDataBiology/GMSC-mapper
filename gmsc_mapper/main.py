@@ -348,6 +348,11 @@ def download_db(args):
     elif not quiet:
         print('Conserved domain index file already exists. Skip downloading conserved domain index file. Use -f to force download')
 
+    if not quiet:
+        print(f'\nNote: you probably want to run `gmsc-mapper createdb` to build the alignment database before mapping.\n'
+              f'For example:\n'
+              f'  gmsc-mapper createdb -i {args.dbdir}/GMSC10.90AA.faa.gz -o {args.dbdir} -m diamond')
+
 def create_db(args):
     from shutil import which
 
