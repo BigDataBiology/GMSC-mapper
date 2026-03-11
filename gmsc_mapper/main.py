@@ -38,6 +38,8 @@ def parse_args(args):
                                 help='Download all database')
     cmd_download_db.add_argument('-f', action="store_true", dest='force',
                                 help='Force download even if the files exist')
+    cmd_download_db.add_argument('--quiet', action='store_true', dest='quiet',
+                                help='Suppress progress output')
     
     cmd_create_db = subparsers.add_parser('createdb', 
                                           help='Create target database')
@@ -215,34 +217,66 @@ def validate_args(args,has_diamond,has_mmseqs):
     if not args.nodomain:
         expect_database(path.join(args.dbdir, "GMSC10.90AA.cdd.tsv.xz"))
 
-def _download_file(url, destdir):
+def _format_size(nbytes):
+    for unit in ['B', 'KB', 'MB', 'GB']:
+        if nbytes < 1024:
+            return f'{nbytes:.1f} {unit}'
+        nbytes /= 1024
+    return f'{nbytes:.1f} TB'
+
+def _download_file(url, destdir, quiet=False):
     import requests
     from gmsc_mapper.gmsc_mapper_version import __version__
     basename = url.rsplit('/', 1)[-1]
     fname = os.path.join(destdir, basename)
-    logger.info(f'Downloading {basename}...')
+    if not quiet:
+        sys.stderr.write(f'Downloading {basename}...')
+        sys.stderr.flush()
     with requests.get(url, stream=True, headers={'User-Agent': f'GMSC-mapper {__version__}'}) as r:
         r.raise_for_status()
+        total = int(r.headers.get('Content-Length', 0))
+        downloaded = 0
         with open(fname, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
-    logger.info(f'{basename} downloaded successfully.')
+                if not quiet:
+                    downloaded += len(chunk)
+                    if total:
+                        sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)} / {_format_size(total)}')
+                    else:
+                        sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)}')
+                    sys.stderr.flush()
+    if not quiet:
+        sys.stderr.write(f'\rDownloading {basename}... done.{" " * 20}\n')
+        sys.stderr.flush()
 
-def _download_xz_to_gz(url, destdir, dest_basename):
+def _download_xz_to_gz(url, destdir, dest_basename, quiet=False):
     import lzma
     import gzip
     import requests
     from gmsc_mapper.gmsc_mapper_version import __version__
+    basename = url.rsplit('/', 1)[-1]
     fname = os.path.join(destdir, dest_basename)
     tmp_fname = fname + '.tmp'
-    logger.info(f'Downloading {url.rsplit("/", 1)[-1]} and converting to {dest_basename}...')
+    if not quiet:
+        sys.stderr.write(f'Downloading {basename} (converting to {dest_basename})...')
+        sys.stderr.flush()
     try:
         with requests.get(url, stream=True, headers={'User-Agent': f'GMSC-mapper {__version__}'}) as r:
             r.raise_for_status()
+            total = int(r.headers.get('Content-Length', 0))
+            downloaded = 0
             decompressor = lzma.LZMADecompressor()
             with gzip.open(tmp_fname, 'wb') as gzf:
                 for chunk in r.iter_content(chunk_size=8192):
                     gzf.write(decompressor.decompress(chunk))
+                    if not quiet:
+                        downloaded += len(chunk)
+                        if total:
+                            sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)} / {_format_size(total)}')
+                        else:
+                            sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)}')
+                        sys.stderr.flush()
                     if decompressor.eof:
                         break
         os.rename(tmp_fname, fname)
@@ -250,59 +284,63 @@ def _download_xz_to_gz(url, destdir, dest_basename):
         if os.path.exists(tmp_fname):
             os.unlink(tmp_fname)
         raise
-    logger.info(f'{dest_basename} downloaded and converted successfully.')
+    if not quiet:
+        sys.stderr.write(f'\rDownloading {basename}... done.{" " * 20}\n')
+        sys.stderr.flush()
 
 def download_db(args):
     from gmsc_mapper.utils import ask
+    quiet = args.quiet
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.faa.gz')):
         if args.all or ask("Download 90AA fasta file (~11G)?") == 'y':
             _download_xz_to_gz('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.faa.xz',
                                 args.dbdir,
-                                'GMSC10.90AA.faa.gz')
-        else:
+                                'GMSC10.90AA.faa.gz',
+                                quiet=quiet)
+        elif not quiet:
             print('Skip downloading 90AA fasta file.')
-    else:
+    elif not quiet:
         print('90AA fasta file already exists. Skip downloading 90AA fasta file. Use -f to force download')
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.index.tsv')):
         if args.all or ask("Download habitat index file (~2.3G)?") == 'y':
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.npy',
-                                args.dbdir)
+                                args.dbdir, quiet=quiet)
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.index.tsv',
-                                args.dbdir)
-        else:
+                                args.dbdir, quiet=quiet)
+        elif not quiet:
             print('Skip downloading habitat index file.')
-    else:
+    elif not quiet:
         print('Habitat index file already exists. Skip downloading habitat index file. Use -f to force download')
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.index.tsv')):
         if args.all or ask("Download taxonomy index file (~2.3G)?") == 'y':
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.npy',
-                                args.dbdir)
+                                args.dbdir, quiet=quiet)
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.index.tsv',
-                                args.dbdir)
-        else:
+                                args.dbdir, quiet=quiet)
+        elif not quiet:
             print('Skip downloading taxonomy index file.')
-    else:
+    elif not quiet:
         print('Taxonomy index file already exists. Skip downloading taxonomy index file. Use -f to force download')
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.high_quality.tsv.xz')):
         if args.all or ask("Download quality index file (2.6M)?") == 'y':
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.high_quality.tsv.xz',
-                                args.dbdir)
-        else:
+                                args.dbdir, quiet=quiet)
+        elif not quiet:
             print('Skip downloading quality index file.')
-    else:
+    elif not quiet:
         print('Quality index file already exists. Skip downloading quality index file. Use -f to force download')
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.cdd.tsv.xz')):
         if args.all or ask("Download conserved domain index file (88M)?") == 'y':
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.cdd.tsv.xz',
-                                args.dbdir)
-        else:
+                                args.dbdir, quiet=quiet)
+        elif not quiet:
             print('Skip downloading conserved domain index file.')
-    else:
+    elif not quiet:
         print('Conserved domain index file already exists. Skip downloading conserved domain index file. Use -f to force download')
 
 def create_db(args):

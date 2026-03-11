@@ -1,4 +1,6 @@
 Unreleased
+	* downloaddb: Add download progress feedback (file size) to stderr
+	* downloaddb: Add --quiet flag to suppress progress output
 
 Version 0.2.0 9 Mar 2026 by Luis Pedro Coelho
 	* Add `# GMSC-mapper version ...` comments to generated TSV outputs and
