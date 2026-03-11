@@ -230,22 +230,25 @@ def _download_file(url, destdir, quiet=False):
     basename = url.rsplit('/', 1)[-1]
     fname = os.path.join(destdir, basename)
     if not quiet:
-        sys.stderr.write(f'Downloading {basename}...')
+        sys.stderr.write(f'Downloading {basename}...\n')
         sys.stderr.flush()
     with requests.get(url, stream=True, headers={'User-Agent': f'GMSC-mapper {__version__}'}) as r:
         r.raise_for_status()
         total = int(r.headers.get('Content-Length', 0))
         downloaded = 0
+        prev_shown = 0
         with open(fname, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
                 if not quiet:
                     downloaded += len(chunk)
-                    if total:
-                        sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)} / {_format_size(total)}')
-                    else:
-                        sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)}')
-                    sys.stderr.flush()
+                    if downloaded - prev_shown >= total // 100:
+                        prev_shown = downloaded
+                        if total:
+                            sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)} / {_format_size(total)}')
+                        else:
+                            sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)}')
+                        sys.stderr.flush()
     if not quiet:
         sys.stderr.write(f'\rDownloading {basename}... done.{" " * 20}\n')
         sys.stderr.flush()
@@ -259,19 +262,21 @@ def _download_xz_to_gz(url, destdir, dest_basename, quiet=False):
     fname = os.path.join(destdir, dest_basename)
     tmp_fname = fname + '.tmp'
     if not quiet:
-        sys.stderr.write(f'Downloading {basename} (converting to {dest_basename})...')
+        sys.stderr.write(f'Downloading {basename} (converting to {dest_basename})...\n')
         sys.stderr.flush()
     try:
         with requests.get(url, stream=True, headers={'User-Agent': f'GMSC-mapper {__version__}'}) as r:
             r.raise_for_status()
             total = int(r.headers.get('Content-Length', 0))
             downloaded = 0
+            prev_shown = 0
             decompressor = lzma.LZMADecompressor()
             with gzip.open(tmp_fname, 'wb') as gzf:
                 for chunk in r.iter_content(chunk_size=8192):
                     gzf.write(decompressor.decompress(chunk))
-                    if not quiet:
-                        downloaded += len(chunk)
+                    downloaded += len(chunk)
+                    if not quiet and (downloaded - prev_shown) >= total // 100:
+                        prev_shown = downloaded
                         if total:
                             sys.stderr.write(f'\rDownloading {basename}... {_format_size(downloaded)} / {_format_size(total)}')
                         else:
