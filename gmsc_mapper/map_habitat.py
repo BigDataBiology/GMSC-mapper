@@ -15,13 +15,13 @@ def formatlabel(x):
     x = sorted(x)
     return ','.join(x)
 
-def store_index(indexfile): 
+def load_index_to_habitat(indexfile):
     index_habitat = pd.read_csv(indexfile,
                                 sep='\t',
                                 header=None,
                                 names=['index','habitat'])
-    index_habitat_dict = index_habitat['habitat'].to_dict()
-    return index_habitat_dict
+    return index_habitat['habitat'].to_dict()
+
 
 def smorf_habitat(indexfile, outdir, habitatfile, resultfile):
     habitat_file = path.join(outdir, "habitat.out.smorfs.tsv")	
@@ -36,7 +36,7 @@ def smorf_habitat(indexfile, outdir, habitatfile, resultfile):
     result['sseqid'] = result['sseqid'].apply(lambda x: int(x.split('.')[2].replace('_','')))
     mapped_sseqid = result['sseqid'].to_list()
 
-    index_habitat_dict = store_index(indexfile)
+    index_habitat_dict = load_index_to_habitat(indexfile)
 
     habitat = np.load(habitatfile,mmap_mode='r')
 
