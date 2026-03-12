@@ -1,4 +1,6 @@
 Unreleased
+	* downloaddb: Download habitat/taxonomy `.npy.xz` files and decompress
+	  them on the fly
 
 Version 0.2.0 11 Mar 2026 by Luis Pedro Coelho
 	* Add `# GMSC-mapper version ...` comments to generated TSV outputs and

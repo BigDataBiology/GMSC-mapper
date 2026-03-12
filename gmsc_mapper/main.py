@@ -253,16 +253,17 @@ def _download_file(url, destdir, quiet=False):
         sys.stderr.write(f'\rDownloading {basename}... done.{" " * 20}\n')
         sys.stderr.flush()
 
-def _download_xz_to_gz(url, destdir, dest_basename, quiet=False):
+def _download_xz(url, destdir, dest_basename, quiet=False, open_dest=open, description=None):
     import lzma
-    import gzip
     import requests
     from gmsc_mapper.gmsc_mapper_version import __version__
     basename = url.rsplit('/', 1)[-1]
     fname = os.path.join(destdir, dest_basename)
     tmp_fname = fname + '.tmp'
     if not quiet:
-        sys.stderr.write(f'Downloading {basename} (converting to {dest_basename})...\n')
+        if description is None:
+            description = f'Downloading {basename}...'
+        sys.stderr.write(f'{description}\n')
         sys.stderr.flush()
     try:
         with requests.get(url, stream=True, headers={'User-Agent': f'GMSC-mapper {__version__}'}) as r:
@@ -271,9 +272,9 @@ def _download_xz_to_gz(url, destdir, dest_basename, quiet=False):
             downloaded = 0
             prev_shown = 0
             decompressor = lzma.LZMADecompressor()
-            with gzip.open(tmp_fname, 'wb') as gzf:
+            with open_dest(tmp_fname, 'wb') as outf:
                 for chunk in r.iter_content(chunk_size=8192):
-                    gzf.write(decompressor.decompress(chunk))
+                    outf.write(decompressor.decompress(chunk))
                     downloaded += len(chunk)
                     if not quiet and (downloaded - prev_shown) >= total // 100:
                         prev_shown = downloaded
@@ -292,6 +293,15 @@ def _download_xz_to_gz(url, destdir, dest_basename, quiet=False):
     if not quiet:
         sys.stderr.write(f'\rDownloading {basename}... done.{" " * 20}\n')
         sys.stderr.flush()
+
+def _download_xz_to_gz(url, destdir, dest_basename, quiet=False):
+    import gzip
+    _download_xz(url,
+                 destdir,
+                 dest_basename,
+                 quiet=quiet,
+                 open_dest=gzip.open,
+                 description=f'Downloading {url.rsplit("/", 1)[-1]} (converting to {dest_basename})...')
 
 def download_db(args):
     from gmsc_mapper.utils import ask
@@ -312,8 +322,10 @@ def download_db(args):
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.index.tsv')):
         if args.all or ask("Download habitat index file (~2.3G)?") == 'y':
-            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.npy',
-                                args.dbdir, quiet=quiet)
+            _download_xz('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.npy.xz',
+                                args.dbdir,
+                                'GMSC10.90AA.habitat.npy',
+                                quiet=quiet)
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.index.tsv',
                                 args.dbdir, quiet=quiet)
         elif not quiet:
@@ -323,8 +335,10 @@ def download_db(args):
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.index.tsv')):
         if args.all or ask("Download taxonomy index file (~2.3G)?") == 'y':
-            _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.npy',
-                                args.dbdir, quiet=quiet)
+            _download_xz('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.npy.xz',
+                                args.dbdir,
+                                'GMSC10.90AA.taxonomy.npy',
+                                quiet=quiet)
             _download_file('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.index.tsv',
                                 args.dbdir, quiet=quiet)
         elif not quiet:
