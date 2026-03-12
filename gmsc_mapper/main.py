@@ -321,7 +321,7 @@ def download_db(args):
         print('90AA fasta file already exists. Skip downloading 90AA fasta file. Use -f to force download')
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.habitat.index.tsv')):
-        if args.all or ask("Download habitat index file (~2.3G)?") == 'y':
+        if args.all or ask("Download habitat index file (214M download, 2.3G on disk)?") == 'y':
             _download_xz('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.habitat.npy.xz',
                                 args.dbdir,
                                 'GMSC10.90AA.habitat.npy',
@@ -334,7 +334,7 @@ def download_db(args):
         print('Habitat index file already exists. Skip downloading habitat index file. Use -f to force download')
 
     if args.force or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.npy')) or not os.path.exists(os.path.join(args.dbdir,'GMSC10.90AA.taxonomy.index.tsv')):
-        if args.all or ask("Download taxonomy index file (~2.3G)?") == 'y':
+        if args.all or ask("Download taxonomy index file (387M download, 2.3G on disk)?") == 'y':
             _download_xz('https://gmsc-api.big-data-biology.org/files/GMSC10.90AA.taxonomy.npy.xz',
                                 args.dbdir,
                                 'GMSC10.90AA.taxonomy.npy',
