@@ -1,9 +1,6 @@
 Unreleased
-	* downloaddb: Add download progress feedback (file size) to stderr
-	* downloaddb: Add --quiet flag to suppress progress output
-	* downloaddb: Hint to run `createdb` after downloading
 
-Version 0.2.0 9 Mar 2026 by Luis Pedro Coelho
+Version 0.2.0 11 Mar 2026 by Luis Pedro Coelho
 	* Add `# GMSC-mapper version ...` comments to generated TSV outputs and
 	  `summary.txt`
 	* cli: Add `citation` subcommand to print the paper citation
@@ -21,6 +18,9 @@ Version 0.2.0 9 Mar 2026 by Luis Pedro Coelho
 	* Fix overly broad exception handling in generate_fasta()
 	* Fix resource leak in predicted_smorf_count()
 	* Convert project packaging from setup.py to pyproject.toml
+	* downloaddb: Add download progress feedback (file size) to stderr (except
+	when --quiet is used)
+	* downloaddb: Hint to run `createdb` after downloading
 	* Internal: update testing to use uv
 	* Internal: test in newer versions of Python
 	* Internal: use tmp_path fixture in tests
