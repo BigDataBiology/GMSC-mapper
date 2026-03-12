@@ -6,6 +6,7 @@
   `summary.txt`
 * Add a `citation` subcommand to print the paper citation
 * Download xz-compressed FASTA and convert to gzip on the fly
+* Similarly, download compress habitat/taxonomy files and decompress them to disk (saving download time)
 * Use the `requests` library instead of `wget` for database downloads
 * Remove auto-download/install of DIAMOND and MMseqs; show an error if the
   tools are not installed

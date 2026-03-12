@@ -1,7 +1,3 @@
-Unreleased
-	* downloaddb: Download habitat/taxonomy `.npy.xz` files and decompress
-	  them on the fly
-
 Version 0.2.0 11 Mar 2026 by Luis Pedro Coelho
 	* Add `# GMSC-mapper version ...` comments to generated TSV outputs and
 	  `summary.txt`
@@ -23,6 +19,8 @@ Version 0.2.0 11 Mar 2026 by Luis Pedro Coelho
 	* downloaddb: Add download progress feedback (file size) to stderr (except
 	when --quiet is used)
 	* downloaddb: Hint to run `createdb` after downloading
+	* downloaddb: Download compress habitat/taxonomy files and decompress them
+	on the fly
 	* Internal: update testing to use uv
 	* Internal: test in newer versions of Python
 	* Internal: use tmp_path fixture in tests
