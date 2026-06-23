@@ -29,7 +29,7 @@ def parse_args(args):
     cmd_download_db = subparsers.add_parser('downloaddb', 
                                           help='Download target database')
     
-    cmd_download_db.add_argument('--dbdir',
+    cmd_download_db.add_argument('--dbdir', '--db-dir',
                                required=False,
                                help='Path to the database files.',
                                dest='dbdir',
